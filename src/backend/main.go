@@ -1,13 +1,29 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"time"
+)
+
+func hi(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hi there!")
+
+}
 
 func main() {
-	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
-	r.Run() // 监听并在 0.0.0.0:8080 上启动服务
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", hi)
+
+	myServer := &http.Server{
+		Addr:         ":8081",
+		Handler:      mux,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
+
+	if err := myServer.ListenAndServe(); err != nil {
+		log.Fatal(err)
+	}
 }
