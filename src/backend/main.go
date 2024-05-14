@@ -7,14 +7,33 @@ import (
 	"time"
 )
 
-func hi(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hi there!")
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := fmt.Fprintf(w, "处理器: %s\n", "indexHandler")
+	if err != nil {
+		return
+	}
+
+}
+func hiHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := fmt.Fprintf(w, "处理器: %s\n", "hiHandler")
+	if err != nil {
+		return
+	}
+
+}
+func webHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := fmt.Fprintf(w, "处理器: %s\n", "webHandler")
+	if err != nil {
+		return
+	}
 
 }
 
 func main() {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", hi)
+	mux.HandleFunc("/", indexHandler)
+	mux.HandleFunc("/hi", hiHandler)
+	mux.HandleFunc("/hi/web", webHandler)
 
 	myServer := &http.Server{
 		Addr:         ":8081",
