@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <div class="login-card shadow-lg">
-      <h2 class="text-center mb-4">Welcome</h2>
+      <h1 class="text-center mb-4">Welcome</h1>
       <form @submit.prevent="handleLogin">
         <div class="form-floating mb-3 text-center">
           <div><label for="email">Email address</label></div>
@@ -11,7 +11,6 @@
               class="form-control text-center"
               id="email"
               v-model="email"
-              placeholder="name@example.com"
               required
           />
         </div>
@@ -24,7 +23,6 @@
               class="form-control text-center"
               id="password"
               v-model="password"
-              placeholder="Password"
               required
           />
         </div>
@@ -39,6 +37,9 @@
           <span v-if="isLoading">Logging in...</span>
         </button>
       </form>
+    </div>
+    <div class="circle-button-container">
+      <van-button round type="success" color="#7232dd" to="about">about US</van-button>
     </div>
   </div>
 </template>
@@ -105,6 +106,11 @@ const handleLogin = async () => {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: none;
   font-size: 1.5rem; /* 调整这个值以设置所需的字号 */
+  color: white; /* 设置文字颜色为白色 */
+  padding: 10px 20px; /* 添加一些内边距，使按钮更大一些 */
+  border-radius: 5px; /* 添加圆角 */
+  cursor: pointer; /* 鼠标悬停时显示指针 */
+  transition: background 0.3s ease; /* 平滑过渡效果 */
 }
 
 .btn-primary:focus, .btn-primary:hover {
@@ -121,5 +127,11 @@ const handleLogin = async () => {
 .form-control {
   text-align: center;
   font-size: 1.5rem; /* 调整这个值以设置所需的字号 */
+}
+
+.circle-button-container {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
 }
 </style>
