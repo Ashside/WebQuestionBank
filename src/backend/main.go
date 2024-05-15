@@ -1,74 +1,48 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
+	"time"
 )
 
-var db = make(map[string]string)
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := fmt.Fprintf(w, "处理器: %s\n", "indexHandler")
+	if err != nil {
+		return
+	}
 
-func setupRouter() *gin.Engine {
-	// Disable Console Color
-	// gin.DisableConsoleColor()
-	r := gin.Default()
+}
+func hiHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := fmt.Fprintf(w, "处理器: %s\n", "hiHandler")
+	if err != nil {
+		return
+	}
 
-	// Ping test
-	r.GET("/ping", func(c *gin.Context) {
-		c.String(http.StatusOK, "pong")
-	})
+}
+func webHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := fmt.Fprintf(w, "处理器: %s\n", "webHandler")
+	if err != nil {
+		return
+	}
 
-	// Get user value
-	r.GET("/user/:name", func(c *gin.Context) {
-		user := c.Params.ByName("name")
-		value, ok := db[user]
-		if ok {
-			c.JSON(http.StatusOK, gin.H{"user": user, "value": value})
-		} else {
-			c.JSON(http.StatusOK, gin.H{"user": user, "status": "no value"})
-		}
-	})
-
-	// Authorized group (uses gin.BasicAuth() middleware)
-	// Same than:
-	// authorized := r.Group("/")
-	// authorized.Use(gin.BasicAuth(gin.Credentials{
-	//	  "foo":  "bar",
-	//	  "manu": "123",
-	//}))
-	authorized := r.Group("/", gin.BasicAuth(gin.Accounts{
-		"foo":  "bar", // user:foo password:bar
-		"manu": "123", // user:manu password:123
-	}))
-
-	/* example curl for /admin with basicauth header
-	   Zm9vOmJhcg== is base64("foo:bar")
-
-		curl -X POST \
-	  	http://localhost:8080/admin \
-	  	-H 'authorization: Basic Zm9vOmJhcg==' \
-	  	-H 'content-type: application/json' \
-	  	-d '{"value":"bar"}'
-	*/
-	authorized.POST("admin", func(c *gin.Context) {
-		user := c.MustGet(gin.AuthUserKey).(string)
-
-		// Parse JSON
-		var json struct {
-			Value string `json:"value" binding:"required"`
-		}
-
-		if c.Bind(&json) == nil {
-			db[user] = json.Value
-			c.JSON(http.StatusOK, gin.H{"status": "ok"})
-		}
-	})
-
-	return r
 }
 
 func main() {
-	r := setupRouter()
-	// Listen and Server in 0.0.0.0:8080
-	r.Run(":8080")
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", indexHandler)
+	mux.HandleFunc("/hi", hiHandler)
+	mux.HandleFunc("/hi/web", webHandler)
+
+	myServer := &http.Server{
+		Addr:         ":8081",
+		Handler:      mux,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
+
+	if err := myServer.ListenAndServe(); err != nil {
+		log.Fatal(err)
+	}
 }
