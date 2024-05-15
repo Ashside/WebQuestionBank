@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/api"
 	"log"
 	"net/http"
 	"time"
@@ -32,8 +33,8 @@ func webHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", indexHandler)
-	mux.HandleFunc("/hi", hiHandler)
-	mux.HandleFunc("/hi/web", webHandler)
+	mux.HandleFunc("/api/loginCheck", api.LoginHandler)
+	mux.HandleFunc("/api/registerCheck", api.RegisterHandler)
 
 	myServer := &http.Server{
 		Addr:         ":8081",
