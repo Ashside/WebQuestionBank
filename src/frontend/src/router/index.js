@@ -13,6 +13,10 @@ const routes = [
         component: () => import('@/views/AboutVue.vue')
     },
     {
+        path: '/loadQuestion',
+        component: () => import('@/views/LoadQuestion.vue')
+    },
+    {
         path: '/:pathMatch(.*)*',
         component: () => import('@/views/NotFound.vue')
     }

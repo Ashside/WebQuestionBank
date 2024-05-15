@@ -1,4 +1,5 @@
-<template>
+<template style="height: 100%">
+  <div style="min-height: 100%" class="background">
     <div class="container">
       <h1>About Us</h1>
       <p>Welcome to <span class="highlight">Our Company</span>! We are a team of passionate individuals dedicated to excellence.</p>
@@ -23,6 +24,7 @@
         <p>Emily is a storyteller at heart, crafting compelling narratives.</p>
       </div>
   </div>
+  </div>
 </template>
 
 <script>
@@ -32,10 +34,10 @@
 </script>
 
 <style scoped>
-  body {
+  html, body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
     margin: 0;
+    height: 100%;
     padding: 0;
   }
   .container {
@@ -45,6 +47,8 @@
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    /* 设置背景颜色及透明度 */
+    background-color: rgba(255, 255, 255, 0.7); /* 0.5表示50%的透明度 */
   }
   h1 {
     color: #333;
@@ -76,5 +80,15 @@
   .team-member p {
     margin: 0;
     color: #666;
+  }
+  .background {
+    /* 设置背景图片的URL */
+    background-image: url("../../public/aboutUs.png");
+    /* 设置背景图片的大小和行为 */
+    background-size: cover; /* 使背景图片充满整个容器 */
+    background-repeat: no-repeat; /* 防止背景图片重复 */
+    /* 可选：添加其他样式，如背景颜色、高度等 */
+    min-height: 100vh;
+    margin: 0;
   }
 </style>

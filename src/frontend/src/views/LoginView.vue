@@ -79,6 +79,20 @@ const handleLogin = async () => {
   justify-content: center;
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  position: relative; /* Add this to make the pseudo-element position relative to the container */
+}
+
+/* Add the following styles for the pseudo-element */
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 200%;
+  height: 100%;
+  background-size: contain; /* Ensure the background images are contained within the element */
+  z-index: -1;
+  transform: translateX(-50%) skewX(-20deg);
 }
 
 .login-card {
