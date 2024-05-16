@@ -5,8 +5,14 @@ import router from './router'; // 引入路由文件
 import { Button } from 'vant';
 // 2. 引入组件样式
 import 'vant/lib/index.css';
+import { BackTop } from "vant";
+import { ActionBar, ActionBarIcon, ActionBarButton } from 'vant';
 
 createApp(App)
     .use(router)
     .use(Button)
+    .use(BackTop)
+    .use(ActionBar)
+    .use(ActionBarIcon)
+    .use(ActionBarButton)
     .mount('#app');

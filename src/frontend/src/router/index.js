@@ -17,6 +17,10 @@ const routes = [
         component: () => import('@/views/LoadQuestion.vue')
     },
     {
+        path: '/home',
+        component: () => import('@/views/HomeVue.vue')
+    },
+    {
         path: '/:pathMatch(.*)*',
         component: () => import('@/views/NotFound.vue')
     }
