@@ -1,13 +1,50 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
+	"github.com/api"
+	"log"
+	"net/http"
+	"time"
+)
+
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := fmt.Fprintf(w, "处理器: %s\n", "indexHandler")
+	if err != nil {
+		return
+	}
+
+}
+func hiHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := fmt.Fprintf(w, "处理器: %s\n", "hiHandler")
+	if err != nil {
+		return
+	}
+
+}
+func webHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := fmt.Fprintf(w, "处理器: %s\n", "webHandler")
+	if err != nil {
+		return
+	}
+
+}
 
 func main() {
-	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
-	r.Run() // 监听并在 0.0.0.0:8080 上启动服务
+	fmt.Println("Server is running...")
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", indexHandler)
+	mux.HandleFunc("/api/loginCheck", api.LoginHandler)
+	mux.HandleFunc("/api/registerCheck", api.RegisterHandler)
+
+	myServer := &http.Server{
+		Addr:         ":8081",
+		Handler:      mux,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
+
+	if err := myServer.ListenAndServe(); err != nil {
+		log.Fatal(err)
+	}
 }

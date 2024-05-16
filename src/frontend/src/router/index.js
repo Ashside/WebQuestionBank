@@ -6,11 +6,19 @@ import {createRouter, createWebHistory} from 'vue-router'
 const routes = [
     {
         path: '/',
-        component: () => import('@/views/HomeVue.vue')
+        component: () => import('@/views/LoginView.vue')
     },
     {
         path: '/about',
         component: () => import('@/views/AboutVue.vue')
+    },
+    {
+        path: '/loadQuestion',
+        component: () => import('@/views/LoadQuestion.vue')
+    },
+    {
+        path: '/home',
+        component: () => import('@/views/HomeVue.vue')
     },
     {
         path: '/:pathMatch(.*)*',
