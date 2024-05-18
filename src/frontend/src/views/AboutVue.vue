@@ -1,4 +1,5 @@
 <template style="height: 100%">
+  <NavigateBar></NavigateBar>
   <div style="min-height: 100%" class="background">
     <div class="container">
       <h1>About Us</h1>
@@ -28,8 +29,11 @@
 </template>
 
 <script>
+import NavigateBar from "@/components/NavigateBar.vue";
+
   export default {
-    name: 'AboutUs'
+    name: 'AboutUs',
+    components: {NavigateBar}
   };
 </script>
 

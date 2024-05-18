@@ -3,22 +3,42 @@
   <div class="home">
     <h1>Welcome to Home!</h1>
     <p>This is the Home view.</p>
-    <div>
+    <div class="card-container">
+      <CustomCard title="测试卡片1" cover="/aboutUs.png"></CustomCard>
+      <CustomCard title="测试卡片2" cover="/aboutUs.png"></CustomCard>
+      <CustomCard title="测试卡片3" cover="/aboutUs.png"></CustomCard>
+      <!-- 可以根据需要添加更多卡片 -->
     </div>
   </div>
 </template>
 
 <script>
 import NavigateBar from "@/components/NavigateBar.vue";
+import CustomCard from "@/components/CustomCard.vue";
 
 export default {
   name: 'HomeVue',
-  components: {Navigate: NavigateBar}
+  components: {
+    CustomCard,
+    Navigate: NavigateBar
+  }
 };
 </script>
 
 <style scoped>
 .home {
   text-align: center;
+}
+
+.card-container {
+  display: flex;
+  justify-content: center;
+  gap: 16px; /* 卡片之间的间距 */
+  flex-wrap: wrap; /* 当空间不足时，换行排列 */
+}
+
+.card-container > * {
+  flex: 1;
+  min-width: 200px; /* 每个卡片的最小宽度 */
 }
 </style>

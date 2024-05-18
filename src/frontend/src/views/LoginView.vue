@@ -56,7 +56,7 @@ const isLoading = ref(false);
 const handleLogin = async () => {
   isLoading.value = true;
   try {
-    const response = await axios.post('http://localhost:3000/api/login', {
+    const response = await axios.post('http://localhost:8081/api/usr/login', {
       email: email.value,
       password: password.value,
     });

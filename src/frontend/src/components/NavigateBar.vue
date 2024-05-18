@@ -21,7 +21,7 @@ export default {
       type: Array,
       required: true,
       default: () => [
-        { text: 'Home', link: '/', icon: 'fas fa-home' },
+        { text: 'Home', link: '/home', icon: 'fas fa-home' },
         { text: 'About', link: '/about', icon: 'fas fa-user' },
         { text: 'Services', link: '/services', icon: 'fas fa-cog' },
         { text: 'Contact', link: '/contact', icon: 'fas fa-envelope' },
@@ -38,9 +38,11 @@ export default {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap');
+
 .navigate {
-  background: #1e1e1e;
-  padding: 10px 20px;
+  background-image: linear-gradient(to right, #333333, #5a6268);
+  padding: 1px 20px;
 }
 
 .navigate ul {
@@ -64,10 +66,12 @@ export default {
   text-decoration: none;
   padding: 10px;
   transition: color 0.3s ease;
+  font-family: 'Dancing Script', cursive; /* 设置花体字体 */
+  font-size: 1.5em;
 }
 
 .navigate a:hover {
-  color: yellow;
+  color: #d4edda;
 }
 
 .navigate span {
