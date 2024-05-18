@@ -2,7 +2,10 @@ module backend
 
 go 1.22.1
 
-require github.com/gin-gonic/gin v1.10.0
+require (
+	github.com/api v0.0.0-00010101000000-000000000000
+	github.com/gin-gonic/gin v1.10.0
+)
 
 require (
 	github.com/bytedance/sonic v1.11.6 // indirect
