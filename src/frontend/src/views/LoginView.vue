@@ -58,7 +58,11 @@ const handleLogin = async () => {
   try {
     const response = await axios.post('http://localhost:8081/api/usr/login', {
       email: email.value,
-      password: password.value,
+      password: password.value},
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      }
     });
     alert('Logged in successfully!');
     if (response.status === 200) {
