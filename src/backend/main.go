@@ -1,23 +1,41 @@
 package main
 
-import "github.com/gin-gonic/gin"
-import "github.com/api"
+import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
 
+func corsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusOK)
+			return
+		}
+
+		c.Next()
+	}
+}
 func main() {
 
-	router := gin.Default()
+	r := gin.Default()
+	r.Use(corsMiddleware())
+	r.OPTIONS("/api/usr/login", func(c *gin.Context) {
 
-	// 创建api路由组
-	api_group := router.Group("/api_group")
+		fmt.Println("Request Headers: ", c.Request.Header)
+		fmt.Println("Request Body: ", c.Request.Body)
+		c.JSON(200, gin.H{"message": "Options Request!"})
 
-	// 在api路由组下创建usr路由组
-	usr := api_group.Group("/usr")
+	})
+	r.POST("/api/usr/login", func(c *gin.Context) {
+		fmt.Println("Request Headers: ", c.Request.Header)
+		fmt.Println("Request Body: ", c.Request.Body)
+		c.JSON(200, gin.H{"message": "Post Request!"})
+	})
 
-	// 在usr路由组下创建loginCheck路由
-	usr.POST("/loginCheck", api.LoginCheckPost)
-
-	err := router.Run(":8081")
-	if err != nil {
-		return
-	}
+	r.Run(":8081")
 }
