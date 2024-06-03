@@ -3,17 +3,15 @@ package api
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func LoginCheckPost(context *gin.Context) {
 
-	// 获取POST请求参数
-
-	// 获取POST请求参数中的username
+	types := context.DefaultPostForm("type", "post")
 	email := context.PostForm("email")
 	password := context.PostForm("password")
 
-	fmt.Println("email: ", email)
-	fmt.Println("password: ", password)
+	context.String(http.StatusOK, fmt.Sprintf("username:%s , password:%s , types:%s", email, password, types))
 
 }
