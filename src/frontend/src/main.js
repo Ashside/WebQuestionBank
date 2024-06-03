@@ -7,11 +7,9 @@ import { Button } from 'vant';
 import 'vant/lib/index.css';
 import { BackTop } from "vant";
 import { ActionBar, ActionBarIcon, ActionBarButton } from 'vant';
-import { create, NCard } from "naive-ui";
+import naive from "naive-ui";
 
-const naive = create({
-    components: [NCard]
-})
+
 
 createApp(App)
     .use(router)

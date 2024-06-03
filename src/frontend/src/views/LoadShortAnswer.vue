@@ -1,10 +1,20 @@
 <template>
+  <NavigateBar/>
   <div>
     <div>
-      <markdown-editor title="Question"></markdown-editor>
+      <center>
+        <h1>Question Difficulty</h1>
+        <DifficultySelector v-model:difficulty="difficulty" />
+      </center>
     </div>
     <div>
-      <markdown-editor title="Answer"></markdown-editor>
+      <markdown-editor title="Question" v-model="question"></markdown-editor>
+    </div>
+    <div>
+      <markdown-editor title="Answer" v-model="answer"></markdown-editor>
+    </div>
+    <div class="submit-button-container">
+      <button class="submit-button" @click="handleSubmit">Submit</button>
     </div>
   </div>
   <van-back-top />
@@ -12,14 +22,75 @@
 
 <script>
 import MarkdownEditor from '@/components/MarkdownEditor.vue';
+import DifficultySelector from "@/components/DifficultySelector.vue";
+import NavigateBar from "@/components/NavigateBar.vue";
+import axios from 'axios';
+import router from "@/router";
 
 export default {
   components: {
-    MarkdownEditor
+    DifficultySelector,
+    MarkdownEditor,
+    NavigateBar
   },
-  setup() {
-    const list = [...Array(50).keys()];
-    return { list };
+  data() {
+    return {
+      question: '',
+      answer: '',
+      difficulty: 2 // 默认难度
+    };
+  },
+  methods: {
+    async handleSubmit() {
+      const payload = {
+        question: this.question,
+        answer: this.answer,
+        difficulty: this.difficulty
+      };
+      try {
+        const response = await axios.post('http://localhost:8081/api/question_bank/addQuestion/simpleAnswer', payload);
+        console.log('Data submitted successfully:', response.data);
+        if (response.status === 200 && response.data.success) {
+          router.push('/home');
+        }
+      } catch (error) {
+        console.error('Error submitting data:', error);
+      }
+    }
   }
 };
 </script>
+
+<style scoped>
+.submit-button-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.submit-button {
+  background: linear-gradient(45deg, #f39c12, #e74c3c);
+  border: none;
+  border-radius: 25px;
+  color: white;
+  padding: 10px 20px;
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.submit-button:hover {
+  background: linear-gradient(45deg, #e67e22, #d35400);
+  transform: scale(1.05);
+}
+
+.submit-button:active {
+  transform: scale(0.95);
+}
+
+.submit-button:focus {
+  outline: none;
+}
+</style>
