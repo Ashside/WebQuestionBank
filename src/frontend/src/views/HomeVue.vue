@@ -4,7 +4,7 @@
     <h1>Welcome to Home!</h1>
     <p>This is the Home view.</p>
     <div class="card-container">
-      <CustomCard title="测试卡片1" cover="/aboutUs.png"></CustomCard>
+      <CustomCard title="录入简答题" cover="/simple_answer.png" @card-click="navigateTo('LoadQuestion/shortAnswer')"></CustomCard>
       <CustomCard title="测试卡片2" cover="/aboutUs.png"></CustomCard>
       <CustomCard title="测试卡片3" cover="/aboutUs.png"></CustomCard>
       <!-- 可以根据需要添加更多卡片 -->
@@ -15,12 +15,24 @@
 <script>
 import NavigateBar from "@/components/NavigateBar.vue";
 import CustomCard from "@/components/CustomCard.vue";
+import {useRouter} from "vue-router";
 
 export default {
   name: 'HomeVue',
   components: {
     CustomCard,
     Navigate: NavigateBar
+  },
+  setup() {
+    const router = useRouter();
+
+    const navigateTo = (path) => {
+      router.push({ path });
+    };
+
+    return {
+      navigateTo
+    };
   }
 };
 </script>

@@ -65,7 +65,7 @@ const handleLogin = async () => {
       }
     });
     alert('Logged in successfully!');
-    if (response.status === 200) {
+    if (response.status === 200 && response.data.success) {
       router.push('/about');
     }
   } catch (error) {

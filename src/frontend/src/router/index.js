@@ -14,7 +14,14 @@ const routes = [
     },
     {
         path: '/loadQuestion',
-        component: () => import('@/views/LoadQuestion.vue')
+        component: () => import('@/views/LoadShortAnswer.vue'),
+        children: [
+            {
+                path: 'shortAnswer',
+                component: () => import('@/views/LoadShortAnswer.vue')
+            }
+            // 可以根据需要添加更多子路由
+        ]
     },
     {
         path: '/home',

@@ -54,20 +54,19 @@
 
 #### 2.1 获取一个教师的所有题目
 
-#### 2.2 增加一个题目
+#### 2.2 增加一个简答题
 
 提交方式：`POST`
 
-请求路径：`/api/question_bank/addQuestion`
+请求路径：`/api/question_bank/addQuestion/simpleAnswer`
 
 请求参数：
 
-| 参数名称   | 参数类型 | 描述                                 |
-| :--------- | -------- | ------------------------------------ |
-| question   | String   | Markdown 形式的题目                  |
-| type       | String   | 题目类型：单选、多选、判断题、问答题 |
-| answer     | String   | 答案                                 |
-| difficulty | Int      | 题目难度值：1-3，对应从易到难        |
+| 参数名称   | 参数类型 | 描述                          |
+| :--------- | -------- | ----------------------------- |
+| question   | String   | Markdown 形式的题目           |
+| answer     | String   | 答案                          |
+| difficulty | Int      | 题目难度值：1-3，对应从易到难 |
 
 返回参数：
 
