@@ -24,6 +24,7 @@ export default {
 
 <style scoped>
 .markdown-body {
+  color: black;
   padding: 20px;
   border: 1px solid #e1e4e8;
   border-radius: 6px;

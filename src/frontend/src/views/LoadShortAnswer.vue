@@ -5,6 +5,7 @@
       <center>
         <h1>Question Difficulty</h1>
         <DifficultySelector v-model:difficulty="difficulty" />
+        <SubjectSelector v-model:subject="subject" />
       </center>
     </div>
     <div>
@@ -20,43 +21,40 @@
   <van-back-top />
 </template>
 
-<script>
+<script setup>
+import { ref, computed } from 'vue';
+import axios from 'axios';
+import router from "@/router";
+import { useStore } from "vuex";
 import MarkdownEditor from '@/components/MarkdownEditor.vue';
 import DifficultySelector from "@/components/DifficultySelector.vue";
 import NavigateBar from "@/components/NavigateBar.vue";
-import axios from 'axios';
-import router from "@/router";
+import SubjectSelector from "@/components/SubjectSelector.vue";
 
-export default {
-  components: {
-    DifficultySelector,
-    MarkdownEditor,
-    NavigateBar
-  },
-  data() {
-    return {
-      question: '',
-      answer: '',
-      difficulty: 2 // 默认难度
-    };
-  },
-  methods: {
-    async handleSubmit() {
-      const payload = {
-        question: this.question,
-        answer: this.answer,
-        difficulty: this.difficulty
-      };
-      try {
-        const response = await axios.post('http://localhost:8081/api/question_bank/addQuestion/simpleAnswer', payload);
-        console.log('Data submitted successfully:', response.data);
-        if (response.status === 200 && response.data.success) {
-          router.push('/home');
-        }
-      } catch (error) {
-        console.error('Error submitting data:', error);
-      }
+const question = ref('');
+const answer = ref('');
+const difficulty = ref(2); // 默认难度
+const subject = ref('history');
+const store = useStore();
+
+const storeUsername = computed(() => store.state.username);
+
+const handleSubmit = async () => {
+  const payload = {
+    question: question.value,
+    answer: answer.value,
+    difficulty: difficulty.value,
+    subject: subject.value,
+    username: storeUsername.value
+  };
+  try {
+    const response = await axios.post('http://localhost:8081/api/question_bank/addQuestion/simpleAnswer', payload);
+    console.log('Data submitted successfully:', response.data);
+    if (response.status === 200 && response.data.success) {
+      router.push('/home');
     }
+  } catch (error) {
+    console.error('Error submitting data:', error);
   }
 };
 </script>

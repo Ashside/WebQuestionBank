@@ -67,6 +67,8 @@
 | question   | String   | Markdown 形式的题目           |
 | answer     | String   | 答案                          |
 | difficulty | Int      | 题目难度值：1-3，对应从易到难 |
+| subject    | String   | 科目类型                      |
+| username   | String   | 录入题目用户的 username       |
 
 返回参数：
 
