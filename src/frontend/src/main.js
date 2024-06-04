@@ -8,6 +8,7 @@ import 'vant/lib/index.css';
 import { BackTop } from "vant";
 import { ActionBar, ActionBarIcon, ActionBarButton } from 'vant';
 import naive from "naive-ui";
+import store from './store';
 
 
 
@@ -19,4 +20,8 @@ createApp(App)
     .use(ActionBarIcon)
     .use(ActionBarButton)
     .use(naive)
+    .use(store)
     .mount('#app');
+
+// 初始化 store，加载本地存储中的用户名
+store.dispatch('initializeStore');

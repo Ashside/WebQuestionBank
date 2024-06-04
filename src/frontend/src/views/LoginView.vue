@@ -48,6 +48,7 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import router from "@/router";
+import store from "@/store";
 
 const email = ref('');
 const password = ref('');
@@ -56,7 +57,7 @@ const isLoading = ref(false);
 const handleLogin = async () => {
   isLoading.value = true;
   try {
-    const response = await axios.post('http://localhost:8081/api/usr/login', {
+    const response = await axios.post('http://localhost:8081/api/usr/loginCheck', {
       email: email.value,
       password: password.value},
     {
@@ -64,9 +65,10 @@ const handleLogin = async () => {
         'Content-Type': 'application/json',
       }
     });
-    alert('Logged in successfully!');
     if (response.status === 200 && response.data.success) {
-      router.push('/about');
+      store.dispatch('login', email.value);
+      alert('Logged in successfully!');
+      await router.push('/home');
     }
   } catch (error) {
     alert('Failed to login.');
