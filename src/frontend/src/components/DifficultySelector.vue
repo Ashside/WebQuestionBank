@@ -61,17 +61,17 @@ export default {
 }
 
 .difficulty-selector label.easy {
-  background-color: #4caf50;
+  background-color: black;
   color: white;
 }
 
 .difficulty-selector label.medium {
-  background-color: #ffc107;
+  background-color: black;
   color: white;
 }
 
 .difficulty-selector label.hard {
-  background-color: #f44336;
+  background-color: black;
   color: white;
 }
 

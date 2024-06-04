@@ -5,6 +5,7 @@
       <center>
         <h1>Question Difficulty</h1>
         <DifficultySelector v-model:difficulty="difficulty" />
+        <SubjectSelector v-model:subject="subject" />
       </center>
     </div>
     <div>
@@ -24,6 +25,7 @@
 import MarkdownEditor from '@/components/MarkdownEditor.vue';
 import DifficultySelector from "@/components/DifficultySelector.vue";
 import NavigateBar from "@/components/NavigateBar.vue";
+import SubjectSelector from "@/components/SubjectSelector.vue";
 import axios from 'axios';
 import router from "@/router";
 
@@ -31,13 +33,15 @@ export default {
   components: {
     DifficultySelector,
     MarkdownEditor,
-    NavigateBar
+    NavigateBar,
+    SubjectSelector
   },
   data() {
     return {
       question: '',
       answer: '',
-      difficulty: 2 // 默认难度
+      difficulty: 2, // 默认难度
+      subject: 'history'
     };
   },
   methods: {
@@ -45,7 +49,8 @@ export default {
       const payload = {
         question: this.question,
         answer: this.answer,
-        difficulty: this.difficulty
+        difficulty: this.difficulty,
+        subject: this.subject
       };
       try {
         const response = await axios.post('http://localhost:8081/api/question_bank/addQuestion/simpleAnswer', payload);
