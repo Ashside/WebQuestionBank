@@ -1,6 +1,6 @@
 module backend
 
-go 1.22.1
+go 1.20
 
 require (
 	github.com/api v0.0.0-00010101000000-000000000000
