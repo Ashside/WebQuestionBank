@@ -41,7 +41,5 @@ func main() {
 	// 输出：json格式，包含success、reason字段
 	usrGroup.OPTIONS("/registerCheck", api.RegisterCheckPost)
 
-	questionBankGroup := apiGroup.Group("/question_bank")
-
 	r.Run(":8081")
 }
