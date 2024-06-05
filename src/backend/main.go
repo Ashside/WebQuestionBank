@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"github.com/api"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -24,18 +24,24 @@ func main() {
 
 	r := gin.Default()
 	r.Use(corsMiddleware())
-	r.OPTIONS("/api/usr/login", func(c *gin.Context) {
 
-		fmt.Println("Request Headers: ", c.Request.Header)
-		fmt.Println("Request Body: ", c.Request.Body)
-		c.JSON(200, gin.H{"message": "Options Request!"})
+	apiGroup := r.Group("/api")
 
-	})
-	r.POST("/api/usr/login", func(c *gin.Context) {
-		fmt.Println("Request Headers: ", c.Request.Header)
-		fmt.Println("Request Body: ", c.Request.Body)
-		c.JSON(200, gin.H{"message": "Post Request!"})
-	})
+	usrGroup := apiGroup.Group("/user")
+
+	// 处理/api/usr/loginCheck的OPTIONS请求
+	// 该请求用于检查用户登录状态
+	// 输入：form表单，包含username和password
+	// 输出：json格式，包含success、reason和type字段
+	usrGroup.OPTIONS("/loginCheck", api.LoginCheckPost)
+
+	// 处理/api/usr/registerCheck的OPTIONS请求
+	// 该请求用于检查用户注册状态
+	// 输入：form表单，包含username, password, type字段
+	// 输出：json格式，包含success、reason字段
+	usrGroup.OPTIONS("/registerCheck", api.RegisterCheckPost)
+
+	questionBankGroup := apiGroup.Group("/question_bank")
 
 	r.Run(":8081")
 }

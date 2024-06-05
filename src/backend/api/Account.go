@@ -1,17 +1,33 @@
 package api
 
-const (
-	STUDENT = iota
-	TEACHER
-	ADMIN
+import (
+	"gorm.io/gorm"
 )
 
-type Account struct {
-	Username string
+const (
+	STUDENT = "STUDENT"
+	TEACHER = "TEACHER"
+	ADMIN   = "ADMIN"
+)
+
+type Users struct {
+	Username string `gorm:"primaryKey"`
 	Password string
-	Role     int
+	Type     string
 }
 
-func (a *Account) Login() bool {
-	return true
+func GetUserByUsername(db *gorm.DB, username string, user *Users) error {
+	return db.Where("username = ?", username).First(user).Error
+}
+
+func AddUser(db *gorm.DB, user *Users) error {
+	return db.Create(user).Error
+}
+
+func UpdateUser(db *gorm.DB, user *Users) error {
+	return db.Save(user).Error
+}
+
+func DeleteUser(db *gorm.DB, username string) error {
+	return db.Delete(&Users{}, "username = ?", username).Error
 }
