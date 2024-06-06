@@ -9,8 +9,7 @@ import (
 const (
 	DatabaseUserName = "root"
 	DatabasePassword = "123456"
-
-	DatabaseName = "SEProject"
+	DatabaseName     = "SEProject"
 )
 
 type Users struct {

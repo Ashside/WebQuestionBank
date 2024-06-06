@@ -50,6 +50,10 @@ func main() {
 	// 输入：form表单，包含question, answer, difficulty, subject, username字段
 	// 输出：json格式，包含success、reason字段
 	addQuestionGroup.POST("/simpleAnswer", api.AddSimpleAnswerPost)
-
+	// 处理/api/questionBank/addQuestion/choiceAnswer的OPTIONS请求
+	// 该请求用于添加题目
+	// 输入：form表单，包含question, answer, option, difficulty, subject, username字段
+	// 输出：json格式，包含success、reason字段
+	addQuestionGroup.POST("/choiceAnswer", api.AddChoiceAnswerPost)
 	_ = r.Run(":8081")
 }
