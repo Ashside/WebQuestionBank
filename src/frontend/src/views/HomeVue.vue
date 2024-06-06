@@ -5,7 +5,7 @@
     <p>This is the Home view.</p>
     <div class="card-container">
       <CustomCard title="录入简答题" cover="/simple_answer.png" @card-click="navigateTo('LoadQuestion/shortAnswer')"></CustomCard>
-      <CustomCard title="测试卡片2" cover="/aboutUs.png"></CustomCard>
+      <CustomCard title="录入选择题" cover="/multiple_choice.png" @card-click="navigateTo('LoadQuestion/multipleChoice')"></CustomCard>
       <CustomCard title="测试卡片3" cover="/aboutUs.png"></CustomCard>
       <!-- 可以根据需要添加更多卡片 -->
     </div>

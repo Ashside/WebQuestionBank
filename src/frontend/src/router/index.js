@@ -14,11 +14,14 @@ const routes = [
     },
     {
         path: '/loadQuestion',
-        component: () => import('@/views/LoadShortAnswer.vue'),
         children: [
             {
                 path: 'shortAnswer',
                 component: () => import('@/views/LoadShortAnswer.vue')
+            },
+            {
+                path: 'multipleChoice',
+                component: () => import('@/views/LoadMultipleChoice.vue')
             }
             // 可以根据需要添加更多子路由
         ]
