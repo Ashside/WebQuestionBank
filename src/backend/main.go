@@ -27,8 +27,8 @@ func main() {
 
 	apiGroup := r.Group("/api")
 
+	// 处理/api/usr路由组
 	usrGroup := apiGroup.Group("/usr")
-
 	// 处理/api/usr/loginCheck的OPTIONS请求
 	// 该请求用于检查用户登录状态
 	// 输入：form表单，包含username和password
@@ -41,14 +41,15 @@ func main() {
 	// 输出：json格式，包含success、reason字段
 	usrGroup.POST("/registerCheck", api.RegisterCheckPost)
 
+	// 处理/api/questionBank路由组
+	questionBankGroup := apiGroup.Group("/questionBank")
 	// 处理/api/questionBank/addQuestion路由组
-	addQuestionGroup := apiGroup.Group("/questionBank/addQuestion")
-	simAnsGroup := addQuestionGroup.Group("/simpleAnswer")
+	addQuestionGroup := questionBankGroup.Group("/addQuestion")
 	// 处理/api/questionBank/addQuestion/simpleAnswer的OPTIONS请求
 	// 该请求用于添加题目
 	// 输入：form表单，包含question, answer, difficulty, subject, username字段
 	// 输出：json格式，包含success、reason字段
-	simAnsGroup.OPTIONS("", api.AddSimpleAnswerPost)
+	addQuestionGroup.POST("/simpleAnswer", api.AddSimpleAnswerPost)
 
 	_ = r.Run(":8081")
 }
