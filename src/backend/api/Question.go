@@ -7,7 +7,7 @@ import (
 
 // AddSubjectQuestion 向数据库中添加主观题，打印log信息
 func AddSubjectQuestion(db *gorm.DB, question *SubjectiveQuestions) error {
-	log.Printf("Adding question: %+v\n", *question)
+	log.Println("Adding question", question)
 
 	err := db.Create(question).Error
 

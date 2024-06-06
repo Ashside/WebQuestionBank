@@ -2,17 +2,22 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"strconv"
 )
 
 func LoginCheckPost(c *gin.Context) {
-
+	log.Println("LoginCheckPost")
 	var form struct {
 		Username string `form:"username" binding:"required"`
 		Password string `form:"password" binding:"required"`
 	}
+	log.Println("Binding form")
 	if err := c.ShouldBind(&form); err != nil {
+		// 打印表单的键值对
+		log.Printf("form: %+v\n", form)
+		// 返回错误信息
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "reason": "Invalid form", "type": "null"})
 		return
 	}
@@ -38,6 +43,7 @@ func LoginCheckPost(c *gin.Context) {
 
 	// 登录成功
 	c.JSON(http.StatusOK, gin.H{"success": true, "reason": nil, "type": user.Type})
+
 }
 
 func RegisterCheckPost(c *gin.Context) {

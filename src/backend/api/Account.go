@@ -13,7 +13,7 @@ const (
 
 func GetUserByUsername(db *gorm.DB, username string, user *Users) error {
 
-	log.Printf("Get user: %+v\n", *user)
+	log.Printf("Get user: %s\n", username)
 	err := db.Where("username = ?", username).First(user).Error
 	if err != nil {
 		log.Printf("Failed to get user: %v\n", err)
