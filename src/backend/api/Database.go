@@ -42,7 +42,7 @@ type SubjectiveQuestions struct {
 
 func getDatabase() (*gorm.DB, error) {
 
-	log.Println("Connecting to database: ", DatabaseName)
+	log.Println("Connecting to database")
 	dsn := DatabaseUserName + ":" + DatabasePassword + "@tcp(localhost:3306)/" + DatabaseName + "?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
