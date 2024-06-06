@@ -58,7 +58,7 @@
 
 提交方式：`POST`
 
-请求路径：`/api/question_bank/addQuestion/simpleAnswer`
+请求路径：`/api/questionBank/addQuestion/simpleAnswer`
 
 请求参数：
 
