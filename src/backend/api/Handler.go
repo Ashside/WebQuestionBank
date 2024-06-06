@@ -1,6 +1,8 @@
 package api
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -157,9 +159,10 @@ func AddSimpleAnswerPost(context *gin.Context) {
 func AddChoiceAnswerPost(context *gin.Context) {
 	log.Println("AddChoiceAnswerPost")
 	var form struct {
-		Question   string `form:"question" binding:"required"`
-		Answer     string `form:"answer" binding:"required"`
-		Option     string `form:"option" binding:"required"`
+		Question string            `form:"question" binding:"required"`
+		Answer   string            `form:"answer" binding:"required"`
+		Option   map[string]string `form:"option" binding:"required"`
+
 		Difficulty string `form:"difficulty" binding:"required"`
 		Subject    string `form:"subject" binding:"required"`
 		Username   string `form:"username" binding:"required"`
@@ -214,7 +217,17 @@ func AddChoiceAnswerPost(context *gin.Context) {
 	question.Difficulty = form.Difficulty
 	question.Subject = form.Subject
 	question.Author = form.Username
-	question.Options = form.Option
+
+	// 使用json.Marshal将其转换为JSON格式的字符串
+	optionBytes, err := json.Marshal(form.Option)
+	if err != nil {
+		fmt.Println("Error marshalling option:", err)
+		return
+	}
+
+	// 将[]byte转换为string
+	optionString := string(optionBytes)
+	question.Options = optionString
 
 	if err := AddChoiceQuestion(db, &question); err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
