@@ -84,7 +84,7 @@ const handleSubmit = async () => {
     username: storeUsername.value
   };
   try {
-    const response = await axios.post('http://localhost:8081/api/questionBank/addQuestion/simpleAnswer', payload);
+    const response = await axios.post('http://localhost:8081/api/questionBank/addQuestion/multipleChoice', payload);
     console.log('Data submitted successfully:', response.data);
     if (response.status === 200 && response.data.success) {
       router.push('/home');
