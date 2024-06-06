@@ -84,7 +84,7 @@ const handleLogin = async () => {
   isLoading.value = true;
   try {
     const response = await axios.post('http://localhost:8081/api/usr/loginCheck', {
-      email: email.value,
+      username: email.value,
       password: password.value},
     {
       headers: {
@@ -106,9 +106,9 @@ const handleLogin = async () => {
 const handleRegister = async () => {
   isLoading.value = true;
   try {
-    const response = await axios.post('http://localhost:8081/api/usr/loginCheck', {
-          email: email.value,
-          password: password.value,
+    const response = await axios.post('http://localhost:8081/api/usr/registerCheck', {
+          username: newEmail.value,
+          password: newPassword.value,
           type: role.value,
         },
         {
@@ -117,12 +117,12 @@ const handleRegister = async () => {
           }
         });
     if (response.status === 200 && response.data.success) {
-      store.dispatch('login', email.value);
-      alert('Logged in successfully!');
+      store.dispatch('login', newEmail.value);
+      alert('Register in successfully!');
       await router.push('/home');
     }
   } catch (error) {
-    alert('Failed to login.');
+    alert('Failed to register.');
   } finally {
     isLoading.value = false;
   }
