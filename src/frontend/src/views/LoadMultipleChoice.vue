@@ -27,13 +27,13 @@
       <center>
         <div class="multiple-choice-selector">
           <input type="checkbox" id="option1" name="choice" value="option1">
-          <label for="option1">Option 1</label><br>
+          <label for="option1">Option 1</label><p></p>
           <input type="checkbox" id="option2" name="choice" value="option2">
-          <label for="option2">Option 2</label><br>
+          <label for="option2">Option 2</label><p></p>
           <input type="checkbox" id="option3" name="choice" value="option3">
-          <label for="option3">Option 3</label><br>
+          <label for="option3">Option 3</label><p></p>
           <input type="checkbox" id="option4" name="choice" value="option4">
-          <label for="option4">Option 4</label><br>
+          <label for="option4">Option 4</label><p></p>
         </div>
       </center>
     </div>
