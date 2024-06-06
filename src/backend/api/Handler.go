@@ -47,12 +47,13 @@ func LoginCheckPost(c *gin.Context) {
 }
 
 func RegisterCheckPost(c *gin.Context) {
-
+	log.Println("RegisterCheckPost")
 	var form struct {
 		Username string `form:"username" binding:"required"`
 		Password string `form:"password" binding:"required"`
 		Type     string `form:"type" binding:"required"`
 	}
+	log.Println("Binding form")
 	if err := c.ShouldBind(&form); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "reason": "Invalid form"})
 		return

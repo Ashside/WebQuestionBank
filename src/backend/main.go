@@ -39,7 +39,7 @@ func main() {
 	// 该请求用于检查用户注册状态
 	// 输入：form表单，包含username, password, type字段
 	// 输出：json格式，包含success、reason字段
-	usrGroup.OPTIONS("/registerCheck", api.RegisterCheckPost)
+	usrGroup.POST("/registerCheck", api.RegisterCheckPost)
 
 	// 处理/api/questionBank/addQuestion路由组
 	addQuestionGroup := apiGroup.Group("/questionBank/addQuestion")
