@@ -12,7 +12,30 @@
       <markdown-editor title="Question" v-model="question"></markdown-editor>
     </div>
     <div>
-      <markdown-editor title="Answer" v-model="answer"></markdown-editor>
+      <markdown-editor title="Option 1" v-model="option1"></markdown-editor>
+    </div>
+    <div>
+      <markdown-editor title="Option 2" v-model="option2"></markdown-editor>
+    </div>
+    <div>
+      <markdown-editor title="Option 3" v-model="option3"></markdown-editor>
+    </div>
+    <div>
+      <markdown-editor title="Option 4" v-model="option4"></markdown-editor>
+    </div>
+    <div>
+      <center>
+        <div class="multiple-choice-selector">
+          <input type="checkbox" id="option1" name="choice" value="option1">
+          <label for="option1">Option 1</label><br>
+          <input type="checkbox" id="option2" name="choice" value="option2">
+          <label for="option2">Option 2</label><br>
+          <input type="checkbox" id="option3" name="choice" value="option3">
+          <label for="option3">Option 3</label><br>
+          <input type="checkbox" id="option4" name="choice" value="option4">
+          <label for="option4">Option 4</label><br>
+        </div>
+      </center>
     </div>
     <div class="submit-button-container">
       <button class="submit-button" @click="handleSubmit">Submit</button>
@@ -20,6 +43,7 @@
   </div>
   <van-back-top />
 </template>
+
 
 <script setup>
 import { ref, computed } from 'vue';
@@ -32,17 +56,29 @@ import NavigateBar from "@/components/NavigateBar.vue";
 import SubjectSelector from "@/components/SubjectSelector.vue";
 
 const question = ref('');
-const answer = ref('');
+const selectedAnswers = ref('');
 const difficulty = ref(2); // 默认难度
 const subject = ref('history');
 const store = useStore();
+const option1 = ref('');
+const option2 = ref('');
+const option3 = ref('');
+const option4 = ref('');
 
 const storeUsername = computed(() => store.state.username);
 
 const handleSubmit = async () => {
+  const choices = document.getElementsByName('choice');
+  let selectedValues = [];
+  for (let choice of choices) {
+    if (choice.checked) {
+      selectedValues.push(choice.value);
+    }
+  }
   const payload = {
     question: question.value,
-    answer: answer.value,
+    answer: selectedAnswers.value = selectedValues.join(', '), // 将选中的答案拼接成字符串
+    option: { option1: option1.value, option2: option2.value, option3: option3.value, option4: option4.value },
     difficulty: difficulty.value,
     subject: subject.value,
     username: storeUsername.value
@@ -91,4 +127,32 @@ const handleSubmit = async () => {
 .submit-button:focus {
   outline: none;
 }
+
+.multiple-choice-selector {
+  padding: 20px;
+  margin: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+input[type="radio"] {
+  margin: 10px;
+}
+
+label {
+  margin-left: 8px;
+  font-size: 16px;
+}
+
+button {
+  padding: 10px 20px;
+  margin-top: 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
 </style>
