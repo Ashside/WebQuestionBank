@@ -41,5 +41,14 @@ func main() {
 	// 输出：json格式，包含success、reason字段
 	usrGroup.OPTIONS("/registerCheck", api.RegisterCheckPost)
 
+	// 处理/api/questionBank/addQuestion路由组
+	addQuestionGroup := apiGroup.Group("/questionBank/addQuestion")
+	simAnsGroup := addQuestionGroup.Group("/simpleAnswer")
+	// 处理/api/questionBank/addQuestion/simpleAnswer的OPTIONS请求
+	// 该请求用于添加题目
+	// 输入：form表单，包含question, answer, difficulty, subject, username字段
+	// 输出：json格式，包含success、reason字段
+	simAnsGroup.OPTIONS("", api.AddSimpleAnswerPost)
+
 	_ = r.Run(":8081")
 }

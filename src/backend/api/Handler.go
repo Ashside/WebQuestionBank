@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 func LoginCheckPost(c *gin.Context) {
@@ -75,4 +76,48 @@ func RegisterCheckPost(c *gin.Context) {
 
 	// 注册成功
 	c.JSON(http.StatusOK, gin.H{"success": true, "reason": nil})
+}
+
+func AddSimpleAnswerPost(context *gin.Context) {
+	var form struct {
+		Question   string `form:"question" binding:"required"`
+		Answer     string `form:"answer" binding:"required"`
+		Difficulty int    `form:"difficulty" binding:"required"`
+		Subject    string `form:"subject" binding:"required"`
+		Username   string `form:"username" binding:"required"`
+	}
+	if err := context.ShouldBind(&form); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"success": false, "reason": "Invalid form"})
+		return
+	}
+
+	db, err := getDatabase()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+		return
+	}
+
+	// 查询用户是否存在
+	var user Users
+	if err := GetUserByUsername(db, form.Username, &user); err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Users not found"})
+		return
+	}
+
+	// 添加题目
+	var question SubjectiveQuestions
+	question.Content = form.Question
+	question.Answer = form.Answer
+	question.Difficulty = strconv.Itoa(form.Difficulty)
+	question.Subject = form.Subject
+	question.Author = form.Username
+
+	if err := AddSubjectQuestion(db, &question); err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+		return
+
+	}
+
+	// 添加成功
+	context.JSON(http.StatusOK, gin.H{"success": true, "reason": nil})
 }
