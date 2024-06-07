@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"gorm.io/gorm"
 	"io"
 	"io/ioutil"
 	"log"
@@ -13,8 +14,16 @@ import (
 const AccessToken = "24.dcc9972f075b3221c78daffd648b02d8.2592000.1720265395.282335-79244792"
 
 type keywordResponse struct {
-	keyword string
-	score   float64
+	Keyword string
+	Score   float64
+}
+type choiceQuestionKeywords struct {
+	QuestionId int `gorm:"primaryKey,colum:question_id"`
+	KeywordId  int `gorm:"primaryKey,colum:keyword_id"`
+}
+type subjectiveQuestionKeywords struct {
+	QuestionId int `gorm:"primaryKey,colum:question_id"`
+	KeywordId  int `gorm:"primaryKey,colum:keyword_id"`
 }
 
 func getKeyword(text string) ([]keywordResponse, error) {
@@ -52,7 +61,7 @@ func getKeyword(text string) ([]keywordResponse, error) {
 	var result struct {
 		Items []struct {
 			Keyword string  `json:"word"`
-			Score   float64 `json:"score"`
+			Score   float64 `json:"Score"`
 		} `json:"results"`
 	}
 
@@ -73,5 +82,70 @@ func getKeyword(text string) ([]keywordResponse, error) {
 		response = append(response, keywordResponse{item.Keyword, item.Score})
 	}
 	return response, nil
+
+}
+func genKeywordId(db *gorm.DB) int {
+	// 查询数据库中的关键词个数
+	// 如果关键词个数为0，则将id设置为1
+	// 否则将id设置为关键词个数+1
+	// 返回id
+	var id int64
+	// 查询数据库中的关键词个数
+	if err := db.Table("Keywords").Count(&id).Error; err != nil {
+		log.Println("Failed to count keywords")
+		return -1
+	}
+	// 如果关键词个数为0，则将id设置为1
+	if id == 0 {
+		id = 1
+	} else {
+		// 否则将id设置为关键词个数+1
+		id++
+	}
+	log.Println("Generated Keyword id:", id)
+	return int(id)
+
+}
+func AddKeywords(db *gorm.DB, keywords []keywordResponse, quesId int, isChoice bool) {
+
+	for _, keyword := range keywords {
+		// TODO 特异性处理
+		// 生成关键词id
+		id := genKeywordId(db)
+		if id == -1 {
+			log.Println("Failed to generate Keyword id")
+			return
+		}
+
+		// 添加关键词
+		log.Println("Adding Keyword:", keyword.Keyword)
+		err := db.Table("Keywords").Create(&Keywords{Id: id, Keyword: keyword.Keyword, Score: keyword.Score}).Error
+		if err != nil {
+			log.Println("Failed to add Keyword:", keyword.Keyword)
+			return
+		}
+		log.Println("Successfully added Keyword:", keyword.Keyword)
+
+		// 添加关键词和题目的关系
+		log.Println("Adding Keyword-question relationship")
+		if isChoice {
+			err = db.Table("choice_question_keywords").Create(&choiceQuestionKeywords{QuestionId: quesId, KeywordId: id}).Error
+			if err != nil {
+				log.Println("Failed to add Keyword-question relationship")
+				println(err.Error())
+				return
+
+			}
+		} else {
+			err = db.Table("subjective_question_keywords").Create(&subjectiveQuestionKeywords{QuestionId: quesId, KeywordId: id}).Error
+			if err != nil {
+				log.Println("Failed to add Keyword-question relationship")
+				println(err.Error())
+				return
+			}
+		}
+
+	}
+	log.Println("Successfully added keywords")
 
 }
