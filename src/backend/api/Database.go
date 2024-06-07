@@ -20,6 +20,7 @@ type Users struct {
 type Keywords struct {
 	Id      int `gorm:"primaryKey"`
 	Keyword string
+	Score   float64
 }
 type ChoiceQuestions struct {
 	Id         int `gorm:"primaryKey"`

@@ -123,9 +123,6 @@ func AddSimpleAnswerPost(context *gin.Context) {
 		return
 	}
 
-	// TODO 生成题目关键词
-	// TODO 添加关键词
-
 	// 查询选择题和主观题的数量之和
 	var cntChoice int64
 	var cntSubject int64
@@ -152,7 +149,13 @@ func AddSimpleAnswerPost(context *gin.Context) {
 		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
 		return
 	}
-
+	// TODO 生成题目关键词
+	// TODO 添加关键词
+	keywords, err := getKeyword(form.Question)
+	if err != nil {
+		return
+	}
+	AddKeywords(db, keywords, question.Id, false)
 	// 添加成功
 	context.JSON(http.StatusOK, gin.H{"success": true, "reason": nil})
 }
@@ -194,9 +197,6 @@ func AddChoiceAnswerPost(context *gin.Context) {
 		return
 	}
 
-	// TODO 生成题目关键词
-	// TODO 添加关键词
-
 	// 查询选择题和主观题的数量之和
 	var cntChoice int64
 	var cntSubject int64
@@ -218,14 +218,12 @@ func AddChoiceAnswerPost(context *gin.Context) {
 	question.Difficulty = strconv.Itoa(form.Difficulty)
 	question.Subject = form.Subject
 	question.Author = form.Username
-
 	// 使用json.Marshal将其转换为JSON格式的字符串
 	optionBytes, err := json.Marshal(form.Option)
 	if err != nil {
 		fmt.Println("Error marshalling option:", err)
 		return
 	}
-
 	// 将[]byte转换为string
 	optionString := string(optionBytes)
 	question.Options = optionString
@@ -235,4 +233,15 @@ func AddChoiceAnswerPost(context *gin.Context) {
 		return
 
 	}
+	// TODO 生成题目关键词
+	// TODO 添加关键词
+	keywords, err := getKeyword(form.Question)
+	if err != nil {
+		return
+	}
+	AddKeywords(db, keywords, question.Id, true)
+
+	// 添加成功
+	context.JSON(http.StatusOK, gin.H{"success": true, "reason": nil})
+
 }
