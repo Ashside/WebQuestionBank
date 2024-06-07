@@ -1,10 +1,10 @@
 <template>
   <div class="difficulty-selector">
-    <input type="radio" id="easy" value="1" v-model="localDifficulty" @change="updateValue" />
+    <input type="radio" id="easy" value=1 v-model="localDifficulty" @change="updateValue" />
     <label for="easy" class="easy">Easy</label>
-    <input type="radio" id="medium" value="2" v-model="localDifficulty" @change="updateValue" />
+    <input type="radio" id="medium" value=2 v-model="localDifficulty" @change="updateValue" />
     <label for="medium" class="medium">Medium</label>
-    <input type="radio" id="hard" value="3" v-model="localDifficulty" @change="updateValue" />
+    <input type="radio" id="hard" value=3 v-model="localDifficulty" @change="updateValue" />
     <label for="hard" class="hard">Hard</label>
   </div>
 </template>
@@ -30,7 +30,7 @@ export default {
   },
   methods: {
     updateValue() {
-      this.$emit('update:difficulty', this.localDifficulty);
+      this.$emit('update:difficulty', parseInt(this.localDifficulty, 10));
     }
   }
 };
