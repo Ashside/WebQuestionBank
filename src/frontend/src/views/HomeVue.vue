@@ -1,12 +1,12 @@
 <template>
   <Navigate></Navigate>
   <div class="home">
-    <h1>Welcome to Home!</h1>
-    <p>This is the Home view.</p>
+    <h1>欢迎来到首页！</h1>
+    <p>请选择你要进行的操作</p>
     <div class="card-container">
       <CustomCard title="录入简答题" cover="/simple_answer.png" @card-click="navigateTo('LoadQuestion/shortAnswer')"></CustomCard>
       <CustomCard title="录入选择题" cover="/multiple_choice.png" @card-click="navigateTo('LoadQuestion/multipleChoice')"></CustomCard>
-      <CustomCard title="测试卡片3" cover="/aboutUs.png"></CustomCard>
+      <CustomCard title="测试卡片3" cover="/aboutUs.png" @card-click="navigateTo('/ViewQuestion')"></CustomCard>
       <!-- 可以根据需要添加更多卡片 -->
     </div>
   </div>

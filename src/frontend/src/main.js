@@ -9,6 +9,9 @@ import { BackTop } from "vant";
 import { ActionBar, ActionBarIcon, ActionBarButton } from 'vant';
 import naive from "naive-ui";
 import store from './store';
+// 导入全局样式文件
+import './assets/main.css';
+
 
 
 

@@ -1,0 +1,8 @@
+/* 全局背景色 */
+body, html {
+    background-color: #f4f4f9; /* 选择的背景颜色 */
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif; /* 统一字体 */
+    height: 100%; /* 确保全屏高度 */
+}
