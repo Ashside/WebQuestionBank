@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func LoginCheckPost(c *gin.Context) {
@@ -92,7 +93,7 @@ func AddSimpleAnswerPost(context *gin.Context) {
 	var form struct {
 		Question   string `form:"question" binding:"required"`
 		Answer     string `form:"answer" binding:"required"`
-		Difficulty string `form:"difficulty" binding:"required"`
+		Difficulty int    `form:"difficulty" binding:"required"`
 		Subject    string `form:"subject" binding:"required"`
 		Username   string `form:"username" binding:"required"`
 	}
@@ -143,7 +144,7 @@ func AddSimpleAnswerPost(context *gin.Context) {
 	question.Id = int(count) + 1
 	question.Content = form.Question
 	question.Answer = form.Answer
-	question.Difficulty = form.Difficulty
+	question.Difficulty = strconv.Itoa(form.Difficulty)
 	question.Subject = form.Subject
 	question.Author = form.Username
 
@@ -163,7 +164,7 @@ func AddChoiceAnswerPost(context *gin.Context) {
 		Answer   string            `form:"answer" binding:"required"`
 		Option   map[string]string `form:"option" binding:"required"`
 
-		Difficulty string `form:"difficulty" binding:"required"`
+		Difficulty int    `form:"difficulty" binding:"required"`
 		Subject    string `form:"subject" binding:"required"`
 		Username   string `form:"username" binding:"required"`
 	}
@@ -214,7 +215,7 @@ func AddChoiceAnswerPost(context *gin.Context) {
 	question.Id = int(count) + 1
 	question.Content = form.Question
 	question.Answer = form.Answer
-	question.Difficulty = form.Difficulty
+	question.Difficulty = strconv.Itoa(form.Difficulty)
 	question.Subject = form.Subject
 	question.Author = form.Username
 
