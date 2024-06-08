@@ -245,3 +245,37 @@ func AddChoiceAnswerPost(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{"success": true, "reason": nil})
 
 }
+
+func QueryQuestionPost(context *gin.Context) {
+	log.Println("QueryQuestionPost")
+	var form struct {
+		Username   string `form:"username" binding:"required"`
+		Subject    string `form:"subject" binding:"required"`
+		Difficulty int    `form:"difficulty" binding:"required"`
+	}
+
+	log.Println("Binding form")
+	if err := context.ShouldBind(&form); err != nil {
+		log.Println(err)
+		context.JSON(http.StatusBadRequest, gin.H{"success": false, "reason": "Invalid form"})
+		return
+	}
+
+	db, err := getDatabase()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+		return
+	}
+
+	// 查询用户是否存在
+	var user Users
+	if err := GetUserByUsername(db, form.Username, &user); err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Users not found"})
+		return
+	}
+
+	// 查询题目
+	questions := QueryQuestion(db, form.Username, form.Subject, form.Difficulty)
+	context.JSON(http.StatusOK, gin.H{"success": true, "reason": nil, "questions": questions})
+
+}

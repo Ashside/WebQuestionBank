@@ -32,3 +32,34 @@ func AddChoiceQuestion(db *gorm.DB, c *ChoiceQuestions) interface{} {
 
 	return err
 }
+func QueryQuestion(db *gorm.DB, username string, subject string, difficulty int) []ChoiceQuestions {
+	var choiceQuestions []ChoiceQuestions
+	var subjectiveQuestions []ChoiceQuestions
+	// 查询ChoiceQuestions表中的题目
+	err := db.Table("ChoiceQuestions").Where("author = ? AND subject = ? AND difficulty = ?", username, subject, difficulty).Find(&choiceQuestions).Error
+	if err != nil {
+		log.Printf("Failed to query choiceQuestions: %v\n", err)
+	} else {
+		log.Println("Successfully queried choiceQuestions")
+	}
+	// 查询SubjectiveQuestions表中的题目
+	err = db.Table("SubjectiveQuestions").Where("author = ? AND subject = ? AND difficulty = ?", username, subject, difficulty).Find(&subjectiveQuestions).Error
+	if err != nil {
+		log.Printf("Failed to query subjectiveQuestions: %v\n", err)
+	} else {
+		log.Println("Successfully queried subjectiveQuestions")
+	}
+	// 将subjectiveQuestions转换为ChoiceQuestions
+	for _, q := range subjectiveQuestions {
+		choiceQuestions = append(choiceQuestions, ChoiceQuestions{
+			Id:         q.Id,
+			Subject:    q.Subject,
+			Content:    q.Content,
+			Options:    "",
+			Answer:     q.Answer,
+			Difficulty: q.Difficulty,
+		})
+	}
+
+	return choiceQuestions
+}

@@ -56,15 +56,22 @@ func main() {
 	// 输出：json格式，包含success、reason字段
 	addQuestionGroup.POST("/multipleChoice", api.AddChoiceAnswerPost)
 
+	// 处理/api/questionBank/queryQuestion路由组
+	queryQuestionGroup := questionBankGroup.Group("/queryQuestion")
+	// 处理/api/questionBank/queryQuestion的OPTIONS请求
+	// 该请求用于查询题目
+	// 输入：form表单，包含username, subject, difficulty字段.
+	// 输出：json格式，包含success、reason、questions字段，questions字段是一个数组，包含多个题目
+	queryQuestionGroup.POST("", api.QueryQuestionPost)
+
 	ComposionGroup := questionBankGroup.Group("/composition")
 	//处理/api/questionBank/composition的OPTIONS请求
 	// 该请求用于题目查询（组卷）
 	// 输入：form表单，包含difficulty, subject, keyword, username字段
 	// 输出：json格式，包含success字段
-		// if success = false 包含reason字段
-		// else 包含questions（	ID*int，QuestionType*string ）字段	
-			//if questions空 包含message字段
+	// if success = false 包含reason字段
+	// else 包含questions（	ID*int，QuestionType*string ）字段
+	//if questions空 包含message字段
 	ComposionGroup.POST("/search", api.SearchQuestions)
-
 	_ = r.Run(":8081")
 }

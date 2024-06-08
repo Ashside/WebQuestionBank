@@ -8,7 +8,7 @@ import (
 
 const (
 	DatabaseUserName = "root"
-	DatabasePassword = "Aa=12345678"
+	DatabasePassword = "123456"
 	DatabaseName     = "SEProject"
 )
 
