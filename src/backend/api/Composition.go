@@ -61,7 +61,7 @@ func QueryQuestions(db *gorm.DB, tableName, selectFields string, conditions []st
 func SearchQuestions(c *gin.Context) {
 	var form struct {
 		Username   string `form:"username" binding:"required"`
-		Difficulty string `form:"difficulty,omitempty"` // 可选参数，使用omitempty避免未提供时产生错误
+		Difficulty int `form:"difficulty,omitempty"` // 可选参数，使用omitempty避免未提供时产生错误
 		Subject    string `form:"subject,omitempty"`    // 可选参数
 		Keyword    string `form:"keyword,omitempty"`    // 可选参数
 	}
@@ -88,7 +88,7 @@ func SearchQuestions(c *gin.Context) {
 	var conditions []string
 	args := make([]interface{}, 0)
 
-	if form.Difficulty != "" {
+	if form.Difficulty != 0 { 
 		conditions = append(conditions, "T.difficulty = ?")
 		args = append(args, form.Difficulty)
 	}
