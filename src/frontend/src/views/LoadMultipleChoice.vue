@@ -84,7 +84,7 @@ const handleSubmit = async () => {
     username: storeUsername.value
   };
   try {
-    const response = await axios.post(process.env["VUE_APP_API_URL "] + '/api/questionBank/addQuestion/multipleChoice', payload);
+    const response = await axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/addQuestion/multipleChoice', payload);
     console.log('Data submitted successfully:', response.data);
     if (response.status === 200 && response.data.success) {
       router.push('/home');
