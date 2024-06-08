@@ -39,17 +39,17 @@ func QueryQuestions(db *gorm.DB, tableName, selectFields string, conditions []st
 	}
 
 	joinClause := fmt.Sprintf(`
-		JOIN %s_keywords ON %s_keywords.question_id = T.id
+		JOIN %s_keywords ON %s_keywords.question_id = %s.id
 		JOIN keywords ON keywords.id = %s_keywords.keyword_id
-	`, tableName, tableName, tableName)
+	`, tableName, tableName, tableName, tableName) 
 
-	err := db.Table(tableName).Alias("T").
+	err := db.Table(tableName).
 		Select(selectFields).
 		Joins(joinClause).
 		Where(whereClause, args...).
-		Group("T.id"). // 避免重复记录
+		Group(tableName + ".id"). 
 		Scan(&questions).Error
-	
+
 	if err != nil {
 		log.Printf("Error querying %s: %v", tableName, err)
 	} else {
@@ -85,36 +85,37 @@ func SearchQuestions(c *gin.Context) {
 	}
 
 	// 构建查询条件
-	var conditions []string
+	var conditions1 []string
+	var conditions2 []string
 	args := make([]interface{}, 0)
-
+	
 	if form.Difficulty != 0 { 
-		conditions = append(conditions, "T.difficulty = ?")
+		conditions1 = append(conditions1, "choice_questions.difficulty = ?")
+		conditions2 = append(conditions2, "subjective_questions.difficulty = ?")
 		args = append(args, form.Difficulty)
 	}
-
 	if form.Subject != "" {
-		conditions = append(conditions, "T.subject = ?")
+		conditions1 = append(conditions1, "choice_questions.subject = ?")
+		conditions2 = append(conditions2, "subjective_questions.subject = ?")
 		args = append(args, form.Subject)
 	}
-
 	if form.Keyword != "" {
-		// 调整关键词查询条件以适应JOIN后的表别名
-		conditions = append(conditions, "keywords.keyword = ?")
+		conditions1 = append(conditions1, "keywords.keyword = ?")
+		conditions2 = append(conditions2, "keywords.keyword = ?")
 		args = append(args, form.Keyword)
 	}
 
 	log.Printf("Searching questions for user: %s with criteria: %+v", form.Username, form)
 
 	// 查询选择题
-	choiceQuestions, err := queryQuestionsAdvanced(db, "choice_questions", "T.id AS id, 'choice' AS question_type", conditions, args...)
+	choiceQuestions, err := QueryQuestions(db, "choice_questions", "choice_questions.id AS id, 'choice' AS question_type", conditions1, args...)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Failed to fetch choice questions by criteria"})
 		return
 	}
 
 	// 查询主观题
-	subjectiveQuestions, err := queryQuestionsAdvanced(db, "subjective_questions", "T.id AS id, 'subjective' AS question_type", conditions, args...)
+	subjectiveQuestions, err := QueryQuestions(db, "subjective_questions", "subjective_questions.id AS id, 'subjective' AS question_type", conditions2, args...)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Failed to fetch subjective questions by criteria"})
 		return
