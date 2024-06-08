@@ -7,28 +7,32 @@ import store from "@/store";
 const routes = [
     {
         path: '/',
+        name: '',
         component: () => import('@/views/LoginView.vue')
     },
     {
         path: '/Unauthenticated',
+        name: 'Unauthenticated',
         component: () => import('@/views/UnauthenticatedPage.vue')
     },
     {
         path: '/about',
+        name: 'About',
         component: () => import('@/views/AboutVue.vue')
     },
     {
         path: '/loadQuestion',
+        name: 'LoadQuestion',
         children: [
             {
-                path: '/shortAnswer',
+                path: 'shortAnswer',
                 component: () => import('@/views/LoadShortAnswer.vue'),
                 meta: {
                     requiresAuth: true  // 需要认证
                 }
             },
             {
-                path: '/multipleChoice',
+                path: 'multipleChoice',
                 component: () => import('@/views/LoadMultipleChoice.vue'),
                 meta: {
                     requiresAuth: true  // 需要认证
@@ -39,6 +43,7 @@ const routes = [
     },
     {
         path: '/home',
+        name: 'Home',
         component: () => import('@/views/HomeVue.vue'),
         meta: {
             requiresAuth: true  // 需要认证
@@ -46,6 +51,7 @@ const routes = [
     },
     {
         path: '/viewQuestion',
+        name: 'ViewQuestion',
         component: () => import('@/views/ViewQuestions.vue'),
         meta: {
             requiresAuth: true  // 需要认证

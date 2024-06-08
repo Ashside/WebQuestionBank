@@ -44,7 +44,7 @@ export default {
     async fetchQuestions() {
       try {
         // 向API发起请求并获取数据
-        const response = await axios.post(process.env["VUE_APP_API_URL "] + '/api/questionBank/queryQuestion');
+        const response = await axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/queryQuestion');
         if (response.data.success) {
           this.questions = response.data.questions;  // 从返回数据中获取问题列表
         } else {

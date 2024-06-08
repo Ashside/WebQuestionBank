@@ -83,7 +83,7 @@ const role = ref('user');  // 默认为用户角色
 const handleLogin = async () => {
   isLoading.value = true;
   try {
-    const response = await axios.post(process.env["VUE_APP_API_URL "] + '/api/usr/loginCheck', {
+    const response = await axios.post(process.env['VUE_APP_API_URL'] + '/api/usr/loginCheck', {
       username: email.value,
       password: password.value},
     {
@@ -106,7 +106,7 @@ const handleLogin = async () => {
 const handleRegister = async () => {
   isLoading.value = true;
   try {
-    const response = await axios.post(process.env["VUE_APP_API_URL "] + '/api/usr/registerCheck', {
+    const response = await axios.post(process.env['VUE_APP_API_URL'] + '/api/usr/registerCheck', {
           username: newEmail.value,
           password: newPassword.value,
           type: role.value,
