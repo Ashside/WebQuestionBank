@@ -91,7 +91,7 @@ func genKeywordId(db *gorm.DB) int {
 	// 返回id
 	var id int64
 	// 查询数据库中的关键词个数
-	if err := db.Table("Keywords").Count(&id).Error; err != nil {
+	if err := db.Table("keywords").Count(&id).Error; err != nil {
 		log.Println("Failed to count keywords")
 		return -1
 	}
@@ -119,7 +119,7 @@ func AddKeywords(db *gorm.DB, keywords []keywordResponse, quesId int, isChoice b
 
 		// 添加关键词
 		log.Println("Adding Keyword:", keyword.Keyword)
-		err := db.Table("Keywords").Create(&Keywords{Id: id, Keyword: keyword.Keyword, Score: keyword.Score}).Error
+		err := db.Table("keywords").Create(&Keywords{Id: id, Keyword: keyword.Keyword, Score: keyword.Score}).Error
 		if err != nil {
 			log.Println("Failed to add Keyword:", keyword.Keyword)
 			return

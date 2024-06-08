@@ -10,7 +10,7 @@ func AddSubjectQuestion(db *gorm.DB, question *SubjectiveQuestions) error {
 	log.Println("Adding question", question)
 
 	// 向SubjectiveQuestions表中添加题目
-	err := db.Table("SubjectiveQuestions").Create(question).Error
+	err := db.Table("subjectivequestions").Create(question).Error
 	if err != nil {
 		log.Printf("Failed to add question: %v\n", err)
 	} else {
@@ -23,7 +23,7 @@ func AddChoiceQuestion(db *gorm.DB, c *ChoiceQuestions) interface{} {
 	log.Println("Adding question", c)
 
 	// 向ChoiceQuestions表中添加题目
-	err := db.Table("ChoiceQuestions").Create(c).Error
+	err := db.Table("choicequestions").Create(c).Error
 	if err != nil {
 		log.Printf("Failed to add question: %v\n", err)
 	} else {
@@ -36,14 +36,14 @@ func QueryQuestion(db *gorm.DB, username string, subject string, difficulty int)
 	var choiceQuestions []ChoiceQuestions
 	var subjectiveQuestions []ChoiceQuestions
 	// 查询ChoiceQuestions表中的题目
-	err := db.Table("ChoiceQuestions").Where("author = ? AND subject = ? AND difficulty = ?", username, subject, difficulty).Find(&choiceQuestions).Error
+	err := db.Table("choicequestions").Where("author = ? AND subject = ? AND difficulty = ?", username, subject, difficulty).Find(&choiceQuestions).Error
 	if err != nil {
 		log.Printf("Failed to query choiceQuestions: %v\n", err)
 	} else {
 		log.Println("Successfully queried choiceQuestions")
 	}
 	// 查询SubjectiveQuestions表中的题目
-	err = db.Table("SubjectiveQuestions").Where("author = ? AND subject = ? AND difficulty = ?", username, subject, difficulty).Find(&subjectiveQuestions).Error
+	err = db.Table("subjectivequestions").Where("author = ? AND subject = ? AND difficulty = ?", username, subject, difficulty).Find(&subjectiveQuestions).Error
 	if err != nil {
 		log.Printf("Failed to query subjectiveQuestions: %v\n", err)
 	} else {

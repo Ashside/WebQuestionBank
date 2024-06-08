@@ -118,7 +118,7 @@ func AddSimpleAnswerPost(context *gin.Context) {
 	}
 
 	//TODO 查询题目是否重复
-	if err := db.Table("SubjectiveQuestions").Where("content = ?", form.Question).First(&SubjectiveQuestions{}).Error; err == nil {
+	if err := db.Table("subjectivequestions").Where("content = ?", form.Question).First(&SubjectiveQuestions{}).Error; err == nil {
 		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Question already exists"})
 		return
 	}
@@ -126,11 +126,11 @@ func AddSimpleAnswerPost(context *gin.Context) {
 	// 查询选择题和主观题的数量之和
 	var cntChoice int64
 	var cntSubject int64
-	if err := db.Table("ChoiceQuestions").Count(&cntChoice).Error; err != nil {
+	if err := db.Table("choicequestions").Count(&cntChoice).Error; err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
 		return
 	}
-	if err := db.Table("SubjectiveQuestions").Count(&cntSubject).Error; err != nil {
+	if err := db.Table("subjectivequestions").Count(&cntSubject).Error; err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
 		return
 	}
@@ -192,7 +192,7 @@ func AddChoiceAnswerPost(context *gin.Context) {
 	}
 
 	//TODO 查询题目是否重复
-	if err := db.Table("ChoiceQuestions").Where("content = ?", form.Question).First(&ChoiceQuestions{}).Error; err == nil {
+	if err := db.Table("choicequestions").Where("content = ?", form.Question).First(&ChoiceQuestions{}).Error; err == nil {
 		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Question already exists"})
 		return
 	}
@@ -200,11 +200,11 @@ func AddChoiceAnswerPost(context *gin.Context) {
 	// 查询选择题和主观题的数量之和
 	var cntChoice int64
 	var cntSubject int64
-	if err := db.Table("ChoiceQuestions").Count(&cntChoice).Error; err != nil {
+	if err := db.Table("choicequestions").Count(&cntChoice).Error; err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
 		return
 	}
-	if err := db.Table("SubjectiveQuestions").Count(&cntSubject).Error; err != nil {
+	if err := db.Table("subjectivequestions").Count(&cntSubject).Error; err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
 		return
 	}
