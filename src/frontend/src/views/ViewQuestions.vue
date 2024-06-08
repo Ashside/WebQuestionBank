@@ -5,8 +5,17 @@
     <ul>
       <!-- 渲染接收到的问题的描述 -->
       <li v-for="(item, index) in questions" :key="index">
-        <h3> 题目{{ index }} </h3>
-        <MarkdownRenderer :content="item.question" />
+        <h3> 题目{{ index + 1 }} </h3>
+        <div v-if="item.type === 'simpleAnswer'">
+          <MarkdownRenderer :content="item.question" />
+        </div>
+        <div v-else-if="item.type === 'multipleChoice'">
+          <MarkdownRenderer :content="item.question + '<br>' +
+          'option1: ' + item.option.option1 + '<br>' +
+          'option2: ' + item.option.option2 + '<br>' +
+          'option3: ' + item.option.option3 + '<br>' +
+          'option4: ' + item.option.option4" />
+        </div>
       </li>
     </ul>
   </div>
@@ -35,7 +44,7 @@ export default {
     async fetchQuestions() {
       try {
         // 向API发起请求并获取数据
-        const response = await axios.post('http://localhost:8081/api/questionBank/queryQuestion');
+        const response = await axios.post(process.env["VUE_APP_API_URL "] + '/api/questionBank/queryQuestion');
         if (response.data.success) {
           this.questions = response.data.questions;  // 从返回数据中获取问题列表
         } else {
@@ -56,7 +65,7 @@ export default {
 div {
   background-color: #f4f4f9;
   font-family: 'Arial', sans-serif;
-  padding: 20px;  /* 新增内边距 */
+  padding: 13px;  /* 新增内边距 */
 }
 
 /* 标题样式 */

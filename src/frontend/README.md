@@ -29,6 +29,16 @@ docker run -p 8080:3000 frontend
 
 之后在本机的 8080 端口即可完成访问。
 
+### 运行 IP 配置
+
+对于后端不同的服务器 IP 地址，可以在`src/.env`中进行配置。后端 API 访问的 IP 地址需修改一下字段：
+
+```
+VUE_APP_API_URL = http://localhost:8081
+```
+
+重新启动并运行。
+
 ### Compiles and hot-reloads for development
 
 ```
