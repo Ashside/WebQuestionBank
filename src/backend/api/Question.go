@@ -32,23 +32,46 @@ func AddChoiceQuestion(db *gorm.DB, c *ChoiceQuestions) interface{} {
 
 	return err
 }
-func QueryQuestion(db *gorm.DB, username string, subject string, difficulty int) []ChoiceQuestions {
+func QueryQuestionFromCertainInf(db *gorm.DB, username string, subject string, difficulty int) []ChoiceQuestions {
 	var choiceQuestions []ChoiceQuestions
 	var subjectiveQuestions []ChoiceQuestions
-	// 查询ChoiceQuestions表中的题目
-	err := db.Table("choicequestions").Where("author = ? AND subject = ? AND difficulty = ?", username, subject, difficulty).Find(&choiceQuestions).Error
-	if err != nil {
-		log.Printf("Failed to query choiceQuestions: %v\n", err)
-	} else {
-		log.Println("Successfully queried choiceQuestions")
+
+	/*
+		// 查询ChoiceQuestions表中的题目
+		err := db.Table("choicequestions").Where("author = ? AND subject = ? AND difficulty = ?", username, subject, difficulty).Find(&choiceQuestions).Error
+		if err != nil {
+			log.Printf("Failed to query choiceQuestions: %v\n", err)
+		} else {
+			log.Println("Successfully queried choiceQuestions")
+		}
+		// 查询SubjectiveQuestions表中的题目
+		err = db.Table("subjectivequestions").Where("author = ? AND subject = ? AND difficulty = ?", username, subject, difficulty).Find(&subjectiveQuestions).Error
+		if err != nil {
+			log.Printf("Failed to query subjectiveQuestions: %v\n", err)
+		} else {
+			log.Println("Successfully queried subjectiveQuestions")
+		}*/
+
+	// 根据传入的参数查询ChoiceQuestions表中的题目
+	// 先检查参数是否给出
+	if username == "" && subject == "" && difficulty == 0 {
+		// 从表中查询所有题目
+		err := db.Table("choicequestions").Find(&choiceQuestions).Error
+
+		if err != nil {
+			log.Printf("Failed to query choiceQuestions: %v\n", err)
+		} else {
+			log.Println("Successfully queried choiceQuestions")
+		}
+		err = db.Table("subjectivequestions").Find(&subjectiveQuestions).Error
+		if err != nil {
+			log.Printf("Failed to query subjectiveQuestions: %v\n", err)
+		} else {
+			log.Println("Successfully queried subjectiveQuestions")
+		}
+
 	}
-	// 查询SubjectiveQuestions表中的题目
-	err = db.Table("subjectivequestions").Where("author = ? AND subject = ? AND difficulty = ?", username, subject, difficulty).Find(&subjectiveQuestions).Error
-	if err != nil {
-		log.Printf("Failed to query subjectiveQuestions: %v\n", err)
-	} else {
-		log.Println("Successfully queried subjectiveQuestions")
-	}
+
 	// 将subjectiveQuestions转换为ChoiceQuestions
 	for _, q := range subjectiveQuestions {
 		choiceQuestions = append(choiceQuestions, ChoiceQuestions{

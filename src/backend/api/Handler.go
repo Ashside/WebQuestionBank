@@ -249,9 +249,9 @@ func AddChoiceAnswerPost(context *gin.Context) {
 func QueryQuestionPost(context *gin.Context) {
 	log.Println("QueryQuestionPost")
 	var form struct {
-		Username   string `form:"username" binding:"required"`
-		Subject    string `form:"subject" binding:"required"`
-		Difficulty int    `form:"difficulty" binding:"required"`
+		Username   string `form:"username" binding:""`
+		Subject    string `form:"subject" binding:""`
+		Difficulty int    `form:"difficulty" binding:""`
 	}
 
 	log.Println("Binding form")
@@ -267,15 +267,36 @@ func QueryQuestionPost(context *gin.Context) {
 		return
 	}
 
-	// 查询用户是否存在
-	var user Users
-	if err := GetUserByUsername(db, form.Username, &user); err != nil {
-		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Users not found"})
-		return
-	}
-
+	log.Println(form.Username)
+	log.Println(form.Subject)
+	log.Println(form.Difficulty)
 	// 查询题目
-	questions := QueryQuestion(db, form.Username, form.Subject, form.Difficulty)
-	context.JSON(http.StatusOK, gin.H{"success": true, "reason": nil, "questions": questions})
+	questions := QueryQuestionFromCertainInf(db, form.Username, form.Subject, form.Difficulty)
 
+	var response []gin.H
+	for _, question := range questions {
+		// 检查question的类型
+		if question.Options != "" {
+			response = append(response, gin.H{
+				"type":       "multipleChoice",
+				"question":   question.Content,
+				"answer":     question.Answer,
+				"difficulty": question.Difficulty,
+				"subject":    question.Subject,
+				"option":     "",
+			})
+			continue
+		} else {
+			response = append(response, gin.H{
+				"type":       "simpleAnswer",
+				"question":   question.Content,
+				"answer":     question.Answer,
+				"difficulty": question.Difficulty,
+				"subject":    question.Subject,
+				"option":     question.Options,
+			})
+		}
+
+	}
+	context.JSON(http.StatusOK, gin.H{"success": true, "reason": nil, "questions": response})
 }
