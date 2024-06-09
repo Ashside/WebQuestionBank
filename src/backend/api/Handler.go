@@ -277,23 +277,32 @@ func QueryQuestionPost(context *gin.Context) {
 	for _, question := range questions {
 		// 检查question的类型
 		if question.Options != "" {
+			// 解析question的option
+			var option map[string]string
+			err := json.Unmarshal([]byte(question.Options), &option)
+			if err != nil {
+				log.Println("JSON", question.Options)
+				fmt.Println("Error unmarshalling option:", err)
+				return
+			}
 			response = append(response, gin.H{
 				"type":       "multipleChoice",
 				"question":   question.Content,
 				"answer":     question.Answer,
 				"difficulty": question.Difficulty,
 				"subject":    question.Subject,
-				"option":     "",
+				"option":     option,
 			})
 			continue
 		} else {
+
 			response = append(response, gin.H{
 				"type":       "simpleAnswer",
 				"question":   question.Content,
 				"answer":     question.Answer,
 				"difficulty": question.Difficulty,
 				"subject":    question.Subject,
-				"option":     question.Options,
+				"option":     "",
 			})
 		}
 
