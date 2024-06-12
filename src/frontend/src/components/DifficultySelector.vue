@@ -42,7 +42,6 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 20px;
   margin: 20px 0;
 }
 
@@ -52,26 +51,29 @@ export default {
 
 .difficulty-selector label {
   padding: 10px 20px;
-  border-radius: 25px;
+  border: none; /* 移除边框 */
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease;
   font-size: 16px;
   font-weight: bold;
   text-transform: uppercase;
+  /* 添加如下属性来使标签变成正方形 */
+  min-width: 100px;
+  margin: 0; /* 移除边距让它们紧贴 */
 }
 
 .difficulty-selector label.easy {
-  background-color: black;
+  background-color: #333333;
   color: white;
 }
 
 .difficulty-selector label.medium {
-  background-color: black;
+  background-color: #333333;
   color: white;
 }
 
 .difficulty-selector label.hard {
-  background-color: black;
+  background-color: #333333;
   color: white;
 }
 

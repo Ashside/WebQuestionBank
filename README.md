@@ -3,13 +3,67 @@
 ## Requirements
 
 ### 后端
-- go version go1.20 windows/amd64
-- gin-gonic/gin v1.7.4
+
+后端使用 Go 语言编写，版本为 1.20，适用于 Windows / amd64 架构。Web 框架采用 gin-gonic / gin v1.7.4。你需要安装 Go 和相关的库来保证程序的正常运行。
 
 ### 前端
-- node 
-- npm 
-- vue v3
+
+前端使用 Vue3 进行编写，你需要安装 Node.js 和 Vue 来保证程序的正常运行。
+
+### 数据库
+
+数据库使用 MySQL 数据库。
+
+## 实现功能
+
+## 如何部署和配置
+
+### 前端部署
+
+#### `npm` 部署
+
+前端你可以直接使用 `npm` 进行部署。要确保你已经安装了 Node.js，如果没有安装，请前往 https://nodejs.org/ 进行安装。安装完成后，使用：
+
+```
+npm install
+```
+
+`npm` 会自动完成依赖配置，之后使用命令：
+
+```
+npm run serve
+```
+
+运行前端服务，并在浏览器中查看。
+
+#### Docker 部署
+
+使用 Docker 运行前端界面，切换到`\frontend`文件夹下，执行如下指令：
+
+```
+docker build -t frontend .
+docker run -p 8080:3000 frontend
+```
+
+之后在本机的 `8080` 端口即可完成访问。
+
+#### 运行 IP 配置
+
+对于后端不同的服务器 IP 地址，可以在`src/frontend/.env`中进行配置。后端 API 访问的 IP 地址需修改一下字段：
+
+```
+VUE_APP_API_URL = http://localhost:8081
+```
+
+重新启动并运行。
+
+## OpenAPI
+
+我们使用 Apifox 组织 API，你可以在[此网站](https://apifox.com/apidoc/shared-6bd451e3-8d10-40a4-bb52-5ce49f6262de)中查到目前开放的API接口。
+
+## Acknowledgement
+
+1. 感谢 OpenAI [ChatGPT](https://chatgpt.com/#) 的大力支持。
 
 ## 策划案
 

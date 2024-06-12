@@ -59,32 +59,34 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 60vh;
+  height: 30vh; /* 将高度调整小一点 */
   padding: 20px;
+  background-color: #f9f9f9; /* 轻微改变背景色 */
 }
 
 .container {
   display: flex;
   flex-direction: column;
-  width: 80%;
-  height: 80%;
+  width: 70%; /* 默认的容器宽度调小 */
+  height: 100%; /* 调整为100%以适应markdown-editor的高度 */
   background-color: #ffffff;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  overflow: auto;
-  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); /* 更明显的阴影效果 */
+  overflow: hidden; /* 隐藏滚动条 */
+  padding: 15px; /* 调整内部间距 */
 }
 
 .container h2 {
-  margin: 0 0 20px;
-  font-size: 24px;
+  margin-bottom: 15px; /* 减少标题与内容的间隔 */
+  font-size: 20px; /* 字体大小调整 */
+  color: #333; /* 字体颜色更深 */
   text-align: center;
 }
 
 .editor-preview-container {
   display: flex;
   flex: 1;
-  overflow: auto;
+  overflow: hidden; /* 隐藏内部滚动条 */
 }
 
 .editor-pane,
@@ -92,29 +94,29 @@ export default {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: auto;
-  padding: 20px;
+  overflow: auto; /* 允许滚动 */
+  padding: 15px; /* 内部间距调整 */
 }
 
 .editor-pane textarea {
   width: 100%;
   height: 100%;
-  border: none;
+  border: 1px solid #ccc; /* 添加边框 */
   resize: none;
   padding: 10px;
-  font-size: 16px;
-  line-height: 1.5;
+  font-size: 14px; /* 字体大小调整 */
+  line-height: 1.4; /* 行高调整 */
   border-radius: 4px;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .preview-pane {
   border-left: 1px solid #ddd;
-  padding: 20px;
+  padding: 15px; /* 调整内部间距 */
 }
 
 .preview-pane > * {
-  width: 90%;
+  width: 100%; /* 宽度调整为100% */
 }
 
 .editor-pane textarea:focus {
