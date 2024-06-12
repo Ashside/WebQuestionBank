@@ -22,8 +22,8 @@ const store = createStore({
             localStorage.removeItem('username');
         },
         initializeStore({ commit }) {
-            // const username = localStorage.getItem('username');
-            const username = '';
+            const username = localStorage.getItem('username');
+            // const username = '';
             if (username) {
                 commit('setUsername', username);
             }

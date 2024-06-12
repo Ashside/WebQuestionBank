@@ -3,37 +3,37 @@
   <div>
     <div>
       <center>
-        <h1>Question Difficulty</h1>
+        <h1>题目难度和科目选择</h1>
         <DifficultySelector v-model:difficulty="difficulty" />
         <SubjectSelector v-model:subject="subject" />
       </center>
     </div>
     <div>
-      <markdown-editor title="Question" v-model="question"></markdown-editor>
+      <markdown-editor title="题目" v-model="question"></markdown-editor>
     </div>
     <div>
-      <markdown-editor title="Option 1" v-model="option1"></markdown-editor>
+      <markdown-editor title="选项 1" v-model="option1"></markdown-editor>
     </div>
     <div>
-      <markdown-editor title="Option 2" v-model="option2"></markdown-editor>
+      <markdown-editor title="选项 2" v-model="option2"></markdown-editor>
     </div>
     <div>
-      <markdown-editor title="Option 3" v-model="option3"></markdown-editor>
+      <markdown-editor title="选项 3" v-model="option3"></markdown-editor>
     </div>
     <div>
-      <markdown-editor title="Option 4" v-model="option4"></markdown-editor>
+      <markdown-editor title="选项 4" v-model="option4"></markdown-editor>
     </div>
     <div>
       <center>
         <div class="multiple-choice-selector">
           <input type="checkbox" id="option1" name="choice" value="option1">
-          <label for="option1">Option 1</label><p></p>
+          <label for="option1">选项 1</label><p></p>
           <input type="checkbox" id="option2" name="choice" value="option2">
-          <label for="option2">Option 2</label><p></p>
+          <label for="option2">选项 2</label><p></p>
           <input type="checkbox" id="option3" name="choice" value="option3">
-          <label for="option3">Option 3</label><p></p>
+          <label for="option3">选项 3</label><p></p>
           <input type="checkbox" id="option4" name="choice" value="option4">
-          <label for="option4">Option 4</label><p></p>
+          <label for="option4">选项 4</label><p></p>
         </div>
       </center>
     </div>

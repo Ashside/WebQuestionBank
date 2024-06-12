@@ -3,16 +3,16 @@
   <div>
     <div>
       <center>
-        <h1>Question Difficulty</h1>
+        <h2>题目难度和科目选择</h2>
         <DifficultySelector v-model:difficulty="difficulty" />
         <SubjectSelector v-model:subject="subject" />
       </center>
     </div>
     <div>
-      <markdown-editor title="Question" v-model="question"></markdown-editor>
+      <markdown-editor title="题目" v-model="question"></markdown-editor>
     </div>
     <div>
-      <markdown-editor title="Answer" v-model="answer"></markdown-editor>
+      <markdown-editor title="答案" v-model="answer"></markdown-editor>
     </div>
     <div class="submit-button-container">
       <button class="submit-button" @click="handleSubmit">Submit</button>
