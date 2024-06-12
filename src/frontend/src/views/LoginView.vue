@@ -1,45 +1,67 @@
 <template>
   <div class="login-container">
-    <div class="login-card shadow-lg">
+    <!-- 使用v-if和v-else来切换登录和注册表单 -->
+    <div v-if="isLogin" class="login-card shadow-lg">
+      <!-- 登录表单 -->
       <h1 class="text-center mb-4">Welcome</h1>
       <form @submit.prevent="handleLogin">
         <div class="form-floating mb-3 text-center">
           <div><label for="email">Email address</label></div>
           <p></p>
-          <input
-              type="email"
-              class="form-control text-center"
-              id="email"
-              v-model="email"
-              required
-          />
+          <input type="email" class="form-control text-center" id="email" v-model="email" required />
         </div>
         <p></p>
         <div class="form-floating mb-3 text-center">
           <div><label for="password">Password</label></div>
           <p></p>
-          <input
-              type="password"
-              class="form-control text-center"
-              id="password"
-              v-model="password"
-              required
-          />
+          <input type="password" class="form-control text-center" id="password" v-model="password" required />
         </div>
         <p></p>
-        <button
-            class="btn btn-primary w-100"
-            type="submit"
-            :disabled="isLoading"
-        >
+        <button class="btn btn-primary w-100" type="submit" :disabled="isLoading">
           <span v-if="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
           <span v-if="!isLoading">Login</span>
           <span v-if="isLoading">Logging in...</span>
         </button>
       </form>
+      <!-- 切换到注册按钮 -->
+      <p></p>
+      <button @click="toggleForm" class="btn btn-primary w-100">Need an account? Register</button>
     </div>
-    <div class="circle-button-container">
-      <van-button round type="success" color="#7232dd" to="about">about US</van-button>
+
+    <div v-else class="login-card shadow-lg">
+      <!-- 注册表单 -->
+      <h1 class="text-center mb-4">Register</h1>
+      <form @submit.prevent="handleRegister">
+        <div class="form-floating mb-3 text-center">
+          <div><label for="new-email">Email address</label></div>
+          <p></p>
+          <input type="email" class="form-control text-center" id="new-email" v-model="newEmail" required />
+        </div>
+        <p></p>
+        <div class="form-floating mb-3 text-center">
+          <div><label for="new-password">Password</label></div>
+          <p></p>
+          <input type="password" class="form-control text-center" id="new-password" v-model="newPassword" required />
+        </div>
+        <p></p>
+        <!-- 新增用户角色选择 -->
+        <div class="form-floating mb-3 text-center">
+          <div><label for="role">Role</label></div>
+          <select id="role" class="form-control" v-model="role">
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <p></p>
+        <button class="btn btn-primary w-100" type="submit" :disabled="isLoading">
+          <!-- 注册按钮内容 -->
+            <span v-if="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span v-if="!isLoading">Register</span>
+            <span v-if="isLoading">Registering...</span>
+        </button>
+      </form>
+      <p></p>
+      <button @click="toggleForm" class="btn btn-primary w-100">Already have an account? Login</button>
     </div>
   </div>
 </template>
@@ -48,27 +70,66 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import router from "@/router";
+import store from "@/store";
 
 const email = ref('');
 const password = ref('');
+const newEmail = ref('');
+const newPassword = ref('');
 const isLoading = ref(false);
+const isLogin = ref(true);  // 初始为登录视图
+const role = ref('user');  // 默认为用户角色
 
 const handleLogin = async () => {
   isLoading.value = true;
   try {
-    const response = await axios.post('http://localhost:3000/api/login', {
-      email: email.value,
-      password: password.value,
+    const response = await axios.post(process.env['VUE_APP_API_URL'] + '/api/usr/loginCheck', {
+      username: email.value,
+      password: password.value},
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      }
     });
-    alert('Logged in successfully!');
-    if (response.status === 200) {
-      router.push('/about');
+    if (response.status === 200 && response.data.success) {
+      store.dispatch('login', email.value);
+      alert('Logged in successfully!');
+      await router.push('/home');
     }
   } catch (error) {
     alert('Failed to login.');
   } finally {
     isLoading.value = false;
   }
+};
+
+const handleRegister = async () => {
+  isLoading.value = true;
+  try {
+    const response = await axios.post(process.env['VUE_APP_API_URL'] + '/api/usr/registerCheck', {
+          username: newEmail.value,
+          password: newPassword.value,
+          type: role.value,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+    if (response.status === 200 && response.data.success) {
+      store.dispatch('login', newEmail.value);
+      alert('Register in successfully!');
+      await router.push('/home');
+    }
+  } catch (error) {
+    alert('Failed to register.');
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const toggleForm = () => {
+  isLogin.value = !isLogin.value;  // 切换表单
 };
 </script>
 
@@ -79,10 +140,9 @@ const handleLogin = async () => {
   justify-content: center;
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  position: relative; /* Add this to make the pseudo-element position relative to the container */
+  position: relative;
 }
 
-/* Add the following styles for the pseudo-element */
 .login-container::before {
   content: '';
   position: absolute;
@@ -90,19 +150,19 @@ const handleLogin = async () => {
   left: 50%;
   width: 200%;
   height: 100%;
-  background-size: contain; /* Ensure the background images are contained within the element */
+  background-size: contain;
   z-index: -1;
   transform: translateX(-50%) skewX(-20deg);
 }
 
 .login-card {
   background: #fff;
-  padding: 3rem; /* 增加padding以增大卡片 */
+  padding: 3rem;
   border-radius: 10px;
   width: 100%;
-  max-width: 500px; /* 增加max-width以增大卡片 */
+  max-width: 500px;
   animation: fadeIn 1s ease-in-out;
-  text-align: center; /* 设置卡片内容居中 */
+  text-align: center;
 }
 
 @keyframes fadeIn {
@@ -119,33 +179,50 @@ const handleLogin = async () => {
 .btn-primary {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: none;
-  font-size: 1.5rem; /* 调整这个值以设置所需的字号 */
-  color: white; /* 设置文字颜色为白色 */
-  padding: 10px 20px; /* 添加一些内边距，使按钮更大一些 */
-  border-radius: 5px; /* 添加圆角 */
-  cursor: pointer; /* 鼠标悬停时显示指针 */
-  transition: background 0.3s ease; /* 平滑过渡效果 */
+  font-size: 1.5rem;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
 
 .btn-primary:focus, .btn-primary:hover {
   background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
 }
 
-/* 让表单文本居中 */
 .form-floating label {
   width: 100%;
   text-align: center;
-  font-size: 1.5rem; /* 调整这个值以设置所需的字号 */
+  font-size: 1.5rem;
 }
 
-.form-control {
+.form-control, select {
   text-align: center;
-  font-size: 1.5rem; /* 调整这个值以设置所需的字号 */
+  font-size: 1.5rem;
+  border: 2px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  appearance: none; /* Remove default styling */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) no-repeat right .75rem center/8px 10px;
+  color: black;
 }
 
-.circle-button-container {
+select option {
+  background: white;
+  color: black;
+}
+
+/* Add custom arrow using CSS */
+select::after {
+  content: "";
   position: absolute;
-  bottom: 20px;
-  right: 20px;
+  right: 15px;
+  top: 50%;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid white; /* Arrow color */
+  transform: translateY(-50%);
 }
 </style>

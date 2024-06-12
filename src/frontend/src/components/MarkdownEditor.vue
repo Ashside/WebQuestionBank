@@ -4,10 +4,10 @@
       <h2>{{ title }}</h2>
       <div class="editor-preview-container">
         <div class="editor-pane">
-          <textarea v-model="inputText" v-auto-resize placeholder="请输入Markdown内容..."></textarea>
+          <textarea v-model="localInputText" v-auto-resize placeholder="请输入Markdown内容..."></textarea>
         </div>
         <div class="preview-pane">
-          <MarkdownRenderer :content="inputText" />
+          <MarkdownRenderer :content="localInputText" />
         </div>
       </div>
     </div>
@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import autoResize from '@/directives/autoResize';
 
@@ -31,12 +31,24 @@ export default {
       type: String,
       required: true,
     },
+    modelValue: {
+      type: String,
+      required: true,
+    },
   },
-  setup() {
-    const inputText = ref('');
+  setup(props, { emit }) {
+    const localInputText = ref(props.modelValue);
+
+    watch(() => props.modelValue, (newValue) => {
+      localInputText.value = newValue;
+    });
+
+    watch(localInputText, (newValue) => {
+      emit('update:modelValue', newValue);
+    });
 
     return {
-      inputText,
+      localInputText,
     };
   },
 };
@@ -48,7 +60,6 @@ export default {
   justify-content: center;
   align-items: center;
   height: 60vh;
-  background-color: #f0f0f0;
   padding: 20px;
 }
 

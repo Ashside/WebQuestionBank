@@ -1,5 +1,9 @@
 {
   "dependencies": {
-    "github-markdown-css": "^5.5.1"
+    "github-markdown-css": "^5.5.1",
+    "vuex": "^4.0.2"
+  },
+  "devDependencies": {
+    "naive-ui": "^2.38.2"
   }
 }
