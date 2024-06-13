@@ -1,98 +1,84 @@
-<template style="height: 100%">
+<template>
   <NavigateBar></NavigateBar>
-  <div style="min-height: 100%" class="background">
-    <div class="container">
-      <h1>About Us</h1>
-      <p>Welcome to <span class="highlight">Our Company</span>! We are a team of passionate individuals dedicated to excellence.</p>
-      <div class="team-member">
-        <h3>John Doe</h3>
-        <p>Co-founder & CEO</p>
-        <p>John is a visionary leader with a keen eye for innovation.</p>
+  <br>
+  <div class="about-us">
+    <h1>关于我们</h1>
+    <p>我们的团队由三位成员组成，每位成员都拥有独特的技能和职责，致力于为用户提供卓越的软件解决方案。</p>
+
+    <h2>我们的项目</h2>
+    <a href="https://github.com/Ashside/WebQuestionBank" target="_blank">
+      <img src="../assets/github.png" alt="GitHub Project">
+    </a>
+
+    <h2>团队成员</h2>
+      <div class="member">
+        <h3>Ashside</h3>
+        <p> 搭建并测试后端框架 </p>
+        <p> 编写部分路由分组代码 </p>
+        <p> 封装部分数据库接口 </p>
       </div>
-      <div class="team-member">
-        <h3>Jane Smith</h3>
-        <p>Co-founder & CTO</p>
-        <p>Jane is a tech enthusiast who loves turning ideas into reality.</p>
+    <br>
+      <div class="member">
+        <h3>Meng Yueqi</h3>
+        <p> API 接口设计 </p>
+        <p> 前端页面开发及部署 </p>
+        <p> 部分服务器部署测试 </p>
       </div>
-      <div class="team-member">
-        <h3>David Lee</h3>
-        <p>Lead Designer</p>
-        <p>David's creativity knows no bounds, always pushing the envelope.</p>
+    <br>
+      <div class="member">
+        <h3>MaxSuperMax33</h3>
+        <p> 编写部分路由分组代码 </p>
+        <p> 封装部分数据库接口 </p>
+        <p> 识别并优化性能瓶颈，进行必要的代码重构 </p>
       </div>
-      <div class="team-member">
-        <h3>Emily Johnson</h3>
-        <p>Marketing Manager</p>
-        <p>Emily is a storyteller at heart, crafting compelling narratives.</p>
-      </div>
-  </div>
   </div>
 </template>
 
 <script>
 import NavigateBar from "@/components/NavigateBar.vue";
 
-  export default {
-    name: 'AboutUs',
-    components: {NavigateBar}
-  };
+export default {
+  name: 'GitHubProject',
+  components: {NavigateBar}
+};
 </script>
 
 <style scoped>
-  html, body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    height: 100%;
-    padding: 0;
-  }
-  .container {
-    max-width: 800px;
-    margin: 50px auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-    /* 设置背景颜色及透明度 */
-    background-color: rgba(255, 255, 255, 0.7); /* 0.5表示50%的透明度 */
-  }
-  h1 {
-    color: #333;
-    text-align: center;
-    margin-bottom: 30px;
-  }
-  p {
-    color: #666;
-    line-height: 1.6;
-    margin-bottom: 20px;
-  }
-  .highlight {
-    color: #ff5722;
-    font-weight: bold;
-  }
-  .team-member {
-    margin-bottom: 30px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 20px;
-  }
-  .team-member:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-  }
-  .team-member h3 {
-    color: #333;
-    margin: 0 0 10px;
-  }
-  .team-member p {
-    margin: 0;
-    color: #666;
-  }
-  .background {
-    /* 设置背景图片的URL */
-    background-image: url("../../public/aboutUs.png");
-    /* 设置背景图片的大小和行为 */
-    background-size: cover; /* 使背景图片充满整个容器 */
-    background-repeat: no-repeat; /* 防止背景图片重复 */
-    /* 可选：添加其他样式，如背景颜色、高度等 */
-    min-height: 100vh;
-    margin: 0;
-  }
+.about-us {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+  background-color: #fff; /* Optional: can change to other colors */
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+h1, h2 {
+  color: #333;
+}
+
+p, li, h3 {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+a {
+  display: inline-block;
+  margin: 20px;
+}
+
+img {
+  width: 100px; /* Adjust as needed */
+  height: auto;
+}
+
+
+.member {
+  flex: 1;
+  padding: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
 </style>
