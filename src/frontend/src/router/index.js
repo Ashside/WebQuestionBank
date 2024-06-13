@@ -58,6 +58,14 @@ const routes = [
         }
     },
     {
+        path: '/MakeTest',
+        name: 'MakeTest',
+        component: () => import('@/views/MakeTest.vue'),
+        meta: {
+            requiresAuth: true  // 需要认证
+        }
+    },
+    {
         path: '/:pathMatch(.*)*',
         component: () => import('@/views/NotFound.vue'),
     }

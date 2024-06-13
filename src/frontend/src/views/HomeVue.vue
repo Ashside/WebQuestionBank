@@ -7,7 +7,7 @@
       <CustomCard title="录入简答题" cover="/simple_answer.png" @card-click="navigateTo('LoadQuestion/shortAnswer')"></CustomCard>
       <CustomCard title="录入选择题" cover="/multiple_choice.png" @card-click="navigateTo('LoadQuestion/multipleChoice')"></CustomCard>
       <CustomCard title="查看题库" cover="/question_bank.png" @card-click="navigateTo('/ViewQuestion')"></CustomCard>
-      <!-- 可以根据需要添加更多卡片 -->
+      <CustomCard title="组卷" cover="/make_test.png" @card-click="navigateTo('/MakeTest')"></CustomCard>
     </div>
   </div>
 </template>
