@@ -16,10 +16,20 @@
           'option3: ' + item.option.option3 + '<br>' +
           'option4: ' + item.option.option4" />
         </div>
+        <div class="tag-container">
+          <n-tag v-if="item.subject === 'history'" style="background-color: #ffa726">历史</n-tag>
+          <n-tag v-else-if="item.subject === 'math'" style="background-color: #66bb6a">数学</n-tag>
+          <n-tag v-else-if="item.subject === 'english'" style="background-color: #42a5f5">英语</n-tag>
+
+          <n-tag v-if="item.difficulty === 1" type="success">简单</n-tag>
+          <n-tag v-else-if="item.difficulty === 2" type="warning">中等</n-tag>
+          <n-tag v-else-if="item.difficulty === 3" type="error">困难</n-tag>
+        </div>
       </li>
     </ul>
   </div>
 </template>
+
 
 <script>
 import axios from 'axios';
@@ -61,6 +71,13 @@ export default {
 </script>
 
 <style scoped>
+/* 添加标签容器样式 */
+.tag-container {
+  display: flex;
+  gap: 8px;  /* 设置较小的间隔 */
+  padding: 8px;  /* 设置内边距 */
+}
+
 /* 整体背景、字体设置和内边距 */
 div {
   background-color: #f4f4f9;
