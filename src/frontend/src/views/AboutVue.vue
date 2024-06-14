@@ -5,6 +5,10 @@
     <h1>关于我们</h1>
     <p>我们的团队由三位成员组成，每位成员都拥有独特的技能和职责，致力于为用户提供卓越的软件解决方案。</p>
 
+    <h2>我们的目标</h2>
+    <p>我们的目标是为用户提供一个方便的在线题库，用户可以在这里查看、录入、组卷、测试题目。
+      我们希望借助我们的努力，让需要题库管理的用户零成本、低成本搭建好用高效的系统。</p>
+
     <h2>我们的项目</h2>
     <a href="https://github.com/Ashside/WebQuestionBank" target="_blank">
       <img src="../assets/github.png" alt="GitHub Project">
