@@ -3,65 +3,65 @@
     <!-- 使用v-if和v-else来切换登录和注册表单 -->
     <div v-if="isLogin" class="login-card shadow-lg">
       <!-- 登录表单 -->
-      <h1 class="text-center mb-4">Welcome</h1>
+      <h1 class="text-center mb-4">欢迎使用网络题库</h1>
       <form @submit.prevent="handleLogin">
         <div class="form-floating mb-3 text-center">
-          <div><label for="email">Email address</label></div>
+          <div><label for="email">电子邮箱地址</label></div>
           <p></p>
           <input type="email" class="form-control text-center" id="email" v-model="email" required />
         </div>
         <p></p>
         <div class="form-floating mb-3 text-center">
-          <div><label for="password">Password</label></div>
+          <div><label for="password">密码</label></div>
           <p></p>
           <input type="password" class="form-control text-center" id="password" v-model="password" required />
         </div>
         <p></p>
         <button class="btn btn-primary w-100" type="submit" :disabled="isLoading">
           <span v-if="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-          <span v-if="!isLoading">Login</span>
-          <span v-if="isLoading">Logging in...</span>
+          <span v-if="!isLoading">登录</span>
+          <span v-if="isLoading">登录中...</span>
         </button>
       </form>
       <!-- 切换到注册按钮 -->
       <p></p>
-      <button @click="toggleForm" class="btn btn-primary w-100">Need an account? Register</button>
+      <button @click="toggleForm" class="btn btn-primary w-100">还没有账号？注册</button>
     </div>
 
     <div v-else class="login-card shadow-lg">
       <!-- 注册表单 -->
-      <h1 class="text-center mb-4">Register</h1>
+      <h1 class="text-center mb-4">注册</h1>
       <form @submit.prevent="handleRegister">
         <div class="form-floating mb-3 text-center">
-          <div><label for="new-email">Email address</label></div>
+          <div><label for="new-email">电子邮箱地址</label></div>
           <p></p>
           <input type="email" class="form-control text-center" id="new-email" v-model="newEmail" required />
         </div>
         <p></p>
         <div class="form-floating mb-3 text-center">
-          <div><label for="new-password">Password</label></div>
+          <div><label for="new-password">密码</label></div>
           <p></p>
           <input type="password" class="form-control text-center" id="new-password" v-model="newPassword" required />
         </div>
         <p></p>
         <!-- 新增用户角色选择 -->
         <div class="form-floating mb-3 text-center">
-          <div><label for="role">Role</label></div>
+          <div><label for="role">身份</label></div>
           <select id="role" class="form-control" v-model="role">
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
+            <option value="user">用户</option>
+            <option value="admin">管理员</option>
           </select>
         </div>
         <p></p>
         <button class="btn btn-primary w-100" type="submit" :disabled="isLoading">
           <!-- 注册按钮内容 -->
             <span v-if="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-            <span v-if="!isLoading">Register</span>
-            <span v-if="isLoading">Registering...</span>
+            <span v-if="!isLoading">注册</span>
+            <span v-if="isLoading">注册中</span>
         </button>
       </form>
       <p></p>
-      <button @click="toggleForm" class="btn btn-primary w-100">Already have an account? Login</button>
+      <button @click="toggleForm" class="btn btn-primary w-100">已经有账号了？登录</button>
     </div>
   </div>
 </template>
