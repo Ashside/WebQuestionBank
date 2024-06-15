@@ -34,7 +34,12 @@
       </li>
     </ul>
   </div>
-  <button @click="submitSelectedQuestions">提交选中的题目</button>
+  <div class="button-container">
+    <button @click="submitSelectedQuestions">提交选中的题目</button>
+    <transition name="fade">
+      <button v-if="submissionSuccess" @click="handleExtraAction">执行额外的操作</button>
+    </transition>
+  </div>
 </template>
 
 
@@ -42,7 +47,7 @@
 import axios from 'axios';
 import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
 import NavigateBar from "@/components/NavigateBar.vue";
-import router from "@/router";
+// import router from "@/router";
 
 export default {
   name: 'ViewQuestions',
@@ -50,7 +55,9 @@ export default {
 
   data() {
     return {
-      questions: []  // 存储从API获取的问题数据
+      questions: [],  // 存储从API获取的问题数据
+      submissionSuccess: false,
+      pdfURL: ''
     }
   },
 
@@ -65,6 +72,7 @@ export default {
         const response = await axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/queryQuestion');
         if (response.data.success) {
           this.questions = response.data.questions;  // 从返回数据中获取问题列表
+          this.pdfURL = ''
         } else {
           console.error('Failed to fetch questions:', response.data.reason);
           // 处理API返回的错误
@@ -79,8 +87,8 @@ export default {
       axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/makeTest', { questions: selectedQuestions })
           .then(response => {
             if(response.data.success) {
-              alert("提交成功!")
-              router.push('/home')
+              this.submissionSuccess = true;
+              this.pdfURL = 'https://' + response.data.pdfURL;
             } else {
               console.error("提交失败:", response.data.reason);
             }
@@ -88,6 +96,9 @@ export default {
           .catch(error => {
             console.error("提交时出错:", error);
           });
+    },
+    handleExtraAction() {
+      window.location.href = this.pdfURL;
     }
   }
 }
@@ -175,7 +186,7 @@ input[type="checkbox"]:checked::after {
 
 /* 提交按钮样式 */
 button {
-  background-color: #66bb6a; /* 绿色背景 */
+  background-color: #1e88e5; /* 绿色背景 */
   color: white;
   border: none;
   padding: 10px 20px;
@@ -184,12 +195,11 @@ button {
   cursor: pointer;
   transition: background-color 0.3s;
   display: block;
-  margin: 20px auto; /* 居中按钮 */
   text-align: center;
 }
 
 button:hover {
-  background-color: #57a05a; /* 深绿色背景 */
+  background-color: #2a2a72; /* 深绿色背景 */
 }
 
 .question-header {
@@ -206,6 +216,12 @@ h3 {
 
 input[type="checkbox"] {
   flex-shrink: 0; /* 防止复选框大小调整 */
+}
+
+.button-container {
+  display: flex;  /* 启用flex布局 */
+  justify-content: center;  /* 水平居中 */
+  gap: 10px;  /* 按钮之间的间隔 */
 }
 
 </style>
