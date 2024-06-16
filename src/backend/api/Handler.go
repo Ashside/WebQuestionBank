@@ -379,6 +379,7 @@ func DeleteQuestionPost(context *gin.Context) {
 				context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
 				return
 			}
+			continue
 		}
 		var subjectQuestion SubjectiveQuestions
 		if err := db.Table("subjectivequestions").Where("id = ?", question.ID).First(&subjectQuestion).Error; err == nil {
@@ -388,6 +389,7 @@ func DeleteQuestionPost(context *gin.Context) {
 				context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
 				return
 			}
+			continue
 		}
 		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Question not found"})
 		return
