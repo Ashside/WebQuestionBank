@@ -285,6 +285,12 @@ func QueryQuestionPost(context *gin.Context) {
 				fmt.Println("Error unmarshalling option:", err)
 				return
 			}
+			// 查询关键词
+			keywords, err := GetKeywordsByQuestionId(db, question.Id, true)
+			if err != nil {
+				log.Println("Failed to get keywords")
+				return
+			}
 			response = append(response, gin.H{
 				"type":       "multipleChoice",
 				"question":   question.Content,
@@ -292,10 +298,17 @@ func QueryQuestionPost(context *gin.Context) {
 				"difficulty": question.Difficulty,
 				"subject":    question.Subject,
 				"option":     option,
+				"keywords":   keywords,
+				"id":         question.Id,
 			})
 			continue
 		} else {
-
+			// 查询关键词
+			keywords, err := GetKeywordsByQuestionId(db, question.Id, false)
+			if err != nil {
+				log.Println("Failed to get keywords")
+				return
+			}
 			response = append(response, gin.H{
 				"type":       "simpleAnswer",
 				"question":   question.Content,
@@ -303,6 +316,8 @@ func QueryQuestionPost(context *gin.Context) {
 				"difficulty": question.Difficulty,
 				"subject":    question.Subject,
 				"option":     "",
+				"keywords":   keywords,
+				"id":         question.Id,
 			})
 		}
 
