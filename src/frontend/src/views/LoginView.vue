@@ -117,7 +117,7 @@ const handleRegister = async () => {
           }
         });
     if (response.status === 200 && response.data.success) {
-      store.dispatch('login', newEmail.value);
+      store.dispatch('login', { username: newEmail.value, role: role.value });
       alert('Register in successfully!');
       await router.push('/home');
     }
