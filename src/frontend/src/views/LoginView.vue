@@ -50,6 +50,7 @@
           <select id="role" class="form-control" v-model="role">
             <option value="user">用户</option>
             <option value="admin">管理员</option>
+            <option value="student">学生</option>
           </select>
         </div>
         <p></p>

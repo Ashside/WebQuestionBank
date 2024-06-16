@@ -47,6 +47,7 @@
 import axios from 'axios';
 import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
 import NavigateBar from "@/components/NavigateBar.vue";
+import store from "@/store";
 // import router from "@/router";
 
 export default {
@@ -84,7 +85,10 @@ export default {
     },
     submitSelectedQuestions() {
       const selectedQuestions = this.questions.filter(q => q.selected).map(q => ({ id: q.id }));
-      axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/makeTest', { questions: selectedQuestions })
+      axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/makeTest', {
+        username: store.state.username,
+        questions: selectedQuestions
+      })
           .then(response => {
             if(response.data.success) {
               this.submissionSuccess = true;

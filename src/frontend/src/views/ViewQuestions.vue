@@ -44,7 +44,11 @@
 import axios from 'axios';
 import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
 import NavigateBar from "@/components/NavigateBar.vue";
-import { mapState } from 'vuex';
+import {computed} from "vue";
+import store from "@/store";
+
+const storeRole = computed(() => store.state.role);
+const isAdmin = computed(() => storeRole.value === 'admin');
 
 export default {
   name: 'ViewQuestions',
@@ -52,14 +56,8 @@ export default {
 
   data() {
     return {
-      questions: []  // 存储从API获取的问题数据
-    }
-  },
-
-  computed: {
-    ...mapState(['role']),  // 映射 role 到局部计算属性
-    isAdmin() {
-      return this.role === 'admin';  // 检查是否管理员
+      questions: [],  // 存储从API获取的问题数据
+      isAdmin
     }
   },
 
@@ -90,7 +88,8 @@ export default {
       const selectedQuestionIds = selectedQuestions.map(item => ({ id: item.id }));
       // 向API发送请求删除选中的问题
       axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/deleteQuestion', {
-        questionIds: selectedQuestionIds
+        username: store.state.username,
+        questions: selectedQuestionIds
       }).then(response => {
         if (response.data.success) {
           alert('Deleted successfully!');

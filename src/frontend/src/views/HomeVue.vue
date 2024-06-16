@@ -4,10 +4,12 @@
     <h1>欢迎来到首页！</h1>
     <p>请选择你要进行的操作</p>
     <div class="card-container">
-      <CustomCard title="录入简答题" cover="/simple_answer.png" @card-click="navigateTo('LoadQuestion/shortAnswer')"></CustomCard>
-      <CustomCard title="录入选择题" cover="/multiple_choice.png" @card-click="navigateTo('LoadQuestion/multipleChoice')"></CustomCard>
-      <CustomCard title="查看题库" cover="/question_bank.png" @card-click="navigateTo('/ViewQuestion')"></CustomCard>
-      <CustomCard title="组卷" cover="/make_test.png" @card-click="navigateTo('/MakeTest')"></CustomCard>
+      <CustomCard v-if="!isStudent" title="录入简答题" cover="/simple_answer.png" @card-click="navigateTo('LoadQuestion/shortAnswer')"></CustomCard>
+      <CustomCard v-if="!isStudent" title="录入选择题" cover="/multiple_choice.png" @card-click="navigateTo('LoadQuestion/multipleChoice')"></CustomCard>
+      <CustomCard v-if="!isStudent" title="查看题库" cover="/question_bank.png" @card-click="navigateTo('/ViewQuestion')"></CustomCard>
+      <CustomCard v-if="!isStudent" title="组卷" cover="/make_test.png" @card-click="navigateTo('/MakeTest')"></CustomCard>
+      <CustomCard v-if="isStudent" title="完成试卷" cover="/exam.png" @card-click="navigateTo('/MakeTest')"></CustomCard>
+      <CustomCard v-if="isStudent" title="查看试卷" cover="/view_test.png" @card-click="navigateTo('/MakeTest')"></CustomCard>
     </div>
   </div>
 </template>
@@ -16,6 +18,11 @@
 import NavigateBar from "@/components/NavigateBar.vue";
 import CustomCard from "@/components/CustomCard.vue";
 import {useRouter} from "vue-router";
+import {computed} from "vue";
+import store from "@/store";
+
+const storeRole = computed(() => store.state.role);
+const isStudent = computed(() => storeRole.value === 'student');
 
 export default {
   name: 'HomeVue',
@@ -23,6 +30,7 @@ export default {
     CustomCard,
     Navigate: NavigateBar
   },
+
   setup() {
     const router = useRouter();
 
@@ -31,7 +39,8 @@ export default {
     };
 
     return {
-      navigateTo
+      navigateTo,
+      isStudent
     };
   }
 };
