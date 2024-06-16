@@ -73,5 +73,13 @@ func main() {
 	// else 包含questions（	ID*int，QuestionType*string ）字段
 	//if questions空 包含message字段
 	ComposionGroup.POST("/search", api.SearchQuestions)
+
+	//处理/api/questionBank/deleteQuestion的OPTIONS请求
+	// 该请求用于删除题目
+	// 输入：form表单，包含questions字段，questions是一个数组，包含多个题目的id
+	// 输出：json格式，包含success、reason字段
+	// 约束：只有管理员可以删除题目
+	questionBankGroup.POST("/deleteQuestion", api.DeleteQuestionPost)
+
 	_ = r.Run(":8081")
 }
