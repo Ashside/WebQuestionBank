@@ -5,7 +5,10 @@
     <ul>
       <!-- 渲染接收到的问题的描述 -->
       <li v-for="(item, index) in questions" :key="index">
-        <h3> 题目{{ index + 1 }} </h3>
+        <div class="question-header">
+          <input v-if="isAdmin" type="checkbox" v-model="item.selected">
+          <h3> 题目{{ index + 1 }} </h3>
+        </div>
         <div v-if="item.type === 'simpleAnswer'">
           <MarkdownRenderer :content="item.question" />
         </div>
@@ -30,6 +33,9 @@
         </div>
       </li>
     </ul>
+    <div class="button-container">
+      <button v-if="isAdmin" @click="submitDeleteQuestions">删除选中的题目</button>
+    </div>
   </div>
 </template>
 
@@ -38,6 +44,7 @@
 import axios from 'axios';
 import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
 import NavigateBar from "@/components/NavigateBar.vue";
+import { mapState } from 'vuex';
 
 export default {
   name: 'ViewQuestions',
@@ -46,6 +53,13 @@ export default {
   data() {
     return {
       questions: []  // 存储从API获取的问题数据
+    }
+  },
+
+  computed: {
+    ...mapState(['role']),  // 映射 role 到局部计算属性
+    isAdmin() {
+      return this.role === 'admin';  // 检查是否管理员
     }
   },
 
@@ -68,6 +82,25 @@ export default {
         console.error('Error fetching questions:', error);
         // 处理请求错误
       }
+    },
+    submitDeleteQuestions() {
+      // 获取选中的问题
+      const selectedQuestions = this.questions.filter(item => item.selected);
+      // 获取选中问题的ID
+      const selectedQuestionIds = selectedQuestions.map(item => ({ id: item.id }));
+      // 向API发送请求删除选中的问题
+      axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/deleteQuestion', {
+        questionIds: selectedQuestionIds
+      }).then(response => {
+        if (response.data.success) {
+          alert('Deleted successfully!');
+          this.fetchQuestions();  // 重新获取问题列表
+        } else {
+          alert('Failed to delete questions.');
+        }
+      }).catch(error => {
+        console.error('Error deleting questions:', error);
+      });
     }
   }
 }
@@ -123,4 +156,75 @@ h3 {
   margin: 0;
   border-bottom: 1px solid #eee;
 }
+
+/* 自定义复选框样式 */
+input[type="checkbox"] {
+  -webkit-appearance: none; /* 移除默认外观 */
+  appearance: none;
+  background-color: #fff;
+  margin: 0 10px 0 0;
+  font-size: 1.5em;
+  color: #f44336; /* 红色 */
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f44336; /* 红色边框 */
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #f44336; /* 红色背景 */
+}
+
+input[type="checkbox"]:checked::after {
+  content: "✖"; /* 改为叉 */
+  position: absolute;
+  top: -4px; /* 根据叉的大小微调位置 */
+  left: 4px;
+  color: #fff;
+  font-size: 16px;
+}
+
+/* 提交按钮样式 */
+button {
+  background-color: #f44336; /* 红色背景 */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: block;
+  text-align: center;
+}
+
+button:hover {
+  background-color: #b71c1c; /* 深红色背景 */
+}
+
+
+.question-header {
+  display: flex;
+  align-items: center; /* 垂直居中对齐复选框和标题 */
+  padding: 10px 15px; /* 提供一些内部空间 */
+}
+
+h3 {
+  margin: 0 0 0 10px; /* 为标题添加左侧间距 */
+  color: #2a2a72;
+  flex-grow: 1; /* 允许标题占用剩余空间 */
+}
+
+input[type="checkbox"] {
+  flex-shrink: 0; /* 防止复选框大小调整 */
+}
+
+.button-container {
+  display: flex;  /* 启用flex布局 */
+  justify-content: center;  /* 水平居中 */
+  gap: 10px;  /* 按钮之间的间隔 */
+}
+
 </style>

@@ -92,7 +92,7 @@ const handleLogin = async () => {
       }
     });
     if (response.status === 200 && response.data.success) {
-      store.dispatch('login', email.value);
+      store.dispatch('login', { username: email.value, role: response.data.type });
       alert('Logged in successfully!');
       await router.push('/home');
     }
@@ -117,7 +117,7 @@ const handleRegister = async () => {
           }
         });
     if (response.status === 200 && response.data.success) {
-      store.dispatch('login', newEmail.value);
+      store.dispatch('login', { username: newEmail.value, role: role.value });
       alert('Register in successfully!');
       await router.push('/home');
     }
