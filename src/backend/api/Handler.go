@@ -288,9 +288,9 @@ func QueryQuestionPost(context *gin.Context) {
 			// 查询关键词
 
 			keywordsS, err := GetKeywordsByQuestionId(db, question.Id, false)
-			keywords := make([]string, 0)
+			keywords := make([]map[string]string, 0)
 			for _, keyword := range keywordsS {
-				keywords = append(keywords, keyword.Keyword)
+				keywords = append(keywords, map[string]string{"keyword": keyword.Keyword})
 			}
 			if err != nil {
 				log.Println("Failed to get keywords")
@@ -310,9 +310,10 @@ func QueryQuestionPost(context *gin.Context) {
 		} else {
 			// 查询关键词
 			keywordsS, err := GetKeywordsByQuestionId(db, question.Id, false)
-			keywords := make([]string, 0)
+
+			keywords := make([]map[string]string, 0)
 			for _, keyword := range keywordsS {
-				keywords = append(keywords, keyword.Keyword)
+				keywords = append(keywords, map[string]string{"keyword": keyword.Keyword})
 			}
 			if err != nil {
 				log.Println("Failed to get keywords")
