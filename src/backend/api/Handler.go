@@ -286,7 +286,12 @@ func QueryQuestionPost(context *gin.Context) {
 				return
 			}
 			// 查询关键词
-			keywords, err := GetKeywordsByQuestionId(db, question.Id, true)
+
+			keywordsS, err := GetKeywordsByQuestionId(db, question.Id, false)
+			keywords := make([]string, 0)
+			for _, keyword := range keywordsS {
+				keywords = append(keywords, keyword.Keyword)
+			}
 			if err != nil {
 				log.Println("Failed to get keywords")
 				return
@@ -304,7 +309,11 @@ func QueryQuestionPost(context *gin.Context) {
 			continue
 		} else {
 			// 查询关键词
-			keywords, err := GetKeywordsByQuestionId(db, question.Id, false)
+			keywordsS, err := GetKeywordsByQuestionId(db, question.Id, false)
+			keywords := make([]string, 0)
+			for _, keyword := range keywordsS {
+				keywords = append(keywords, keyword.Keyword)
+			}
 			if err != nil {
 				log.Println("Failed to get keywords")
 				return
@@ -384,4 +393,6 @@ func DeleteQuestionPost(context *gin.Context) {
 	}
 
 	log.Println("DeleteQuestionPost")
+
+	context.JSON(http.StatusOK, gin.H{"success": true, "reason": nil})
 }
