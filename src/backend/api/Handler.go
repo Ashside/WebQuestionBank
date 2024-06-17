@@ -285,6 +285,17 @@ func QueryQuestionPost(context *gin.Context) {
 				fmt.Println("Error unmarshalling option:", err)
 				return
 			}
+			// 查询关键词
+
+			keywordsS, err := GetKeywordsByQuestionId(db, question.Id, false)
+			keywords := make([]map[string]string, 0)
+			for _, keyword := range keywordsS {
+				keywords = append(keywords, map[string]string{"keyword": keyword.Keyword})
+			}
+			if err != nil {
+				log.Println("Failed to get keywords")
+				return
+			}
 			response = append(response, gin.H{
 				"type":       "multipleChoice",
 				"question":   question.Content,
@@ -292,10 +303,22 @@ func QueryQuestionPost(context *gin.Context) {
 				"difficulty": question.Difficulty,
 				"subject":    question.Subject,
 				"option":     option,
+				"keywords":   keywords,
+				"id":         question.Id,
 			})
 			continue
 		} else {
+			// 查询关键词
+			keywordsS, err := GetKeywordsByQuestionId(db, question.Id, false)
 
+			keywords := make([]map[string]string, 0)
+			for _, keyword := range keywordsS {
+				keywords = append(keywords, map[string]string{"keyword": keyword.Keyword})
+			}
+			if err != nil {
+				log.Println("Failed to get keywords")
+				return
+			}
 			response = append(response, gin.H{
 				"type":       "simpleAnswer",
 				"question":   question.Content,
@@ -303,9 +326,76 @@ func QueryQuestionPost(context *gin.Context) {
 				"difficulty": question.Difficulty,
 				"subject":    question.Subject,
 				"option":     "",
+				"keywords":   keywords,
+				"id":         question.Id,
 			})
 		}
 
 	}
 	context.JSON(http.StatusOK, gin.H{"success": true, "reason": nil, "questions": response})
+}
+
+func DeleteQuestionPost(context *gin.Context) {
+	type Question struct {
+		// 题目id
+		ID int `json:"id"`
+	}
+	type Request struct {
+		// 选取的题目列表
+		Questions []Question `form:"questions" binding:"required"`
+		Username  string     `form:"username" binding:"required"`
+	}
+	var request Request
+	if err := context.ShouldBind(&request); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"success": false, "reason": "Invalid form"})
+		return
+	}
+	db, err := getDatabase()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+		return
+	}
+	// 检查是否是管理员
+	var user Users
+	if err := GetUserByUsername(db, request.Username, &user); err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Users not found"})
+		return
+
+	}
+	if user.Type != ADMIN {
+		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Permission denied"})
+		return
+	}
+	log.Println("Admin: ", request.Username)
+	log.Println("Delete Questions: ", request.Questions)
+
+	for _, question := range request.Questions {
+		// 查询题目是否存在
+		var choiceQuestion ChoiceQuestions
+		if err := db.Table("choicequestions").Where("id = ?", question.ID).First(&choiceQuestion).Error; err == nil {
+			err := DeleteChoiceQuestion(db, question.ID)
+			if err != nil {
+				log.Println("Delete Choice Question Error")
+				context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+				return
+			}
+			continue
+		}
+		var subjectQuestion SubjectiveQuestions
+		if err := db.Table("subjectivequestions").Where("id = ?", question.ID).First(&subjectQuestion).Error; err == nil {
+			err := DeleteSubjectQuestion(db, question.ID)
+			if err != nil {
+				log.Println("Delete Subject Question Error")
+				context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+				return
+			}
+			continue
+		}
+		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Question not found"})
+		return
+	}
+
+	log.Println("DeleteQuestionPost")
+
+	context.JSON(http.StatusOK, gin.H{"success": true, "reason": nil})
 }

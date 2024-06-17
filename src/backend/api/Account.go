@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	STUDENT = "STUDENT"
-	TEACHER = "TEACHER"
-	ADMIN   = "ADMIN"
+	STUDENT = "student"
+	TEACHER = "teacher"
+	ADMIN   = "admin"
 )
 
 func GetUserByUsername(db *gorm.DB, username string, user *Users) error {

@@ -149,3 +149,22 @@ func AddKeywords(db *gorm.DB, keywords []keywordResponse, quesId int, isChoice b
 	log.Println("Successfully added keywords")
 
 }
+func GetKeywordsByQuestionId(db *gorm.DB, id int, bChoiceQues bool) ([]Keywords, error) {
+	var keywords []Keywords
+	if bChoiceQues {
+		err := db.Table("keywords").Joins("JOIN choice_question_keywords ON choice_question_keywords.keyword_id = keywords.id").Where("choice_question_keywords.question_id = ?", id).Find(&keywords).Error
+		if err != nil {
+			log.Println("Failed to get keywords")
+			return nil, err
+		}
+	} else {
+		err := db.Table("keywords").Joins("JOIN subjective_question_keywords ON subjective_question_keywords.keyword_id = keywords.id").Where("subjective_question_keywords.question_id = ?", id).Find(&keywords).Error
+		if err != nil {
+			log.Println("Failed to get keywords")
+			return nil, err
+		}
+	}
+	log.Println("Successfully get keywords")
+	return keywords, nil
+
+}

@@ -26,7 +26,7 @@ func AddSubjectQuestion(db *gorm.DB, question *SubjectiveQuestions) error {
 
 	return err
 }
-func AddChoiceQuestion(db *gorm.DB, c *ChoiceQuestions) interface{} {
+func AddChoiceQuestion(db *gorm.DB, c *ChoiceQuestions) error {
 	log.Println("Adding question", c)
 
 	// 向ChoiceQuestions表中添加题目
@@ -230,4 +230,93 @@ func QueryQuestionFromId(db *gorm.DB, id int) (ChoiceQuestions, error) {
 		choiceQuestion = subjectiveQuestion.ToChoiceQuestions()
 	}
 	return choiceQuestion, nil
+}
+
+func DeleteChoiceQuestion(db *gorm.DB, id int) error {
+	// 需要确保id存在
+	// 删除ChoiceQuestions表中的题目
+
+	// 先删除与该题目相关的关键词
+
+	// 查询choice_question_keywords表中的关键词
+	// 同时根据keyword_id删除keywords表中的关键词
+	var keywords []Keywords
+	err := db.Table("choice_question_keywords").Where("question_id = ?", id).Find(&keywords).Error
+	if err != nil {
+		log.Printf("Failed to query keywords: %v\n", err)
+	} else {
+		log.Println("Successfully queried keywords")
+	}
+
+	// 删除choice_question_keywords表中的关键词
+	err = db.Table("choice_question_keywords").Where("question_id = ?", id).Delete(&choiceQuestionKeywords{}).Error
+	if err != nil {
+		log.Printf("Failed to delete keyword: %v\n", err)
+	} else {
+		log.Println("Successfully deleted keyword")
+	}
+
+	for _, keyword := range keywords {
+		err = db.Table("keywords").Where("id = ?", keyword.Id).Delete(&Keywords{}).Error
+		if err != nil {
+			log.Printf("Failed to delete keyword: %v\n", err)
+		} else {
+			log.Println("Successfully deleted keyword")
+		}
+
+	}
+
+	err = db.Table("choicequestions").Where("id = ?", id).Delete(&ChoiceQuestions{}).Error
+	if err != nil {
+		log.Printf("Failed to delete question: %v\n", err)
+	} else {
+		log.Println("Successfully deleted question")
+	}
+
+	return err
+
+}
+
+func DeleteSubjectQuestion(db *gorm.DB, id int) error {
+	// 需要确保id存在
+	// 删除SubjectiveQuestions表中的题目
+
+	// 先删除与该题目相关的关键词
+
+	// 查询subjective_question_keywords表中的关键词
+	// 同时根据keyword_id删除keywords表中的关键词
+	var keywords []Keywords
+	err := db.Table("subjective_question_keywords").Where("question_id = ?", id).Find(&keywords).Error
+	if err != nil {
+		log.Printf("Failed to query keywords: %v\n", err)
+	} else {
+		log.Println("Successfully queried keywords")
+	}
+
+	// 删除subjective_question_keywords表中的关键词
+	err = db.Table("subjective_question_keywords").Where("question_id = ?", id).Delete(&subjectiveQuestionKeywords{}).Error
+	if err != nil {
+		log.Printf("Failed to delete keyword: %v\n", err)
+	} else {
+		log.Println("Successfully deleted keyword")
+	}
+
+	for _, keyword := range keywords {
+		err = db.Table("keywords").Where("id = ?", keyword.Id).Delete(&Keywords{}).Error
+		if err != nil {
+			log.Printf("Failed to delete keyword: %v\n", err)
+		} else {
+			log.Println("Successfully deleted keyword")
+		}
+	}
+
+	err = db.Table("subjectivequestions").Where("id = ?", id).Delete(&SubjectiveQuestions{}).Error
+	if err != nil {
+		log.Printf("Failed to delete question: %v\n", err)
+	} else {
+		log.Println("Successfully deleted question")
+	}
+
+	return err
+
 }
