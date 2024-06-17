@@ -81,5 +81,12 @@ func main() {
 	// 约束：只有管理员可以删除题目
 	questionBankGroup.POST("/deleteQuestion", api.DeleteQuestionPost)
 
+	//处理/api/questionBank/makeTest的OPTIONS请求
+	// 该请求用于组卷
+	// 输入：form表单，包含questions字段，questions是一个数组，包含多个题目的id, username, testName字段
+	// 输出：json格式，包含success、reason、pdfURL字段
+	// 约束：只有教师可以组卷
+	questionBankGroup.POST("/makeTest", api.MakeTestPost)
+
 	_ = r.Run(":8081")
 }
