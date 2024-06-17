@@ -27,7 +27,7 @@
           <n-tag v-if="item.difficulty === 1" type="success">简单</n-tag>
           <n-tag v-else-if="item.difficulty === 2" type="warning">中等</n-tag>
           <n-tag v-else-if="item.difficulty === 3" type="error">困难</n-tag>
-          <n-tag v-for="(keywordObj, i_keyword) in item.keywords" :key="i_keyword">
+          <n-tag v-for="(keywordObj, i_keyword) in item.keywords.slice(0, 3)" :key="i_keyword">
             {{ keywordObj.keyword }}
           </n-tag>
         </div>
@@ -35,10 +35,21 @@
     </ul>
   </div>
   <div class="button-container">
-    <button @click="submitSelectedQuestions">提交选中的题目</button>
+    <button @click="openModal">提交选中的题目</button>
     <transition name="fade">
-      <button v-if="submissionSuccess" @click="handleExtraAction">执行额外的操作</button>
+      <button v-if="submissionSuccess" @click="viewPDFDocument">查看试卷PDF文档</button>
     </transition>
+  </div>
+  <div v-if="isModalOpen" class="modal">
+    <div class="modal-content">
+      <span class="close" @click="closeModal">&times;</span>
+      <center>
+      <h2>请输入试卷信息</h2>
+      <input type="text" v-model="testName" placeholder="试卷名称">
+        <br><br>
+      <button @click="submitSelectedQuestions">确认提交</button>
+      </center>
+    </div>
   </div>
 </template>
 
@@ -58,7 +69,9 @@ export default {
     return {
       questions: [],  // 存储从API获取的问题数据
       submissionSuccess: false,
-      pdfURL: ''
+      pdfURL: '',
+      isModalOpen: false,  // 控制模态框是否显示
+      testName: ''  // 存储输入的试卷名称
     }
   },
 
@@ -67,6 +80,12 @@ export default {
   },
 
   methods: {
+    openModal() {
+      this.isModalOpen = true;
+    },
+    closeModal() {
+      this.isModalOpen = false;
+    },
     async fetchQuestions() {
       try {
         // 向API发起请求并获取数据
@@ -84,9 +103,11 @@ export default {
       }
     },
     submitSelectedQuestions() {
+      this.closeModal();
       const selectedQuestions = this.questions.filter(q => q.selected).map(q => ({ id: q.id }));
       axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/makeTest', {
         username: store.state.username,
+        testName: this.testName,
         questions: selectedQuestions
       })
           .then(response => {
@@ -101,7 +122,7 @@ export default {
             console.error("提交时出错:", error);
           });
     },
-    handleExtraAction() {
+    viewPDFDocument() {
       window.location.href = this.pdfURL;
     }
   }
@@ -227,5 +248,30 @@ input[type="checkbox"] {
   justify-content: center;  /* 水平居中 */
   gap: 10px;  /* 按钮之间的间隔 */
 }
+
+.modal {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  width: 300px;
+}
+
+.close {
+  float: right;
+  cursor: pointer;
+}
+
 
 </style>
