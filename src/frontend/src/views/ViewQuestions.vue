@@ -148,14 +148,6 @@ li:hover {
   transform: scale(1.02);
 }
 
-/* 问题标题样式 */
-h3 {
-  color: #2a2a72;
-  padding: 10px 15px;
-  margin: 0;
-  border-bottom: 1px solid #eee;
-}
-
 /* 自定义复选框样式 */
 input[type="checkbox"] {
   -webkit-appearance: none; /* 移除默认外观 */
@@ -204,26 +196,8 @@ button:hover {
 }
 
 
-.question-header {
-  display: flex;
-  align-items: center; /* 垂直居中对齐复选框和标题 */
-  padding: 10px 15px; /* 提供一些内部空间 */
-}
-
-h3 {
-  margin: 0 0 0 10px; /* 为标题添加左侧间距 */
-  color: #2a2a72;
-  flex-grow: 1; /* 允许标题占用剩余空间 */
-}
-
 input[type="checkbox"] {
   flex-shrink: 0; /* 防止复选框大小调整 */
-}
-
-.button-container {
-  display: flex;  /* 启用flex布局 */
-  justify-content: center;  /* 水平居中 */
-  gap: 10px;  /* 按钮之间的间隔 */
 }
 
 </style>
