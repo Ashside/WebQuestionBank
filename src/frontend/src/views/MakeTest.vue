@@ -27,7 +27,7 @@
           <n-tag v-if="item.difficulty === 1" type="success">简单</n-tag>
           <n-tag v-else-if="item.difficulty === 2" type="warning">中等</n-tag>
           <n-tag v-else-if="item.difficulty === 3" type="error">困难</n-tag>
-          <n-tag v-for="(keywordObj, i_keyword) in item.keywords" :key="i_keyword">
+          <n-tag v-for="(keywordObj, i_keyword) in item.keywords.slice(0, 3)" :key="i_keyword">
             {{ keywordObj.keyword }}
           </n-tag>
         </div>
