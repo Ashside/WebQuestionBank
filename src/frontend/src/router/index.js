@@ -66,6 +66,14 @@ const routes = [
         }
     },
     {
+        path: '/ViewAllTests',
+        name: 'ViewAllTests',
+        component: () => import('@/views/ViewAllTests.vue'),
+        meta: {
+            requiresAuth: true  // 需要认证
+        }
+    },
+    {
         path: '/:pathMatch(.*)*',
         component: () => import('@/views/NotFound.vue'),
     }

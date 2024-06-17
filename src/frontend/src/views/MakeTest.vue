@@ -144,12 +144,7 @@ div {
   padding: 13px;  /* 新增内边距 */
 }
 
-/* 标题样式 */
-h1 {
-  color: #333;
-  text-align: center;
-  margin-bottom: 20px; /* 增加标题与列表间的间隔 */
-}
+
 
 /* 列表样式 */
 ul {
@@ -172,13 +167,6 @@ li:hover {
   transform: scale(1.02);
 }
 
-/* 问题标题样式 */
-h3 {
-  color: #2a2a72;
-  padding: 10px 15px;
-  margin: 0;
-  border-bottom: 1px solid #eee;
-}
 
 /* 自定义复选框样式 */
 input[type="checkbox"] {

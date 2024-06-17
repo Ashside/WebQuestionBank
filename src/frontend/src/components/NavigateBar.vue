@@ -50,7 +50,7 @@ export default {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  margin: 0;
+  margin: 0 auto; /* 居中显示 */
   padding: 0;
 }
 

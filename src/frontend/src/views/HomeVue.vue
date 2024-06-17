@@ -9,7 +9,7 @@
       <CustomCard v-if="!isStudent" title="查看题库" cover="/question_bank.png" @card-click="navigateTo('/ViewQuestion')"></CustomCard>
       <CustomCard v-if="!isStudent" title="组卷" cover="/make_test.png" @card-click="navigateTo('/MakeTest')"></CustomCard>
       <CustomCard v-if="isStudent" title="完成试卷" cover="/exam.png" @card-click="navigateTo('/MakeTest')"></CustomCard>
-      <CustomCard v-if="isStudent" title="查看试卷" cover="/view_test.png" @card-click="navigateTo('/MakeTest')"></CustomCard>
+      <CustomCard v-if="isStudent" title="查看试卷" cover="/view_test.png" @card-click="navigateTo('/ViewAllTests')"></CustomCard>
     </div>
   </div>
 </template>
