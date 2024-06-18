@@ -81,27 +81,31 @@ func findAvailableKeywordId(db *gorm.DB) int {
 	// 如果关键词个数为0，则将id设置为1
 	// 否则将id设置为关键词个数最近的一个可用id
 	// 返回id
+	var cnt int64
 	var id int64
 	// 查询数据库中的关键词个数
-	if err := db.Table("keywords").Count(&id).Error; err != nil {
+	if err := db.Table("keywords").Count(&cnt).Error; err != nil {
 		log.Println("Failed to count keywords")
 		return -1
 	}
+
 	// 如果关键词个数为0，则将id设置为1
-	if id == 0 {
+	if cnt == 0 {
 		id = 1
 	} else {
 		// 否则从id开始递增
-		for cnt := id; cnt > 0; cnt++ {
-			if err := db.Table("keywords").Where("id = ?", cnt).Find(&Keywords{}).Error; err != nil {
-				// 如果找不到id为cnt的关键词，则将id设置为cnt
-				id = cnt
+		for i := 1; i <= int(cnt); i++ {
+			var existingKeyword Keywords
+			if err := db.Table("keywords").Where("id = ?", i).First(&existingKeyword).Error; err != nil {
+				id = int64(i)
 				break
 			}
+
 		}
 	}
-	log.Println("Find Keyword id:", id)
+
 	return int(id)
+
 }
 
 func genKeywordId(db *gorm.DB, keyword string) (int, bool) {
@@ -114,8 +118,9 @@ func genKeywordId(db *gorm.DB, keyword string) (int, bool) {
 	}
 
 	// 否则调用findAvailableKeywordId函数查找可用的id
-	log.Println("Generating Keyword id")
+
 	id := findAvailableKeywordId(db)
+	log.Println("Generating Keyword id:", id)
 	return id, false
 }
 
