@@ -136,12 +136,12 @@ func AddSimpleAnswerPost(context *gin.Context) {
 		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
 		return
 	}
-
+	context.JSON(http.StatusOK, gin.H{"success": true, "reason": nil})
 	keywords, err := getKeyword(form.Question)
 	if err != nil {
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"success": true, "reason": nil})
+
 	AddKeywords(db, keywords, question.Id, false)
 	// 添加成功
 
