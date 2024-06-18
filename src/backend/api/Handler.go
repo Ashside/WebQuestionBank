@@ -260,7 +260,7 @@ func QueryQuestionPost(context *gin.Context) {
 			}
 			// 查询关键词
 
-			keywordsS, err := GetKeywordsByQuestionId(db, question.Id, false)
+			keywordsS, err := GetKeywordsByQuestionId(db, question.Id, true)
 			keywords := make([]map[string]string, 0)
 			for _, keyword := range keywordsS {
 				keywords = append(keywords, map[string]string{"keyword": keyword.Keyword})
