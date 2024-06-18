@@ -197,41 +197,35 @@ func (s *SubjectiveQuestions) ToChoiceQuestions() ChoiceQuestions {
 		Difficulty: s.Difficulty,
 	}
 }
-func QueryQuestionFromId(db *gorm.DB, id int) (ChoiceQuestions, error) {
+func QueryQuestionFromId(db *gorm.DB, id int) (ChoiceQuestions, bool) {
 	var choiceQuestion ChoiceQuestions
 	var subjectiveQuestion SubjectiveQuestions
 	if id == 0 {
 		log.Println("Empty id")
-		return choiceQuestion, nil
+		return choiceQuestion, false
 	}
 	// 查询ChoiceQuestions表中的题目
 	err := db.Table("choicequestions").Where("id = ?", id).Find(&choiceQuestion).Error
 	if err != nil || choiceQuestion.Id == 0 {
 		log.Printf("Failed to query choiceQuestions: %v\n", err)
+
 	} else {
 		log.Println("Successfully queried choiceQuestions")
 		log.Println(choiceQuestion.Id)
+		return choiceQuestion, true
 	}
 	// 查询SubjectiveQuestions表中的题目
 	err = db.Table("subjectivequestions").Where("id = ?", id).Find(&subjectiveQuestion).Error
-	if err != nil {
+	if err != nil || subjectiveQuestion.Id == 0 {
 		log.Printf("Failed to query subjectiveQuestions: %v\n", err)
+		// 这里查询失败一定意味着id不存在
+		return ChoiceQuestions{}, false
 	} else {
 		log.Println("Successfully queried subjectiveQuestions")
-	}
-
-	if choiceQuestion.Id == 0 {
 		choiceQuestion = subjectiveQuestion.ToChoiceQuestions()
+		return choiceQuestion, true
 	}
-	if err != nil {
-		log.Printf("Failed to query question: %v\n", err)
 
-		return ChoiceQuestions{}, err
-	} else {
-		log.Println("Successfully queried question")
-
-	}
-	return choiceQuestion, nil
 }
 
 func DeleteChoiceQuestion(db *gorm.DB, id int) error {
@@ -325,8 +319,8 @@ func DeleteSubjectQuestion(db *gorm.DB, id int) error {
 
 func isQuestionExistFromID(db *gorm.DB, id int64) bool {
 
-	fromId, err := QueryQuestionFromId(db, int(id))
-	if err != nil {
+	fromId, bExist := QueryQuestionFromId(db, int(id))
+	if bExist != true {
 		return false
 	}
 	// 如果id为0，说明不存在，虽然id为0的题目理论上也不应该存在

@@ -109,10 +109,12 @@ func genKeywordId(db *gorm.DB, keyword string) (int, bool) {
 	var existingKeyword Keywords
 	if err := db.Table("keywords").Where("keyword = ?", keyword).First(&existingKeyword).Error; err == nil {
 		// 如果有则返回该关键词的id
+		log.Println("Existing Keyword id:", existingKeyword.Id)
 		return existingKeyword.Id, true
 	}
 
 	// 否则调用findAvailableKeywordId函数查找可用的id
+	log.Println("Generating Keyword id")
 	id := findAvailableKeywordId(db)
 	return id, false
 }
