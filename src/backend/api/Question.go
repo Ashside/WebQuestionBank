@@ -285,8 +285,10 @@ func DeleteSubjectQuestion(db *gorm.DB, id int) error {
 	err := db.Table("subjective_question_keywords").Where("question_id = ?", id).Find(&keywords).Error
 	if err != nil {
 		log.Printf("Failed to query keywords: %v\n", err)
+		return err
 	} else {
 		log.Println("Successfully queried keywords")
+		log.Println(keywords)
 	}
 
 	// 删除subjective_question_keywords表中的关键词
@@ -294,7 +296,7 @@ func DeleteSubjectQuestion(db *gorm.DB, id int) error {
 	if err != nil {
 		log.Printf("Failed to delete keyword: %v\n", err)
 	} else {
-		log.Println("Successfully deleted keyword")
+		log.Println("Successfully deleted relationship")
 	}
 
 	for _, keyword := range keywords {
@@ -302,7 +304,7 @@ func DeleteSubjectQuestion(db *gorm.DB, id int) error {
 		if err != nil {
 			log.Printf("Failed to delete keyword: %v\n", err)
 		} else {
-			log.Println("Successfully deleted keyword")
+			log.Println("Successfully deleted keyword", keyword.Keyword)
 		}
 	}
 
