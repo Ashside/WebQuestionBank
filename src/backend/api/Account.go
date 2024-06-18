@@ -30,6 +30,7 @@ func AddUser(db *gorm.DB, user *Users) error {
 		log.Printf("Failed to add user: %v\n", err)
 	} else {
 		log.Println("Successfully added user")
+		log.Println("User type: ", user.Type)
 	}
 	return err
 }

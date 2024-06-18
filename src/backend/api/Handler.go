@@ -123,22 +123,9 @@ func AddSimpleAnswerPost(context *gin.Context) {
 		return
 	}
 
-	// 查询选择题和主观题的数量之和
-	var cntChoice int64
-	var cntSubject int64
-	if err := db.Table("choicequestions").Count(&cntChoice).Error; err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
-		return
-	}
-	if err := db.Table("subjectivequestions").Count(&cntSubject).Error; err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
-		return
-	}
-	count := cntChoice + cntSubject
-
 	// 添加题目
 	var question SubjectiveQuestions
-	question.Id = int(count) + 1
+	question.Id = findAvailableID(db)
 	question.Content = form.Question
 	question.Answer = form.Answer
 	question.Difficulty = strconv.Itoa(form.Difficulty)
@@ -197,22 +184,9 @@ func AddChoiceAnswerPost(context *gin.Context) {
 		return
 	}
 
-	// 查询选择题和主观题的数量之和
-	var cntChoice int64
-	var cntSubject int64
-	if err := db.Table("choicequestions").Count(&cntChoice).Error; err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
-		return
-	}
-	if err := db.Table("subjectivequestions").Count(&cntSubject).Error; err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
-		return
-	}
-	count := cntChoice + cntSubject
-
 	// 添加题目
 	var question ChoiceQuestions
-	question.Id = int(count) + 1
+	question.Id = findAvailableID(db)
 	question.Content = form.Question
 	question.Answer = form.Answer
 	question.Difficulty = strconv.Itoa(form.Difficulty)
@@ -435,7 +409,7 @@ func MakeTestPost(context *gin.Context) {
 		return
 	}
 
-	// 鉴权
+	// 鉴权，要求学生无法创建试卷
 	if user.Type == STUDENT {
 		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Permission denied"})
 		return
@@ -444,11 +418,7 @@ func MakeTestPost(context *gin.Context) {
 
 	// 查询题目是否存在
 	for _, question := range request.Questions {
-		var choiceQuestion ChoiceQuestions
-		if err := db.Table("choicequestions").Where("id = ?", question.ID).First(&choiceQuestion).Error; err != nil {
-			context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Question not found"})
-			return
-		}
+		isQuestionExistFromID(db, question.ID)
 	}
 
 }
