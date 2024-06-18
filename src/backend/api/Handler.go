@@ -136,15 +136,15 @@ func AddSimpleAnswerPost(context *gin.Context) {
 		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
 		return
 	}
-	// TODO 生成题目关键词
-	// TODO 添加关键词
+
 	keywords, err := getKeyword(form.Question)
 	if err != nil {
 		return
 	}
+	context.JSON(http.StatusOK, gin.H{"success": true, "reason": nil})
 	AddKeywords(db, keywords, question.Id, false)
 	// 添加成功
-	context.JSON(http.StatusOK, gin.H{"success": true, "reason": nil})
+
 }
 
 func AddChoiceAnswerPost(context *gin.Context) {
