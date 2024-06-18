@@ -123,22 +123,9 @@ func AddSimpleAnswerPost(context *gin.Context) {
 		return
 	}
 
-	// 查询选择题和主观题的数量之和
-	var cntChoice int64
-	var cntSubject int64
-	if err := db.Table("choicequestions").Count(&cntChoice).Error; err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
-		return
-	}
-	if err := db.Table("subjectivequestions").Count(&cntSubject).Error; err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
-		return
-	}
-	count := cntChoice + cntSubject
-
 	// 添加题目
 	var question SubjectiveQuestions
-	question.Id = int(count) + 1
+	question.Id = findAvailableQuesID(db)
 	question.Content = form.Question
 	question.Answer = form.Answer
 	question.Difficulty = strconv.Itoa(form.Difficulty)
@@ -197,22 +184,9 @@ func AddChoiceAnswerPost(context *gin.Context) {
 		return
 	}
 
-	// 查询选择题和主观题的数量之和
-	var cntChoice int64
-	var cntSubject int64
-	if err := db.Table("choicequestions").Count(&cntChoice).Error; err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
-		return
-	}
-	if err := db.Table("subjectivequestions").Count(&cntSubject).Error; err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
-		return
-	}
-	count := cntChoice + cntSubject
-
 	// 添加题目
 	var question ChoiceQuestions
-	question.Id = int(count) + 1
+	question.Id = findAvailableQuesID(db)
 	question.Content = form.Question
 	question.Answer = form.Answer
 	question.Difficulty = strconv.Itoa(form.Difficulty)
@@ -233,8 +207,7 @@ func AddChoiceAnswerPost(context *gin.Context) {
 		return
 
 	}
-	// TODO 生成题目关键词
-	// TODO 添加关键词
+
 	keywords, err := getKeyword(form.Question)
 	if err != nil {
 		return
@@ -267,9 +240,6 @@ func QueryQuestionPost(context *gin.Context) {
 		return
 	}
 
-	log.Println(form.Username)
-	log.Println(form.Subject)
-	log.Println(form.Difficulty)
 	// 查询题目
 	questions := QueryQuestionFromCertainInf(db, form.Username, form.Subject, form.Difficulty)
 
@@ -287,7 +257,7 @@ func QueryQuestionPost(context *gin.Context) {
 			}
 			// 查询关键词
 
-			keywordsS, err := GetKeywordsByQuestionId(db, question.Id, false)
+			keywordsS, err := GetKeywordsByQuestionId(db, question.Id, true)
 			keywords := make([]map[string]string, 0)
 			for _, keyword := range keywordsS {
 				keywords = append(keywords, map[string]string{"keyword": keyword.Keyword})
@@ -402,15 +372,22 @@ func DeleteQuestionPost(context *gin.Context) {
 
 func MakeTestPost(context *gin.Context) {
 	log.Println("MakeTestPost")
-	var form struct {
-		Username   string `form:"username" binding:"required"`
-		Subject    string `form:"subject" binding:"required"`
-		Question   int    `form:"question" binding:"required"`
-		Difficulty int    `form:"difficulty" binding:"required"`
+	type Question struct {
+		// 题目id
+		ID int64 `json:"id"`
 	}
+	type Request struct {
+		// 选取的题目列表
+		Questions []Question `form:"questions" binding:"required"`
+		// 试卷名称
+		TestName string `form:"testName" binding:"required"`
+		// 提交者邮箱
+		Username string `form:"username" binding:"required"`
+	}
+
 	log.Println("Binding form")
-	if err := context.ShouldBind(&form); err != nil {
-		log.Println(err)
+	var request Request
+	if err := context.ShouldBind(&request); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"success": false, "reason": "Invalid form"})
 		return
 	}
@@ -423,16 +400,21 @@ func MakeTestPost(context *gin.Context) {
 
 	// 查询用户是否存在
 	var user Users
-	if err := GetUserByUsername(db, form.Username, &user); err != nil {
+	if err := GetUserByUsername(db, request.Username, &user); err != nil {
 		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Users not found"})
 		return
 	}
 
-	// 查询题目
-	questions := QueryQuestionFromCertainInf(db, "", form.Subject, form.Difficulty)
-	if len(questions) < form.Question {
-		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Not enough questions"})
+	// 鉴权，要求学生无法创建试卷
+	if user.Type == STUDENT {
+		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Permission denied"})
 		return
+
+	}
+
+	// 查询题目是否存在
+	for _, question := range request.Questions {
+		isQuestionExistFromID(db, question.ID)
 	}
 
 }
