@@ -9,14 +9,29 @@
       </div>
     </li>
   </ul>
+  <div v-if="showModal" class="modal">
+    <div class="markdown-container">
+      <div>
+        <MarkdownRenderer :content="testDetails"></MarkdownRenderer>
+        <br><br>
+        <center>
+          <button @click="findSameTest(testID)">显示相似试卷</button>
+        </center>
+      </div>
+      <MarkdownRenderer v-if="showSameTest" :content="sameTestDetails"></MarkdownRenderer>
+    </div>
+  </div>
 </template>
+
 
 <script>
 import axios from 'axios';
 import NavigateBar from "@/components/NavigateBar.vue";
+import store from "@/store";
+import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
 
 export default {
-  components: {NavigateBar},
+  components: {MarkdownRenderer, NavigateBar},
 
   created() {
     this.fetchTests();
@@ -24,14 +39,34 @@ export default {
 
   data() {
     return {
-      tests: []
+      tests: [],
+      showModal: false,
+      testDetails: '',
+      sameTestDetails: '',
+      showSameTest: false,
+      testID: -1
     }
   },
 
   methods: {
+    onEscKey(event) {
+      if (event.keyCode === 27) { // 27 是 Esc 键的键码
+        this.closeModal();
+      }
+    },
+
+    closeModal() {
+      this.showModal = false;
+      document.removeEventListener('keydown', this.onEscKey); // 移除监听器
+    },
+
+    openModal() {
+      this.showModal = true;
+      document.addEventListener('keydown', this.onEscKey); // 添加监听器
+    },
     async fetchTests() {
       try {
-        const response = await axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/queryTest');
+        const response = await axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/queryAllTests');
         if (response.data.success) {
           this.tests = response.data.test;
         } else {
@@ -43,9 +78,41 @@ export default {
     },
 
     viewTestDetails(testId) {
-      // 这里可以根据你的应用需求进行调整，例如跳转到试卷详细页面或者显示一个模态框等
-      console.log('Viewing details for test ID:', testId);
-      // 例如使用 this.$router.push(`/test/${testId}`); 来进行页面跳转
+      axios.post(process.env["VUE_APP_API_URL"] + `/api/questionBank/queryTestByID`, {
+        testId: testId,
+        username: store.state.username
+      })
+          .then(response => {
+            if (response.data.success) {
+              this.testDetails = response.data.test;
+              this.openModal();
+              this.testID = testId;
+            } else {
+              console.error('Failed to fetch test details:', response.data.reason);
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching test details:', error);
+          });
+    },
+
+    findSameTest(testId){
+      this.showSameTest = true;
+      axios.post(process.env["VUE_APP_API_URL"] + `/api/questionBank/findSameTestByID`, {
+        testId: testId,
+        username: store.state.username
+      })
+          .then(response => {
+            if (response.data.success) {
+              this.sameTestDetails = response.data.test;
+              this.showSameTest = true;
+            } else {
+              console.error('Failed to fetch test details:', response.data.reason);
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching test details:', error);
+          });
     }
   }
 }
@@ -92,4 +159,32 @@ button {
 button:hover {
   background-color: #2a2a72;
 }
+
+.modal {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.7); /* 深色背景透明度调整 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+div.modal > div {
+  background-color: white; /* 添加背景颜色以区分内容区 */
+  padding: 20px; /* 内部 padding 增加 */
+  border-radius: 8px; /* 圆角设计 */
+  max-width: 90%; /* 限制最大宽度，使内容更集中 */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* 增加阴影效果 */
+}
+
+div.markdown-container {
+  gap: 10px;
+  margin-bottom: 30px; /* 设置较大的底部边距 */
+  display: flex;  /* 启用flex布局 */
+  justify-content: center;  /* 水平居中 */
+}
+
 </style>
