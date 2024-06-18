@@ -82,29 +82,29 @@ func findAvailableKeywordId(db *gorm.DB) int {
 	// 否则将id设置为关键词个数最近的一个可用id
 	// 返回id
 	var cnt int64
-	var id int64
+	var id int
 	// 查询数据库中的关键词个数
 	if err := db.Table("keywords").Count(&cnt).Error; err != nil {
 		log.Println("Failed to count keywords")
 		return -1
 	}
-
+	log.Println("Keyword count:", cnt)
 	// 如果关键词个数为0，则将id设置为1
 	if cnt == 0 {
 		id = 1
 	} else {
 		// 否则从id开始递增
-		for i := 1; i <= int(cnt); i++ {
+		for i := 1; i <= int(cnt)+1; i++ {
 			var existingKeyword Keywords
 			if err := db.Table("keywords").Where("id = ?", i).First(&existingKeyword).Error; err != nil {
-				id = int64(i)
+				id = i
 				break
 			}
 
 		}
 	}
 
-	return int(id)
+	return id
 
 }
 
