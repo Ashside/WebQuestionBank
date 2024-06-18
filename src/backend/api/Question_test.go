@@ -51,3 +51,62 @@ func TestQueryQuestionFromId(t *testing.T) {
 		})
 	}
 }
+
+func Test_isQuestionExistFromID(t *testing.T) {
+	type args struct {
+		db *gorm.DB
+		id int64
+	}
+	dbTest, _ := getDatabase()
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+
+		{
+			name: "Test1",
+			args: args{
+				db: dbTest,
+				id: 1,
+			},
+			want: true,
+		},
+		{
+			name: "Test2",
+			args: args{
+				db: dbTest,
+				id: 3,
+			},
+			want: true,
+		}, {
+			name: "Test3",
+			args: args{
+				db: dbTest,
+				id: 7,
+			},
+			want: true,
+		}, {
+			name: "Test3",
+			args: args{
+				db: dbTest,
+				id: 4,
+			},
+			want: true,
+		}, {
+			name: "Test3",
+			args: args{
+				db: dbTest,
+				id: 2,
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isQuestionExistFromID(tt.args.db, tt.args.id); got != tt.want {
+				t.Errorf("isQuestionExistFromID() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
