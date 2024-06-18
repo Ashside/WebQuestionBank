@@ -10,10 +10,19 @@
     </li>
   </ul>
   <div v-if="showModal" class="modal">
-    <MarkdownRenderer :content="testDetails"></MarkdownRenderer>
+    <div class="markdown-container">
+      <div>
+        <MarkdownRenderer :content="testDetails"></MarkdownRenderer>
+        <br><br>
+        <center>
+          <button @click="findSameTest(testID)">显示相似试卷</button>
+        </center>
+      </div>
+      <MarkdownRenderer v-if="showSameTest" :content="sameTestDetails"></MarkdownRenderer>
+    </div>
   </div>
-
 </template>
+
 
 <script>
 import axios from 'axios';
@@ -32,7 +41,10 @@ export default {
     return {
       tests: [],
       showModal: false,
-      testDetails: ''
+      testDetails: '',
+      sameTestDetails: '',
+      showSameTest: false,
+      testID: -1
     }
   },
 
@@ -74,6 +86,26 @@ export default {
             if (response.data.success) {
               this.testDetails = response.data.test;
               this.openModal();
+              this.testID = testId;
+            } else {
+              console.error('Failed to fetch test details:', response.data.reason);
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching test details:', error);
+          });
+    },
+
+    findSameTest(testId){
+      this.showSameTest = true;
+      axios.post(process.env["VUE_APP_API_URL"] + `/api/questionBank/findSameTestByID`, {
+        testId: testId,
+        username: store.state.username
+      })
+          .then(response => {
+            if (response.data.success) {
+              this.sameTestDetails = response.data.test;
+              this.showSameTest = true;
             } else {
               console.error('Failed to fetch test details:', response.data.reason);
             }
@@ -134,10 +166,25 @@ button:hover {
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0,0,0,0.7); /* 深色背景透明度调整 */
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+div.modal > div {
+  background-color: white; /* 添加背景颜色以区分内容区 */
+  padding: 20px; /* 内部 padding 增加 */
+  border-radius: 8px; /* 圆角设计 */
+  max-width: 90%; /* 限制最大宽度，使内容更集中 */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* 增加阴影效果 */
+}
+
+div.markdown-container {
+  gap: 10px;
+  margin-bottom: 30px; /* 设置较大的底部边距 */
+  display: flex;  /* 启用flex布局 */
+  justify-content: center;  /* 水平居中 */
 }
 
 </style>
