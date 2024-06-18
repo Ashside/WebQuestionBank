@@ -240,9 +240,6 @@ func QueryQuestionPost(context *gin.Context) {
 		return
 	}
 
-	log.Println(form.Username)
-	log.Println(form.Subject)
-	log.Println(form.Difficulty)
 	// 查询题目
 	questions := QueryQuestionFromCertainInf(db, form.Username, form.Subject, form.Difficulty)
 
