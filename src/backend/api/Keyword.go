@@ -12,6 +12,7 @@ import (
 )
 
 const AccessToken = "24.dcc9972f075b3221c78daffd648b02d8.2592000.1720265395.282335-79244792"
+const KeyNum = "5"
 
 type keywordResponse struct {
 	Keyword string
@@ -21,7 +22,7 @@ type keywordResponse struct {
 func getKeyword(text string) ([]keywordResponse, error) {
 
 	url := "https://aip.baidubce.com/rpc/2.0/nlp/v1/txt_keywords_extraction?access_token=" + AccessToken
-	payload := strings.NewReader(`{"text":["` + text + `"]}`)
+	payload := strings.NewReader(`{"text":["` + text + `"],"num":` + KeyNum + `}`)
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", url, payload)
 
