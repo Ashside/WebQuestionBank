@@ -1,5 +1,8 @@
 package api
 
 type Test struct {
-	ID int `json:"id"`
+	Id        int `gorm:"primaryKey"`
+	Name      string
+	Author    string
+	Questions []QuestionSummary `gorm:"foreignKey:TestId"`
 }

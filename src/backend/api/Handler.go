@@ -402,15 +402,22 @@ func DeleteQuestionPost(context *gin.Context) {
 
 func MakeTestPost(context *gin.Context) {
 	log.Println("MakeTestPost")
-	var form struct {
-		Username   string `form:"username" binding:"required"`
-		Subject    string `form:"subject" binding:"required"`
-		Question   int    `form:"question" binding:"required"`
-		Difficulty int    `form:"difficulty" binding:"required"`
+	type Question struct {
+		// 题目id
+		ID int64 `json:"id"`
 	}
+	type Request struct {
+		// 选取的题目列表
+		Questions []Question `form:"questions" binding:"required"`
+		// 试卷名称
+		TestName string `form:"testName" binding:"required"`
+		// 提交者邮箱
+		Username string `form:"username" binding:"required"`
+	}
+
 	log.Println("Binding form")
-	if err := context.ShouldBind(&form); err != nil {
-		log.Println(err)
+	var request Request
+	if err := context.ShouldBind(&request); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"success": false, "reason": "Invalid form"})
 		return
 	}
@@ -423,16 +430,25 @@ func MakeTestPost(context *gin.Context) {
 
 	// 查询用户是否存在
 	var user Users
-	if err := GetUserByUsername(db, form.Username, &user); err != nil {
+	if err := GetUserByUsername(db, request.Username, &user); err != nil {
 		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Users not found"})
 		return
 	}
 
-	// 查询题目
-	questions := QueryQuestionFromCertainInf(db, "", form.Subject, form.Difficulty)
-	if len(questions) < form.Question {
-		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Not enough questions"})
+	// 鉴权
+	if user.Type == STUDENT {
+		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Permission denied"})
 		return
+
+	}
+
+	// 查询题目是否存在
+	for _, question := range request.Questions {
+		var choiceQuestion ChoiceQuestions
+		if err := db.Table("choicequestions").Where("id = ?", question.ID).First(&choiceQuestion).Error; err != nil {
+			context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Question not found"})
+			return
+		}
 	}
 
 }

@@ -41,3 +41,15 @@ func UpdateUser(db *gorm.DB, user *Users) error {
 func DeleteUser(db *gorm.DB, username string) error {
 	return db.Delete(&Users{}, "username = ?", username).Error
 }
+
+func (user *Users) IsStudent() bool {
+	return user.Type == STUDENT
+}
+
+func (user *Users) IsTeacher() bool {
+	return user.Type == TEACHER
+}
+
+func (user *Users) IsAdmin() bool {
+	return user.Type == ADMIN
+}
