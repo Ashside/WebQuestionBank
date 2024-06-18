@@ -22,7 +22,6 @@ type Users struct {
 type Keywords struct {
 	Id      int `gorm:"primaryKey"`
 	Keyword string
-	Score   float64
 }
 type ChoiceQuestions struct {
 	Id         int `gorm:"primaryKey"`
@@ -40,6 +39,14 @@ type SubjectiveQuestions struct {
 	Answer     string
 	Difficulty string
 	Author     string
+}
+type ChoiceQuestionKeywords struct {
+	QuestionId int `gorm:"primaryKey,colum:question_id"`
+	KeywordId  int `gorm:"primaryKey,colum:keyword_id"`
+}
+type SubjectiveQuestionKeywords struct {
+	QuestionId int `gorm:"primaryKey,colum:question_id"`
+	KeywordId  int `gorm:"primaryKey,colum:keyword_id"`
 }
 
 func getDatabase() (*gorm.DB, error) {
