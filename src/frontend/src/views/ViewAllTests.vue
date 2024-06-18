@@ -9,14 +9,20 @@
       </div>
     </li>
   </ul>
+  <div v-if="showModal" class="modal">
+    <MarkdownRenderer :content="testDetails"></MarkdownRenderer>
+  </div>
+
 </template>
 
 <script>
 import axios from 'axios';
 import NavigateBar from "@/components/NavigateBar.vue";
+import store from "@/store";
+import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
 
 export default {
-  components: {NavigateBar},
+  components: {MarkdownRenderer, NavigateBar},
 
   created() {
     this.fetchTests();
@@ -24,14 +30,31 @@ export default {
 
   data() {
     return {
-      tests: []
+      tests: [],
+      showModal: false,
+      testDetails: ''
     }
   },
 
   methods: {
+    onEscKey(event) {
+      if (event.keyCode === 27) { // 27 是 Esc 键的键码
+        this.closeModal();
+      }
+    },
+
+    closeModal() {
+      this.showModal = false;
+      document.removeEventListener('keydown', this.onEscKey); // 移除监听器
+    },
+
+    openModal() {
+      this.showModal = true;
+      document.addEventListener('keydown', this.onEscKey); // 添加监听器
+    },
     async fetchTests() {
       try {
-        const response = await axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/queryTest');
+        const response = await axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/queryAllTests');
         if (response.data.success) {
           this.tests = response.data.test;
         } else {
@@ -43,9 +66,21 @@ export default {
     },
 
     viewTestDetails(testId) {
-      // 这里可以根据你的应用需求进行调整，例如跳转到试卷详细页面或者显示一个模态框等
-      console.log('Viewing details for test ID:', testId);
-      // 例如使用 this.$router.push(`/test/${testId}`); 来进行页面跳转
+      axios.post(process.env["VUE_APP_API_URL"] + `/api/questionBank/queryTestByID`, {
+        testId: testId,
+        username: store.state.username
+      })
+          .then(response => {
+            if (response.data.success) {
+              this.testDetails = response.data.test;
+              this.openModal();
+            } else {
+              console.error('Failed to fetch test details:', response.data.reason);
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching test details:', error);
+          });
     }
   }
 }
@@ -92,4 +127,17 @@ button {
 button:hover {
   background-color: #2a2a72;
 }
+
+.modal {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 </style>
