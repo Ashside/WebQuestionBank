@@ -17,14 +17,6 @@ type keywordResponse struct {
 	Keyword string
 	Score   float64
 }
-type choiceQuestionKeywords struct {
-	QuestionId int `gorm:"primaryKey,colum:question_id"`
-	KeywordId  int `gorm:"primaryKey,colum:keyword_id"`
-}
-type subjectiveQuestionKeywords struct {
-	QuestionId int `gorm:"primaryKey,colum:question_id"`
-	KeywordId  int `gorm:"primaryKey,colum:keyword_id"`
-}
 
 func getKeyword(text string) ([]keywordResponse, error) {
 
@@ -84,10 +76,10 @@ func getKeyword(text string) ([]keywordResponse, error) {
 	return response, nil
 
 }
-func genKeywordId(db *gorm.DB) int {
+func findAvailableKeywordId(db *gorm.DB) int {
 	// 查询数据库中的关键词个数
 	// 如果关键词个数为0，则将id设置为1
-	// 否则将id设置为关键词个数+1
+	// 否则将id设置为关键词个数最近的一个可用id
 	// 返回id
 	var id int64
 	// 查询数据库中的关键词个数
@@ -99,48 +91,71 @@ func genKeywordId(db *gorm.DB) int {
 	if id == 0 {
 		id = 1
 	} else {
-		// 否则将id设置为关键词个数+1
-		id++
+		// 否则从id开始递增
+		for cnt := id; cnt > 0; cnt++ {
+			if err := db.Table("keywords").Where("id = ?", cnt).Find(&Keywords{}).Error; err != nil {
+				// 如果找不到id为cnt的关键词，则将id设置为cnt
+				id = cnt
+				break
+			}
+		}
 	}
-	log.Println("Generated Keyword id:", id)
+	log.Println("Find Keyword id:", id)
 	return int(id)
-
 }
+
+func genKeywordId(db *gorm.DB, keyword string) (int, bool) {
+	// 先查找是否有相同的关键词
+	var existingKeyword Keywords
+	if err := db.Table("keywords").Where("keyword = ?", keyword).First(&existingKeyword).Error; err == nil {
+		// 如果有则返回该关键词的id
+		return existingKeyword.Id, true
+	}
+
+	// 否则调用findAvailableKeywordId函数查找可用的id
+	id := findAvailableKeywordId(db)
+	return id, false
+}
+
 func AddKeywords(db *gorm.DB, keywords []keywordResponse, quesId int, isChoice bool) {
 
 	for _, keyword := range keywords {
-		// TODO 特异性处理
 		// 生成关键词id
-		id := genKeywordId(db)
+		id, isExist := genKeywordId(db, keyword.Keyword)
 		if id == -1 {
 			log.Println("Failed to generate Keyword id")
 			return
 		}
+		// 如果关键词已经存在，则不需要添加关键词
+		if isExist {
+			log.Println("Keyword already exists")
 
-		// 添加关键词
-		log.Println("Adding Keyword:", keyword.Keyword)
-		err := db.Table("keywords").Create(&Keywords{Id: id, Keyword: keyword.Keyword, Score: keyword.Score}).Error
-		if err != nil {
-			log.Println("Failed to add Keyword:", keyword.Keyword)
-			return
+		} else {
+			// 添加关键词
+			log.Println("Adding Keyword:", keyword.Keyword)
+			err := db.Table("keywords").Create(&Keywords{Id: id, Keyword: keyword.Keyword}).Error
+			if err != nil {
+				log.Println("Failed to add Keyword:", keyword.Keyword)
+				return
+			}
+			log.Println("Successfully added Keyword:", keyword.Keyword)
 		}
-		log.Println("Successfully added Keyword:", keyword.Keyword)
 
 		// 添加关键词和题目的关系
 		log.Println("Adding Keyword-question relationship")
 		if isChoice {
-			err = db.Table("choice_question_keywords").Create(&choiceQuestionKeywords{QuestionId: quesId, KeywordId: id}).Error
+			err := db.Table("choice_question_keywords").Create(&ChoiceQuestionKeywords{QuestionId: quesId, KeywordId: id}).Error
 			if err != nil {
 				log.Println("Failed to add Keyword-question relationship")
-				println(err.Error())
+				log.Println(err.Error())
 				return
 
 			}
 		} else {
-			err = db.Table("subjective_question_keywords").Create(&subjectiveQuestionKeywords{QuestionId: quesId, KeywordId: id}).Error
+			err := db.Table("subjective_question_keywords").Create(&SubjectiveQuestionKeywords{QuestionId: quesId, KeywordId: id}).Error
 			if err != nil {
 				log.Println("Failed to add Keyword-question relationship")
-				println(err.Error())
+				log.Println(err.Error())
 				return
 			}
 		}
@@ -149,6 +164,7 @@ func AddKeywords(db *gorm.DB, keywords []keywordResponse, quesId int, isChoice b
 	log.Println("Successfully added keywords")
 
 }
+
 func GetKeywordsByQuestionId(db *gorm.DB, id int, bChoiceQues bool) ([]Keywords, error) {
 	var keywords []Keywords
 	if bChoiceQues {

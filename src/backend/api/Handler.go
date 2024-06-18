@@ -125,7 +125,7 @@ func AddSimpleAnswerPost(context *gin.Context) {
 
 	// 添加题目
 	var question SubjectiveQuestions
-	question.Id = findAvailableID(db)
+	question.Id = findAvailableQuesID(db)
 	question.Content = form.Question
 	question.Answer = form.Answer
 	question.Difficulty = strconv.Itoa(form.Difficulty)
@@ -186,7 +186,7 @@ func AddChoiceAnswerPost(context *gin.Context) {
 
 	// 添加题目
 	var question ChoiceQuestions
-	question.Id = findAvailableID(db)
+	question.Id = findAvailableQuesID(db)
 	question.Content = form.Question
 	question.Answer = form.Answer
 	question.Difficulty = strconv.Itoa(form.Difficulty)

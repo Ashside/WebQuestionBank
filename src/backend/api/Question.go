@@ -251,7 +251,7 @@ func DeleteChoiceQuestion(db *gorm.DB, id int) error {
 	}
 
 	// 删除choice_question_keywords表中的关键词
-	err = db.Table("choice_question_keywords").Where("question_id = ?", id).Delete(&choiceQuestionKeywords{}).Error
+	err = db.Table("choice_question_keywords").Where("question_id = ?", id).Delete(&ChoiceQuestionKeywords{}).Error
 	if err != nil {
 		log.Printf("Failed to delete keyword: %v\n", err)
 	} else {
@@ -296,7 +296,7 @@ func DeleteSubjectQuestion(db *gorm.DB, id int) error {
 	}
 
 	// 删除subjective_question_keywords表中的关键词
-	err = db.Table("subjective_question_keywords").Where("question_id = ?", id).Delete(&subjectiveQuestionKeywords{}).Error
+	err = db.Table("subjective_question_keywords").Where("question_id = ?", id).Delete(&SubjectiveQuestionKeywords{}).Error
 	if err != nil {
 		log.Printf("Failed to delete keyword: %v\n", err)
 	} else {
@@ -337,7 +337,7 @@ func isQuestionExistFromID(db *gorm.DB, id int64) bool {
 
 }
 
-func findAvailableID(db *gorm.DB) int {
+func findAvailableQuesID(db *gorm.DB) int {
 	// 从1开始查找可用的id
 	for i := 1; ; i++ {
 		if !isQuestionExistFromID(db, int64(i)) {
