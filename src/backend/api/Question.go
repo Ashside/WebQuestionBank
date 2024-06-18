@@ -5,13 +5,6 @@ import (
 	"log"
 )
 
-type ChoiceOptions struct {
-	Option1 string `json:"option1"`
-	Option2 string `json:"option2"`
-	Option3 string `json:"option3"`
-	Option4 string `json:"option4"`
-}
-
 // AddSubjectQuestion 向数据库中添加主观题，打印log信息
 func AddSubjectQuestion(db *gorm.DB, question *SubjectiveQuestions) error {
 	log.Println("Adding question", question)

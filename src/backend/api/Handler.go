@@ -207,8 +207,7 @@ func AddChoiceAnswerPost(context *gin.Context) {
 		return
 
 	}
-	// TODO 生成题目关键词
-	// TODO 添加关键词
+
 	keywords, err := getKeyword(form.Question)
 	if err != nil {
 		return
