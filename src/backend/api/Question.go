@@ -213,10 +213,11 @@ func QueryQuestionFromId(db *gorm.DB, id int) (ChoiceQuestions, error) {
 	}
 	// 查询ChoiceQuestions表中的题目
 	err := db.Table("choicequestions").Where("id = ?", id).Find(&choiceQuestion).Error
-	if err != nil {
+	if err != nil || choiceQuestion.Id == 0 {
 		log.Printf("Failed to query choiceQuestions: %v\n", err)
 	} else {
 		log.Println("Successfully queried choiceQuestions")
+		log.Println(choiceQuestion.Id)
 	}
 	// 查询SubjectiveQuestions表中的题目
 	err = db.Table("subjectivequestions").Where("id = ?", id).Find(&subjectiveQuestion).Error
@@ -228,6 +229,14 @@ func QueryQuestionFromId(db *gorm.DB, id int) (ChoiceQuestions, error) {
 
 	if choiceQuestion.Id == 0 {
 		choiceQuestion = subjectiveQuestion.ToChoiceQuestions()
+	}
+	if err != nil {
+		log.Printf("Failed to query question: %v\n", err)
+
+		return ChoiceQuestions{}, err
+	} else {
+		log.Println("Successfully queried question")
+
 	}
 	return choiceQuestion, nil
 }
@@ -319,4 +328,27 @@ func DeleteSubjectQuestion(db *gorm.DB, id int) error {
 
 	return err
 
+}
+
+func isQuestionExistFromID(db *gorm.DB, id int64) bool {
+
+	fromId, err := QueryQuestionFromId(db, int(id))
+	if err != nil {
+		return false
+	}
+	// 如果id为0，说明不存在，虽然id为0的题目理论上也不应该存在
+	if fromId.Id == 0 {
+		return false
+	}
+	return true
+
+}
+
+func findAvailableID(db *gorm.DB) int {
+	// 从1开始查找可用的id
+	for i := 1; ; i++ {
+		if !isQuestionExistFromID(db, int64(i)) {
+			return i
+		}
+	}
 }

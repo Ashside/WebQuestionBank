@@ -30,6 +30,7 @@ func AddUser(db *gorm.DB, user *Users) error {
 		log.Printf("Failed to add user: %v\n", err)
 	} else {
 		log.Println("Successfully added user")
+		log.Println("User type: ", user.Type)
 	}
 	return err
 }
@@ -40,4 +41,16 @@ func UpdateUser(db *gorm.DB, user *Users) error {
 
 func DeleteUser(db *gorm.DB, username string) error {
 	return db.Delete(&Users{}, "username = ?", username).Error
+}
+
+func (user *Users) IsStudent() bool {
+	return user.Type == STUDENT
+}
+
+func (user *Users) IsTeacher() bool {
+	return user.Type == TEACHER
+}
+
+func (user *Users) IsAdmin() bool {
+	return user.Type == ADMIN
 }

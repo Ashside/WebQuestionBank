@@ -10,6 +10,8 @@ const (
 	DatabaseUserName = "root"
 	DatabasePassword = "Aa=12345678"
 	DatabaseName     = "SEProject"
+
+	DatabaseAddress = "121.43.124.218:3306"
 )
 
 type Users struct {
@@ -43,12 +45,12 @@ type SubjectiveQuestions struct {
 func getDatabase() (*gorm.DB, error) {
 
 	log.Println("Connecting to database")
-	dsn := DatabaseUserName + ":" + DatabasePassword + "@tcp(localhost:3306)/" + DatabaseName + "?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := DatabaseUserName + ":" + DatabasePassword + "@tcp(" + DatabaseAddress + ")/" + DatabaseName + "?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
-
+	log.Println("Successfully connected to database")
 	return db, nil
 
 }
