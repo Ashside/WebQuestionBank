@@ -87,6 +87,7 @@ export default {
               this.testDetails = response.data.test;
               this.openModal();
               this.testID = testId;
+              this.showSameTest = false;
             } else {
               console.error('Failed to fetch test details:', response.data.reason);
             }

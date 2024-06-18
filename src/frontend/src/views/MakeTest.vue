@@ -8,6 +8,7 @@
         <div class="question-header">
           <input type="checkbox" v-model="item.selected">
           <h3>题目{{ index + 1 }}</h3>
+          本题分数：<input type="number" v-model="item.score" class="score-input">
         </div>
         <div v-if="item.type === 'simpleAnswer'">
           <MarkdownRenderer :content="item.question" />
@@ -103,24 +104,32 @@ export default {
       }
     },
     submitSelectedQuestions() {
-      this.closeModal();
-      const selectedQuestions = this.questions.filter(q => q.selected).map(q => ({ id: q.id }));
-      axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/makeTest', {
-        username: store.state.username,
-        testName: this.testName,
-        questions: selectedQuestions
-      })
-          .then(response => {
-            if(response.data.success) {
-              this.submissionSuccess = true;
-              this.pdfURL = 'https://' + response.data.pdfURL;
-            } else {
-              console.error("提交失败:", response.data.reason);
-            }
-          })
-          .catch(error => {
-            console.error("提交时出错:", error);
-          });
+      const selectedQuestions = this.questions.filter(q => q.selected);
+      if (selectedQuestions.every(q => q.score && q.score > 0)) {
+        // 所有选中的题目都有有效分数
+        this.closeModal();
+        axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/makeTest', {
+          username: store.state.username,
+          testName: this.testName,
+          questions: selectedQuestions.map(q => ({ id: q.id, score: q.score }))
+        })
+            .then(response => {
+              if(response.data.success) {
+                this.submissionSuccess = true;
+                this.pdfURL = 'https://' + response.data.pdfURL;
+              } else {
+                console.error("提交失败:", response.data.reason);
+                this.errorMessage = "提交失败: " + response.data.reason;  // 显示错误消息
+              }
+            })
+            .catch(error => {
+              console.error("提交时出错:", error);
+              this.errorMessage = "提交时出错: " + error.message;  // 显示错误消息
+            });
+      } else {
+        // 不是所有选中的题目都有分数
+        alert('请为所有选中的题目输入有效分数');
+      }
     },
     viewPDFDocument() {
       window.location.href = this.pdfURL;
@@ -259,6 +268,19 @@ input[type="checkbox"] {
 .close {
   float: right;
   cursor: pointer;
+}
+
+.score-input {
+  width: 60px;  /* 设置输入框宽度 */
+  padding: 5px 10px;  /* 内边距 */
+  border: 1px solid #ddd;  /* 边框 */
+  border-radius: 4px;  /* 边框圆角 */
+  margin-left: auto;  /* 左边自动间距，推到最右边 */
+  outline: none;  /* 去除聚焦时的边框 */
+}
+
+.score-input:focus {
+  border-color: #42a5f5;  /* 聚焦时的边框颜色 */
 }
 
 
