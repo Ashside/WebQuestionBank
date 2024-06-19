@@ -310,8 +310,11 @@ func getQuestionsByTypeID(db *gorm.DB, questionType string, ids []int) ([]Questi
 		return nil, fmt.Errorf("unsupported question type: %s", questionType)
 	}
 
-	// 查询并映射到QuestionSummary
-	if err := db.Table(tableName).Select("id, 'Choice' AS question_type, subject, content, options, difficulty, author").Where("id IN (?)", ids).Scan(&questions).Error; err != nil {
+	// 调整Select子句，使question_type字段动态反映表名
+	if err := db.Table(tableName).
+		Select("id, ? AS question_type, subject, content, options, difficulty, author", tableName).
+		Where("id IN (?)", ids).
+		Scan(&questions).Error; err != nil {
 		return nil, err
 	}
 
