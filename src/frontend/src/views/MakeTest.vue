@@ -2,9 +2,27 @@
   <NavigateBar />
   <div>
     <h1>问题列表</h1>
+    <div class="subject-selector-container">
+      <div class="subject-selector">
+        <label for="subject">选择科目:</label>
+        <select id="subject" v-model="selectedSubject">
+          <option value="all">所有科目</option>
+          <option v-for="subject in subjects" :key="subject.value" :value="subject.value">{{ subject.label }}</option>
+        </select>
+      </div>
+      <div class="difficulty-selector">
+        <label for="difficulty">选择难度:</label>
+        <select id="difficulty" v-model="selectedDifficulty">
+          <option value="all">所有难度</option>
+          <option value="1">简单</option>
+          <option value="2">中等</option>
+          <option value="3">困难</option>
+        </select>
+      </div>
+    </div>
     <ul>
       <!-- 渲染接收到的问题的描述 -->
-      <li v-for="(item, index) in questions" :key="index">
+      <li v-for="(item, index) in filteredQuestions" :key="index">
         <div class="question-header">
           <input type="checkbox" v-model="item.selected">
           <h3>题目{{ index + 1 }}</h3>
@@ -72,12 +90,30 @@ export default {
       submissionSuccess: false,
       pdfURL: '',
       isModalOpen: false,  // 控制模态框是否显示
-      testName: ''  // 存储输入的试卷名称
+      testName: '',  // 存储输入的试卷名称
+      subjects: [{label: '历史', value: 'history'}, {label: '数学', value: 'math'}, {label: '英语', value: 'english'}],
+      selectedSubject: 'all',
+      selectedDifficulty: 'all'
     }
   },
 
   created() {
     this.fetchQuestions();
+  },
+
+  computed: {
+    // 使用计算属性来动态过滤问题列表
+    filteredQuestions() {
+      if (this.selectedSubject === 'all' && this.selectedDifficulty === 'all') {
+        return this.questions;
+      } else if (this.selectedDifficulty === 'all') {
+        return this.questions.filter(item => item.subject === this.selectedSubject);
+      } else if (this.selectedSubject === 'all') {
+        return this.questions.filter(item => item.difficulty === parseInt(this.selectedDifficulty));
+      } else {
+        return this.questions.filter(item => item.subject === this.selectedSubject && item.difficulty === parseInt(this.selectedDifficulty));
+      }
+    }
   },
 
   methods: {
