@@ -11,8 +11,13 @@ import (
 	"log"
 )
 type QuestionSummary struct {
-	ID         int   `json:"id"`
-	QuestionType string `json:"question_type"`
+	ID            int    `json:"id"`
+	QuestionType  string `json:"question_type"`
+	Subject       string `json:"subject"`
+	Content       string `json:"content"`
+	Options       string `json:"options,omitempty"` // 选择题有值
+	Difficulty    int 	 `json:"difficulty"`
+	Author        string `json:"author"`
 }
 // 从题目列表中随机选择指定数量的题目
 func SelectRandomQuestions(questions []QuestionSummary, count int) []QuestionSummary {
@@ -42,6 +47,12 @@ func QueryQuestions(db *gorm.DB, tableName, selectFields string, conditions []st
 		JOIN %s_keywords ON %s_keywords.question_id = %s.id
 		JOIN keywords ON keywords.id = %s_keywords.keyword_id
 	`, tableName, tableName, tableName, tableName) 
+
+	if tableName == "choice_questions" {
+		selectFields = fmt.Sprintf("%s.content, %s.options, %s.difficulty, %s.author", tableName, tableName, tableName, tableName)
+	} else {
+		selectFields = fmt.Sprintf("%s.content, %s.difficulty, %s.author_id as author", tableName, tableName, tableName)
+	}
 
 	err := db.Table(tableName).
 		Select(selectFields).
@@ -108,14 +119,14 @@ func SearchQuestions(c *gin.Context) {
 	log.Printf("Searching questions for user: %s with criteria: %+v", form.Username, form)
 
 	// 查询选择题
-	choiceQuestions, err := QueryQuestions(db, "choice_questions", "choice_questions.id AS id, 'choice' AS question_type", conditions1, args...)
+	choiceQuestions, err := QueryQuestions(db, "choice_questions", "*", conditions1, args...)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Failed to fetch choice questions by criteria"})
 		return
 	}
 
 	// 查询主观题
-	subjectiveQuestions, err := QueryQuestions(db, "subjective_questions", "subjective_questions.id AS id, 'subjective' AS question_type", conditions2, args...)
+	subjectiveQuestions, err := QueryQuestions(db, "subjective_questions", "*", conditions2, args...)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Failed to fetch subjective questions by criteria"})
 		return
