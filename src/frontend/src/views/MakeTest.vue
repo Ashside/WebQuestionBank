@@ -1,7 +1,11 @@
 <template>
   <NavigateBar />
+  <div v-if="!aiModalOpen">
   <div>
     <h1>问题列表</h1>
+    <div class="button-container">
+      <button @click="toggleAIGeneration" class="ai-generate-btn">找题太麻烦？不如试试 AI 组卷</button>
+    </div>
     <div class="subject-selector-container">
       <div class="subject-selector">
         <label for="subject">选择科目:</label>
@@ -70,6 +74,22 @@
       </center>
     </div>
   </div>
+  </div>
+  <!-- AI组卷模态窗口 -->
+  <div v-if="aiModalOpen">
+      <center>
+        <h2>AI组卷结果</h2>
+        <ul>
+          <li v-for="(question, index) in aiGeneratedQuestions" :key="index">
+            {{ question }}
+          </li>
+        </ul>
+      </center>
+    <div class="button-container">
+      <button @click="closeAIModal">返回</button>
+    </div>
+    <div class="powered-by">Powered by Machine Learning Model</div>
+  </div>
 </template>
 
 
@@ -93,7 +113,9 @@ export default {
       testName: '',  // 存储输入的试卷名称
       subjects: [{label: '历史', value: 'history'}, {label: '数学', value: 'math'}, {label: '英语', value: 'english'}],
       selectedSubject: 'all',
-      selectedDifficulty: 'all'
+      selectedDifficulty: 'all',
+      aiGeneratedQuestions: [],
+      aiModalOpen: false
     }
   },
 
@@ -167,9 +189,32 @@ export default {
         alert('请为所有选中的题目输入有效分数');
       }
     },
+
     viewPDFDocument() {
       window.location.href = this.pdfURL;
-    }
+    },
+
+    toggleAIGeneration() {
+      this.aiModalOpen = !this.aiModalOpen;
+      this.generateAIQuestions();
+    },
+
+    closeAIModal() {
+      this.aiModalOpen = false;
+    },
+
+    async generateAIQuestions() {
+      try {
+        const response = await axios.get(process.env["VUE_APP_API_URL"] + '/api/questionBank/aiGenerate');
+        if (response.data.success) {
+          this.aiGeneratedQuestions = response.data.questions;
+        } else {
+          console.error('AI组卷失败:', response.data.reason);
+        }
+      } catch (error) {
+        console.error('调用AI组卷接口出错:', error);
+      }
+    },
   }
 }
 </script>
@@ -305,5 +350,19 @@ input[type="checkbox"] {
   float: right;
   cursor: pointer;
 }
+
+.powered-by {
+  position: fixed; /* 固定位置，不随滚动条滚动 */
+  right: 0; /* 左下角 */
+  bottom: 10px; /* 距底部10px */
+  background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色背景 */
+  color: rgba(255, 255, 255, 0.5); /* 文字颜色为白色，半透明 */
+  padding: 5px 10px; /* 内边距 */
+  font-size: 14px; /* 字体大小增大 */
+  border-radius: 10px; /* 移除边框圆角 */
+  z-index: 1000; /* 确保在最前面 */
+}
+
+
 
 </style>
