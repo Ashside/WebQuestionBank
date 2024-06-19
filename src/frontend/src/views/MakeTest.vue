@@ -270,18 +270,4 @@ input[type="checkbox"] {
   cursor: pointer;
 }
 
-.score-input {
-  width: 60px;  /* 设置输入框宽度 */
-  padding: 5px 10px;  /* 内边距 */
-  border: 1px solid #ddd;  /* 边框 */
-  border-radius: 4px;  /* 边框圆角 */
-  margin-left: auto;  /* 左边自动间距，推到最右边 */
-  outline: none;  /* 去除聚焦时的边框 */
-}
-
-.score-input:focus {
-  border-color: #42a5f5;  /* 聚焦时的边框颜色 */
-}
-
-
 </style>
