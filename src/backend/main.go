@@ -88,5 +88,11 @@ func main() {
 	// 约束：只有教师可以组卷
 	questionBankGroup.POST("/makeTest", api.MakeTestPost)
 
+	//处理/api/questionBank/queryAllTests的OPTIONS请求
+	// 该请求用于查询所有试卷
+	// 输入：form表单，包含username字段
+	// 输出：json格式，包含success、reason、test字段，test字段是一个数组，包含多个试卷
+	questionBankGroup.POST("/queryAllTests", api.QueryAllTestsPost)
+
 	_ = r.Run(":8081")
 }

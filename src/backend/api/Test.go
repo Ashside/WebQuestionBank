@@ -67,3 +67,20 @@ func GeneratePDFFile(file string, id int) (string, error) {
 	// TODO 待完成
 	return "", nil
 }
+
+func QueryAllTests(db *gorm.DB, username string, userType string) ([]Tests, error) {
+	// 查询所有测试
+	var tests []Tests
+
+	// 如果是管理员，查询所有测试
+	if userType == ADMIN {
+		if err := db.Table("tests").Find(&tests).Error; err != nil {
+			return nil, err
+		}
+	} else {
+		if err := db.Table("tests").Where("author = ?", username).Find(&tests).Error; err != nil {
+			return nil, err
+		}
+	}
+	return tests, nil
+}
