@@ -266,11 +266,13 @@ func QueryQuestionPost(context *gin.Context) {
 				log.Println("Failed to get keywords")
 				return
 			}
+
+			diff, _ := strconv.Atoi(question.Difficulty)
 			response = append(response, gin.H{
 				"type":       "multipleChoice",
 				"question":   question.Content,
 				"answer":     question.Answer,
-				"difficulty": question.Difficulty,
+				"difficulty": diff,
 				"subject":    question.Subject,
 				"option":     option,
 				"keywords":   keywords,
@@ -289,11 +291,12 @@ func QueryQuestionPost(context *gin.Context) {
 				log.Println("Failed to get keywords")
 				return
 			}
+			diff, _ := strconv.Atoi(question.Difficulty)
 			response = append(response, gin.H{
 				"type":       "simpleAnswer",
 				"question":   question.Content,
 				"answer":     question.Answer,
-				"difficulty": question.Difficulty,
+				"difficulty": diff,
 				"subject":    question.Subject,
 				"option":     "",
 				"keywords":   keywords,
@@ -372,9 +375,12 @@ func DeleteQuestionPost(context *gin.Context) {
 
 func MakeTestPost(context *gin.Context) {
 	log.Println("MakeTestPost")
+
 	type Question struct {
 		// 题目id
 		ID int64 `json:"id"`
+		// 本题对应的分值
+		Score int64 `json:"score"`
 	}
 	type Request struct {
 		// 选取的题目列表
@@ -383,6 +389,14 @@ func MakeTestPost(context *gin.Context) {
 		TestName string `form:"testName" binding:"required"`
 		// 提交者邮箱
 		Username string `form:"username" binding:"required"`
+	}
+	type Response struct {
+		// pdf文件的URL，后端自动生成pdf，返回一个可以访问到此pdf的URL，前端通过跳转访问此pdf文件。
+		PDFURL string `json:"pdfURL"`
+		// 原因，若成功为null
+		Reason string `json:"reason"`
+		// 是否成功
+		Success bool `json:"success"`
 	}
 
 	log.Println("Binding form")
@@ -411,10 +425,38 @@ func MakeTestPost(context *gin.Context) {
 		return
 
 	}
+	log.Println("Admin: ", request.Username)
+	log.Println("Make Test: ", request.TestName)
+	log.Println("Questions: ", request.Questions)
 
-	// 查询题目是否存在
-	for _, question := range request.Questions {
-		isQuestionExistFromID(db, question.ID)
+	var testId int
+	testId = findAvailableTestsId(db)
+	if testId == -1 {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error", "pdfURL": ""})
+		return
 	}
+	// 添加试卷
+	var test Tests
+	test.Id = testId
+	test.Name = request.TestName
+	test.Author = request.Username
+
+	for _, question := range request.Questions {
+		test.Grade = float64(question.Score)
+		test.QuestionId = int(question.ID)
+		if err := AddTest(db, &test); err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error", "pdfURL": ""})
+			return
+		}
+	}
+
+	// 生成pdf
+	pdfURL, err := GeneratePDF(db, testId)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error", "pdfURL": ""})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"success": true, "reason": nil, "pdfURL": pdfURL})
 
 }
