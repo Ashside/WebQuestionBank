@@ -65,6 +65,7 @@ func AddTest(db *gorm.DB, t *Tests) error {
 
 func GeneratePDFFile(file string, id int) (string, error) {
 	// TODO 待完成
+	//
 	return "", nil
 }
 
