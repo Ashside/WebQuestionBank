@@ -121,8 +121,8 @@ func SearchQuestions(c *gin.Context) {
 		return
 	}
 
-	choiceQuestions = SelectRandomQuestions(choiceQuestions, 10)
-	subjectiveQuestions = SelectRandomQuestions(subjectiveQuestions, 10)
+	choiceQuestions = SelectRandomQuestions(choiceQuestions, 20)
+	subjectiveQuestions = SelectRandomQuestions(subjectiveQuestions, 20)
 	questions := append(choiceQuestions, subjectiveQuestions...)
 
 	// 返回结果
