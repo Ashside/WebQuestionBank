@@ -61,7 +61,6 @@ export default {
   align-items: center;
   height: 30vh; /* 将高度调整小一点 */
   padding: 20px;
-  background-color: #f9f9f9; /* 轻微改变背景色 */
 }
 
 .container {
@@ -69,7 +68,6 @@ export default {
   flex-direction: column;
   width: 70%; /* 默认的容器宽度调小 */
   height: 100%; /* 调整为100%以适应markdown-editor的高度 */
-  background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); /* 更明显的阴影效果 */
   overflow: hidden; /* 隐藏滚动条 */

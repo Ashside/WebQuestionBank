@@ -1,5 +1,5 @@
 <template>
-  <div class="subject-selector">
+  <div class="load-subject-selector">
     <input type="radio" id="math" value="math" v-model="localSubject" @change="updateValue" />
     <label for="math" class="math">Math</label>
     <input type="radio" id="history" value="history" v-model="localSubject" @change="updateValue" />
@@ -37,18 +37,18 @@ export default {
 </script>
 
 <style scoped>
-.subject-selector {
+.load-subject-selector {
   display: flex;
   justify-content: center;
   align-items: center;
   margin: 20px 0;
 }
 
-.subject-selector input[type="radio"] {
+.load-subject-selector input[type="radio"] {
   display: none;
 }
 
-.subject-selector label {
+.load-subject-selector label {
   padding: 10px 20px;
   border: none; /* 移除边框 */
   cursor: pointer;
@@ -61,34 +61,34 @@ export default {
   margin: 0; /* 移除边距让它们紧贴 */
 }
 
-.subject-selector label.math {
+.load-subject-selector label.math {
   background-color: #333333;
   color: white;
 }
 
-.subject-selector label.history {
+.load-subject-selector label.history {
   background-color: #333333;
   color: white;
 }
 
-.subject-selector label.english {
+.load-subject-selector label.english {
   background-color: #333333;
   color: white;
 }
 
-.subject-selector input[type="radio"]:checked + label.math {
+.load-subject-selector input[type="radio"]:checked + label.math {
   background-color: #1e88e5;
   color: #fff;
   box-shadow: 0 0 15px rgba(30, 136, 229, 0.5);
 }
 
-.subject-selector input[type="radio"]:checked + label.history {
+.load-subject-selector input[type="radio"]:checked + label.history {
   background-color: #fb8c00;
   color: #fff;
   box-shadow: 0 0 15px rgba(251, 140, 0, 0.5);
 }
 
-.subject-selector input[type="radio"]:checked + label.english {
+.load-subject-selector input[type="radio"]:checked + label.english {
   background-color: #8e24aa;
   color: #fff;
   box-shadow: 0 0 15px rgba(142, 36, 170, 0.5);
