@@ -9,9 +9,11 @@ import (
 const (
 	DatabaseUserName = "root"
 	DatabasePassword = "Aa=12345678"
-	DatabaseName     = "SEProject"
+	// DatabasePassword = "123456"
+	DatabaseName = "SEProject"
 
 	DatabaseAddress = "121.43.124.218:3306"
+	//DatabaseAddress = "localhost:3306"
 )
 
 type Users struct {
@@ -47,6 +49,14 @@ type ChoiceQuestionKeywords struct {
 type SubjectiveQuestionKeywords struct {
 	QuestionId int `gorm:"primaryKey,colum:question_id"`
 	KeywordId  int `gorm:"primaryKey,colum:keyword_id"`
+}
+
+type Tests struct {
+	Id         int `gorm:"primaryKey"`
+	Name       string
+	QuestionId int
+	Grade      float64
+	Author     string
 }
 
 func getDatabase() (*gorm.DB, error) {
