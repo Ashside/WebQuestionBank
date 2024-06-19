@@ -42,3 +42,72 @@ h1 {
     margin-bottom: 20px; /* 增加标题与列表间的间隔 */
 }
 
+.score-input {
+    width: 60px;  /* 设置输入框宽度 */
+    padding: 5px 10px;  /* 内边距 */
+    border: 1px solid #ddd;  /* 边框 */
+    border-radius: 4px;  /* 边框圆角 */
+    margin-left: auto;  /* 左边自动间距，推到最右边 */
+    outline: none;  /* 去除聚焦时的边框 */
+}
+
+.score-input:focus {
+    border-color: #42a5f5;  /* 聚焦时的边框颜色 */
+}
+
+.subject-selector-container {
+    display: flex;
+    justify-content: center;  /* 水平居中 */
+    margin: 20px 0;  /* 上下间距 */
+    gap: 10px;
+}
+
+.subject-selector {
+    background-color: #fff;  /* 背景颜色 */
+    padding: 10px 20px;  /* 内边距 */
+    border-radius: 8px;  /* 圆角 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);  /* 阴影 */
+    border: 1px solid #ddd;  /* 边框 */
+}
+
+.subject-selector label {
+    font-weight: bold;  /* 加粗标签文字 */
+    margin-right: 10px;  /* 标签与下拉框的间隔 */
+}
+
+.subject-selector select {
+    padding: 8px 12px;  /* 下拉框内边距 */
+    border-radius: 4px;  /* 下拉框圆角 */
+    border: 1px solid #ccc;  /* 下拉框边框 */
+    cursor: pointer;  /* 鼠标手型 */
+    outline: none;  /* 移除轮廓 */
+}
+
+.subject-selector select:hover {
+    box-shadow: 0 0 8px rgba(0, 0, 255, 0.5);  /* 鼠标悬浮时添加蓝色光晕 */
+}
+
+.difficulty-selector {
+    background-color: #fff;  /* 背景颜色 */
+    padding: 10px 20px;  /* 内边距 */
+    border-radius: 8px;  /* 圆角 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);  /* 阴影 */
+    border: 1px solid #ddd;  /* 边框 */
+}
+
+.difficulty-selector label {
+    font-weight: bold;  /* 加粗标签文字 */
+    margin-right: 10px;  /* 标签与下拉框的间隔 */
+}
+
+.difficulty-selector select {
+    padding: 8px 12px;  /* 下拉框内边距 */
+    border-radius: 4px;  /* 下拉框圆角 */
+    border: 1px solid #ccc;  /* 下拉框边框 */
+    cursor: pointer;  /* 鼠标手型 */
+    outline: none;  /* 移除轮廓 */
+}
+
+.difficulty-selector select:hover {
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.5);  /* 鼠标悬浮时添加红色光晕 */
+}
