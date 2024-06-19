@@ -74,6 +74,14 @@ const routes = [
         }
     },
     {
+        path: '/CheckStudentAnswer',
+        name: 'CheckStudentAnswer',
+        component: () => import('@/views/CheckStudentAnswer.vue'),
+        meta: {
+            requiresAuth: true  // 需要认证
+        }
+    },
+    {
         path: '/:pathMatch(.*)*',
         component: () => import('@/views/NotFound.vue'),
     }
