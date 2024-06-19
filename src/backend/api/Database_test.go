@@ -16,7 +16,7 @@ func Test_getDatabase(t *testing.T) {
 		{
 			name:    "Test getDatabase",
 			want:    nil,
-			wantErr: true,
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
