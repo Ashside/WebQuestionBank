@@ -3,6 +3,7 @@ package api
 import (
 	"gorm.io/gorm"
 	"log"
+	"strconv"
 )
 
 func findAvailableTestsId(db *gorm.DB) int {
@@ -25,14 +26,31 @@ func findAvailableTestsId(db *gorm.DB) int {
 	id = int(maxId + 1)
 	return id
 }
-func GeneratePDF(db *gorm.DB, id int) (string, error) {
+func GenerateMD(db *gorm.DB, id int) (string, error) {
 	// 先查询所有题目
 	var tests []Tests
 	if err := db.Table("tests").Where("id = ?", id).Find(&tests).Error; err != nil {
 		return "", err
 	}
+	var mdFile string
 	log.Println(tests)
-	return "", nil
+	for i, test := range tests {
+		quesId := test.QuestionId
+		// 查询题目
+		ques, bExist := QueryQuestionFromId(db, quesId)
+		if bExist {
+			mdFile += "第" + strconv.Itoa(i+1) + "题\n"
+			mdFile += strconv.Itoa(int(test.Grade)) + "分\n"
+			mdFile += ques.Content + "\n"
+			if ques.Options != "" {
+				mdFile += "选项：" + ques.Options + "\n"
+			}
+		} else {
+			return "", nil
+		}
+
+	}
+	return mdFile, nil
 }
 
 func AddTest(db *gorm.DB, t *Tests) error {
@@ -43,4 +61,9 @@ func AddTest(db *gorm.DB, t *Tests) error {
 	}
 	return nil
 
+}
+
+func GeneratePDFFile(file string, id int) (string, error) {
+	// TODO 待完成
+	return "", nil
 }

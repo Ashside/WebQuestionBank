@@ -451,11 +451,13 @@ func MakeTestPost(context *gin.Context) {
 	}
 
 	// 生成pdf
-	pdfURL, err := GeneratePDF(db, testId)
+	mdFile, err := GenerateMD(db, testId)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error", "pdfURL": ""})
 		return
 	}
+
+	pdfURL, err := GeneratePDFFile(mdFile, testId)
 
 	context.JSON(http.StatusOK, gin.H{"success": true, "reason": nil, "pdfURL": pdfURL})
 
