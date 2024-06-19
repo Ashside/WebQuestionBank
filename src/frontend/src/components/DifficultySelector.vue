@@ -1,5 +1,5 @@
 <template>
-  <div class="difficulty-selector">
+  <div class="load-difficulty-selector">
     <input type="radio" id="easy" value=1 v-model="localDifficulty" @change="updateValue" />
     <label for="easy" class="easy">Easy</label>
     <input type="radio" id="medium" value=2 v-model="localDifficulty" @change="updateValue" />
@@ -38,18 +38,18 @@ export default {
 
 
 <style scoped>
-.difficulty-selector {
+.load-difficulty-selector {
   display: flex;
   justify-content: center;
   align-items: center;
   margin: 20px 0;
 }
 
-.difficulty-selector input[type="radio"] {
+.load-difficulty-selector input[type="radio"] {
   display: none;
 }
 
-.difficulty-selector label {
+.load-difficulty-selector label {
   padding: 10px 20px;
   border: none; /* 移除边框 */
   cursor: pointer;
@@ -62,34 +62,34 @@ export default {
   margin: 0; /* 移除边距让它们紧贴 */
 }
 
-.difficulty-selector label.easy {
+.load-difficulty-selector label.easy {
   background-color: #333333;
   color: white;
 }
 
-.difficulty-selector label.medium {
+.load-difficulty-selector label.medium {
   background-color: #333333;
   color: white;
 }
 
-.difficulty-selector label.hard {
+.load-difficulty-selector label.hard {
   background-color: #333333;
   color: white;
 }
 
-.difficulty-selector input[type="radio"]:checked + label.easy {
+.load-difficulty-selector input[type="radio"]:checked + label.easy {
   background-color: #2e7d32;
   color: #fff;
   box-shadow: 0 0 15px rgba(46, 125, 50, 0.5);
 }
 
-.difficulty-selector input[type="radio"]:checked + label.medium {
+.load-difficulty-selector input[type="radio"]:checked + label.medium {
   background-color: #ffb300;
   color: #fff;
   box-shadow: 0 0 15px rgba(255, 179, 0, 0.5);
 }
 
-.difficulty-selector input[type="radio"]:checked + label.hard {
+.load-difficulty-selector input[type="radio"]:checked + label.hard {
   background-color: #d32f2f;
   color: #fff;
   box-shadow: 0 0 15px rgba(211, 47, 47, 0.5);

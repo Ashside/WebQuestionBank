@@ -1,8 +1,6 @@
 <template>
   <Navigate></Navigate>
   <div class="home">
-    <h1>欢迎来到首页！</h1>
-    <p>请选择你要进行的操作</p>
     <div class="card-container">
       <CustomCard v-if="!isStudent" title="录入简答题" cover="/simple_answer.png" @card-click="navigateTo('LoadQuestion/shortAnswer')"></CustomCard>
       <CustomCard v-if="!isStudent" title="录入选择题" cover="/multiple_choice.png" @card-click="navigateTo('LoadQuestion/multipleChoice')"></CustomCard>
@@ -10,6 +8,7 @@
       <CustomCard v-if="!isStudent" title="组卷" cover="/make_test.png" @card-click="navigateTo('/MakeTest')"></CustomCard>
       <CustomCard v-if="isStudent" title="完成试卷" cover="/exam.png" @card-click="navigateTo('/MakeTest')"></CustomCard>
       <CustomCard title="查看试卷" cover="/view_test.png" @card-click="navigateTo('/ViewAllTests')"></CustomCard>
+      <CustomCard v-if="!isStudent" title="批阅试卷" cover="/test_score.png" @card-click="navigateTo('/ViewAllTests')"></CustomCard>
     </div>
   </div>
 </template>
@@ -56,10 +55,12 @@ export default {
   justify-content: center;
   gap: 16px; /* 卡片之间的间距 */
   flex-wrap: wrap; /* 当空间不足时，换行排列 */
+  padding: 100px; /* 卡片与边框之间的间距 */
 }
 
 .card-container > * {
-  flex: 1;
-  min-width: 200px; /* 每个卡片的最小宽度 */
+  width: 250px; /* 固定宽度 */
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 </style>
