@@ -451,12 +451,95 @@ func MakeTestPost(context *gin.Context) {
 	}
 
 	// 生成pdf
-	pdfURL, err := GeneratePDF(db, testId)
+	mdFile, err := GenerateMD(db, testId)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error", "pdfURL": ""})
 		return
 	}
 
+	pdfURL, err := GeneratePDFFile(mdFile, testId)
+
 	context.JSON(http.StatusOK, gin.H{"success": true, "reason": nil, "pdfURL": pdfURL})
+
+}
+
+func QueryAllTestsPost(context *gin.Context) {
+	type Request struct {
+		// 用户名，要查询的用户名
+		Username string `form:"username"`
+	}
+	type Test struct {
+		// 试卷ID
+		ID int64 `json:"id"`
+		// 试卷名
+		Name string `json:"name"`
+	}
+	type Response struct {
+		// 原因，如果失败返回原因，如果成功则为 null
+		Reason string `json:"reason"`
+		// 是否成功
+		Success bool   `json:"success"`
+		Test    []Test `json:"test"`
+	}
+
+	log.Println("QueryAllTestsPost")
+	var request Request
+	if err := context.ShouldBind(&request); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"success": false, "reason": "Invalid form"})
+		return
+	}
+
+	db, err := getDatabase()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+		return
+	}
+	var tests []Tests
+	if request.Username == "" {
+		var err error
+		tests, err = QueryAllTests(db, "", ADMIN)
+		if err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+			return
+
+		}
+	} else {
+		// 查询用户是否存在
+		var user Users
+		if err := GetUserByUsername(db, request.Username, &user); err != nil {
+			context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Users not found"})
+			return
+		}
+
+		// 鉴权
+		if user.Type == STUDENT {
+			context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Permission denied"})
+			return
+		}
+
+		// 查询试卷
+		var err error
+		tests, err = QueryAllTests(db, request.Username, user.Type)
+		if err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+			return
+		}
+	}
+
+	// 找出tests中互异的id
+	var responseTest []Test
+	var idMap = make(map[int]bool)
+	for _, t := range tests {
+		if _, ok := idMap[t.Id]; !ok {
+			idMap[t.Id] = true
+			responseTest = append(responseTest, Test{ID: int64(t.Id), Name: t.Name})
+		}
+	}
+
+	var response Response
+	response.Success = true
+	response.Reason = ""
+	response.Test = responseTest
+	context.JSON(http.StatusOK, response)
 
 }
