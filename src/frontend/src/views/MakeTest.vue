@@ -77,14 +77,79 @@
   </div>
   <!-- AI组卷模态窗口 -->
   <div v-if="aiModalOpen">
+    <div>
+      <div class="subject-selector-container">
+        <div class="subject-selector">
+          <label for="subject">选择科目:</label>
+          <select id="subject" v-model="selectedSubject">
+            <option value="all">所有科目</option>
+            <option v-for="subject in subjects" :key="subject.value" :value="subject.value">{{ subject.label }}</option>
+          </select>
+        </div>
+        <div class="difficulty-selector">
+          <label for="difficulty">选择难度:</label>
+          <select id="difficulty" v-model="selectedDifficulty">
+            <option value="all">所有难度</option>
+            <option value="1">简单</option>
+            <option value="2">中等</option>
+            <option value="3">困难</option>
+          </select>
+        </div>
+        <button @click="generateAIQuestions">AI组卷</button>
+      </div>
       <center>
         <h2>AI组卷结果</h2>
-        <ul>
-          <li v-for="(question, index) in aiGeneratedQuestions" :key="index">
-            {{ question }}
-          </li>
-        </ul>
       </center>
+      <ul>
+        <!-- 渲染接收到的问题的描述 -->
+        <li v-for="(item, index) in aiGeneratedQuestions" :key="index">
+          <div class="question-header">
+            <input type="checkbox" v-model="item.selected">
+            <h3>题目{{ index + 1 }}</h3>
+            本题分数：<input type="number" v-model="item.score" class="score-input">
+          </div>
+          <div v-if="item.type === 'simpleAnswer'">
+            <MarkdownRenderer :content="item.question" />
+          </div>
+          <div v-else-if="item.type === 'multipleChoice'">
+            <MarkdownRenderer :content="item.question + '<br>' +
+          'option1: ' + item.option.option1 + '<br>' +
+          'option2: ' + item.option.option2 + '<br>' +
+          'option3: ' + item.option.option3 + '<br>' +
+          'option4: ' + item.option.option4" />
+          </div>
+          <div class="tag-container">
+            <n-tag v-if="item.subject === 'history'" style="background-color: #ffa726">历史</n-tag>
+            <n-tag v-else-if="item.subject === 'math'" style="background-color: #66bb6a">数学</n-tag>
+            <n-tag v-else-if="item.subject === 'english'" style="background-color: #42a5f5">英语</n-tag>
+
+            <n-tag v-if="item.difficulty === 1" type="success">简单</n-tag>
+            <n-tag v-else-if="item.difficulty === 2" type="warning">中等</n-tag>
+            <n-tag v-else-if="item.difficulty === 3" type="error">困难</n-tag>
+            <n-tag v-for="(keywordObj, i_keyword) in item.keywords.slice(0, 3)" :key="i_keyword">
+              {{ keywordObj.keyword }}
+            </n-tag>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="button-container">
+      <button @click="openModal">提交选中的题目</button>
+      <transition name="fade">
+        <button v-if="submissionSuccess" @click="viewPDFDocument">查看试卷PDF文档</button>
+      </transition>
+    </div>
+    <div v-if="isModalOpen" class="modal">
+      <div class="modal-content">
+        <span class="close" @click="closeModal">&times;</span>
+        <center>
+          <h2>请输入试卷信息</h2>
+          <input type="text" v-model="testName" placeholder="试卷名称">
+          <br><br>
+          <button @click="submitSelectedAIQuestions">确认提交</button>
+        </center>
+      </div>
+    </div>
     <div class="button-container">
       <button @click="closeAIModal">返回</button>
     </div>
@@ -161,6 +226,7 @@ export default {
         // 处理请求错误
       }
     },
+
     submitSelectedQuestions() {
       const selectedQuestions = this.questions.filter(q => q.selected);
       if (selectedQuestions.every(q => q.score && q.score > 0)) {
@@ -190,13 +256,41 @@ export default {
       }
     },
 
+    submitSelectedAIQuestions() {
+      const selectedAIQuestions = this.aiGeneratedQuestions.filter(q => q.selected);
+      if (selectedAIQuestions.every(q => q.score && q.score > 0)) {
+        // 所有选中的题目都有有效分数
+        this.closeModal();
+        axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/makeTest', {
+          username: store.state.username,
+          testName: this.testName,
+          questions: selectedAIQuestions.map(q => ({ id: q.id, score: q.score }))
+        })
+            .then(response => {
+              if(response.data.success) {
+                this.submissionSuccess = true;
+                this.pdfURL = 'https://' + response.data.pdfURL;
+              } else {
+                console.error("提交失败:", response.data.reason);
+                this.errorMessage = "提交失败: " + response.data.reason;  // 显示错误消息
+              }
+            })
+            .catch(error => {
+              console.error("提交时出错:", error);
+              this.errorMessage = "提交时出错: " + error.message;  // 显示错误消息
+            });
+      } else {
+        // 不是所有选中的题目都有分数
+        alert('请为所有选中的题目输入有效分数');
+      }
+    },
+
     viewPDFDocument() {
       window.location.href = this.pdfURL;
     },
 
     toggleAIGeneration() {
       this.aiModalOpen = !this.aiModalOpen;
-      this.generateAIQuestions();
     },
 
     closeAIModal() {
@@ -205,7 +299,7 @@ export default {
 
     async generateAIQuestions() {
       try {
-        const response = await axios.get(process.env["VUE_APP_API_URL"] + '/api/questionBank/aiGenerate');
+        const response = await axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/aiGenerate');
         if (response.data.success) {
           this.aiGeneratedQuestions = response.data.questions;
         } else {
