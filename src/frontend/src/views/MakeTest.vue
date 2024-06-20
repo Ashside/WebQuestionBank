@@ -77,19 +77,7 @@
   </div>
   <!-- AI组卷模态窗口 -->
   <div v-if="aiModalOpen">
-      <center>
-        <h2>AI组卷结果</h2>
-        <ul>
-          <li v-for="(question, index) in aiGeneratedQuestions" :key="index">
-            {{ question }}
-          </li>
-        </ul>
-      </center>
     <div>
-      <h1>问题列表</h1>
-      <div class="button-container">
-        <button @click="toggleAIGeneration" class="ai-generate-btn">找题太麻烦？不如试试 AI 组卷</button>
-      </div>
       <div class="subject-selector-container">
         <div class="subject-selector">
           <label for="subject">选择科目:</label>
@@ -107,10 +95,14 @@
             <option value="3">困难</option>
           </select>
         </div>
+        <button @click="generateAIQuestions">AI组卷</button>
       </div>
+      <center>
+        <h2>AI组卷结果</h2>
+      </center>
       <ul>
         <!-- 渲染接收到的问题的描述 -->
-        <li v-for="(item, index) in filteredQuestions" :key="index">
+        <li v-for="(item, index) in aiGeneratedQuestions" :key="index">
           <div class="question-header">
             <input type="checkbox" v-model="item.selected">
             <h3>题目{{ index + 1 }}</h3>
@@ -154,7 +146,7 @@
           <h2>请输入试卷信息</h2>
           <input type="text" v-model="testName" placeholder="试卷名称">
           <br><br>
-          <button @click="submitSelectedQuestions">确认提交</button>
+          <button @click="submitSelectedAIQuestions">确认提交</button>
         </center>
       </div>
     </div>
@@ -264,13 +256,41 @@ export default {
       }
     },
 
+    submitSelectedAIQuestions() {
+      const selectedAIQuestions = this.aiGeneratedQuestions.filter(q => q.selected);
+      if (selectedAIQuestions.every(q => q.score && q.score > 0)) {
+        // 所有选中的题目都有有效分数
+        this.closeModal();
+        axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/makeTest', {
+          username: store.state.username,
+          testName: this.testName,
+          questions: selectedAIQuestions.map(q => ({ id: q.id, score: q.score }))
+        })
+            .then(response => {
+              if(response.data.success) {
+                this.submissionSuccess = true;
+                this.pdfURL = 'https://' + response.data.pdfURL;
+              } else {
+                console.error("提交失败:", response.data.reason);
+                this.errorMessage = "提交失败: " + response.data.reason;  // 显示错误消息
+              }
+            })
+            .catch(error => {
+              console.error("提交时出错:", error);
+              this.errorMessage = "提交时出错: " + error.message;  // 显示错误消息
+            });
+      } else {
+        // 不是所有选中的题目都有分数
+        alert('请为所有选中的题目输入有效分数');
+      }
+    },
+
     viewPDFDocument() {
       window.location.href = this.pdfURL;
     },
 
     toggleAIGeneration() {
       this.aiModalOpen = !this.aiModalOpen;
-      this.generateAIQuestions();
     },
 
     closeAIModal() {
@@ -279,7 +299,7 @@ export default {
 
     async generateAIQuestions() {
       try {
-        const response = await axios.get(process.env["VUE_APP_API_URL"] + '/api/questionBank/aiGenerate');
+        const response = await axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/aiGenerate');
         if (response.data.success) {
           this.aiGeneratedQuestions = response.data.questions;
         } else {
