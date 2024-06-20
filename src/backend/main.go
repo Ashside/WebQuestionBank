@@ -64,16 +64,6 @@ func main() {
 	// 输出：json格式，包含success、reason、questions字段，questions字段是一个数组，包含多个题目
 	queryQuestionGroup.POST("", api.QueryQuestionPost)
 
-	ComposionGroup := questionBankGroup.Group("/composition")
-	//处理/api/questionBank/composition的OPTIONS请求
-	// 该请求用于题目查询（组卷）
-	// 输入：form表单，包含difficulty, subject, keyword, username字段
-	// 输出：json格式，包含success字段
-	// if success = false 包含reason字段
-	// else 包含questions（	ID*int，QuestionType*string ）字段
-	//if questions空 包含message字段
-	ComposionGroup.POST("/search", api.SearchQuestions)
-
 	//处理/api/questionBank/deleteQuestion的OPTIONS请求
 	// 该请求用于删除题目
 	// 输入：form表单，包含questions字段，questions是一个数组，包含多个题目的id
@@ -87,6 +77,18 @@ func main() {
 	// 输出：json格式，包含success、reason、pdfURL字段
 	// 约束：只有教师可以组卷
 	questionBankGroup.POST("/makeTest", api.MakeTestPost)
+
+	//处理/api/questionBank/queryAllTests的OPTIONS请求
+	// 该请求用于查询所有试卷
+	// 输入：form表单，包含username字段
+	// 输出：json格式，包含success、reason、test字段，test字段是一个数组，包含多个试卷
+	questionBankGroup.POST("/queryAllTests", api.QueryAllTestsPost)
+	
+	//处理/api/questionBank/findSameTestByID的OPTIONS请求
+	// 该请求用于查找相似试卷
+	// 输入：form表单，包含username,id字段，id为试卷编号
+	// 输出：json格式，包含success、reason、questions字段，questions字段是一个数组，包含多个题目
+	questionBankGroup.POST("/findSameTestByID", api.FindSamePost)
 
 	_ = r.Run(":8081")
 }
