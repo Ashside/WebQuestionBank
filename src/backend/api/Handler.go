@@ -451,7 +451,7 @@ func MakeTestPost(context *gin.Context) {
 	}
 
 	// 生成pdf
-	mdFile, err := GenerateMD(db, testId)
+	mdFile, err := GenerateMdByTestID(db, testId)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error", "pdfURL": ""})
 		return
@@ -540,6 +540,48 @@ func QueryAllTestsPost(context *gin.Context) {
 	response.Success = true
 	response.Reason = ""
 	response.Test = responseTest
+	context.JSON(http.StatusOK, response)
+
+}
+
+func QueryTestByIDPost(context *gin.Context) {
+	type Request struct {
+		// 试卷ID，要查询的试卷ID
+		TestId int64 `form:"testId" binding:"required"`
+		// 用户名，要查询的用户名
+		Username string `form:"username"`
+	}
+	type Response struct {
+		// 原因，如果失败返回原因，如果成功则为 null
+		Reason string `json:"reason"`
+		// 是否成功
+		Success bool   `json:"success"`
+		Test    string `json:"test"`
+	}
+	log.Println("QueryTestByIDPost")
+	var request Request
+
+	if err := context.ShouldBind(&request); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"success": false, "reason": "Invalid form", "test": ""})
+		return
+	}
+
+	db, err := getDatabase()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error", "test": ""})
+		return
+	}
+
+	var response Response
+	mdFile, err := GenerateMdByTestID(db, int(request.TestId))
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error", "test": ""})
+		return
+	}
+
+	response.Success = true
+	response.Reason = ""
+	response.Test = mdFile
 	context.JSON(http.StatusOK, response)
 
 }

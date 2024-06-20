@@ -26,7 +26,7 @@ func findAvailableTestsId(db *gorm.DB) int {
 	id = int(maxId + 1)
 	return id
 }
-func GenerateMD(db *gorm.DB, id int) (string, error) {
+func GenerateMdByTestID(db *gorm.DB, id int) (string, error) {
 	// 先查询所有题目
 	var tests []Tests
 	if err := db.Table("tests").Where("id = ?", id).Find(&tests).Error; err != nil {
@@ -65,6 +65,7 @@ func AddTest(db *gorm.DB, t *Tests) error {
 
 func GeneratePDFFile(file string, id int) (string, error) {
 	// TODO 待完成
+	//
 	return "", nil
 }
 
@@ -83,4 +84,17 @@ func QueryAllTests(db *gorm.DB, username string, userType string) ([]Tests, erro
 		}
 	}
 	return tests, nil
+}
+func queryTestByID(db *gorm.DB, id int) []int {
+	// 返回该测试下所有题目的id
+
+	var test []Tests
+	var quesId []int
+	if err := db.Table("tests").Where("id = ?", id).Find(&test).Error; err != nil {
+		return nil
+	}
+	for _, t := range test {
+		quesId = append(quesId, t.QuestionId)
+	}
+	return quesId
 }
