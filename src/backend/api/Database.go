@@ -8,12 +8,12 @@ import (
 
 const (
 	DatabaseUserName = "root"
-	//DatabasePassword = "Aa=12345678"
-	DatabasePassword = "123456"
-	DatabaseName     = "SEProject"
+	DatabasePassword = "Aa=12345678"
+	//DatabasePassword = "123456"
+	DatabaseName = "SEProject"
 
-	//DatabaseAddress = "121.43.124.218:3306"
-	DatabaseAddress = "localhost:3306"
+	DatabaseAddress = "121.43.124.218:3306"
+	// DatabaseAddress = "localhost:3306"
 )
 
 type Users struct {
