@@ -65,6 +65,31 @@ func GenerateMdByTestID(db *gorm.DB, id int) (string, error) {
 	}
 	return mdFile, nil
 }
+func GenerateMdByQuestions(db *gorm.DB, questions []QuestionSummary) (string, error) {
+	// 生成md文件
+	var mdFile string
+	for i, ques := range questions {
+		mdFile += "# 第" + strconv.Itoa(i+1) + "题\n"
+		mdFile += ques.Content + "\n"
+		if ques.Options != "" {
+			mdFile += "\n"
+			mdFile += "选项：\n\n"
+
+			var options map[string]string
+			if err := json.Unmarshal([]byte(ques.Options), &options); err != nil {
+				log.Println("Failed to unmarshal options")
+				return "", err
+			}
+			for k, v := range options {
+				mdFile += k + " : " + v + "\n"
+				mdFile += "\n"
+			}
+
+		}
+	}
+	return mdFile, nil
+
+}
 
 func AddTest(db *gorm.DB, t *Tests) error {
 	// 添加测试
