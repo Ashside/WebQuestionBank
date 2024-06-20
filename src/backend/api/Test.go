@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"gorm.io/gorm"
 	"log"
 	"strconv"
@@ -39,11 +40,23 @@ func GenerateMdByTestID(db *gorm.DB, id int) (string, error) {
 		// 查询题目
 		ques, bExist := QueryQuestionFromId(db, quesId)
 		if bExist {
-			mdFile += "第" + strconv.Itoa(i+1) + "题\n"
+			mdFile += "# 第" + strconv.Itoa(i+1) + "题\n"
 			mdFile += strconv.Itoa(int(test.Grade)) + "分\n"
 			mdFile += ques.Content + "\n"
 			if ques.Options != "" {
-				mdFile += "选项：" + ques.Options + "\n"
+				mdFile += "\n"
+				mdFile += "选项：\n\n"
+
+				var options map[string]string
+				if err := json.Unmarshal([]byte(ques.Options), &options); err != nil {
+					log.Println("Failed to unmarshal options")
+					return "", err
+				}
+				for k, v := range options {
+					mdFile += k + " : " + v + "\n"
+					mdFile += "\n"
+				}
+
 			}
 		} else {
 			return "", nil
@@ -51,6 +64,31 @@ func GenerateMdByTestID(db *gorm.DB, id int) (string, error) {
 
 	}
 	return mdFile, nil
+}
+func GenerateMdByQuestions(db *gorm.DB, questions []QuestionSummary) (string, error) {
+	// 生成md文件
+	var mdFile string
+	for i, ques := range questions {
+		mdFile += "# 第" + strconv.Itoa(i+1) + "题\n"
+		mdFile += ques.Content + "\n"
+		if ques.Options != "" {
+			mdFile += "\n"
+			mdFile += "选项：\n\n"
+
+			var options map[string]string
+			if err := json.Unmarshal([]byte(ques.Options), &options); err != nil {
+				log.Println("Failed to unmarshal options")
+				return "", err
+			}
+			for k, v := range options {
+				mdFile += k + " : " + v + "\n"
+				mdFile += "\n"
+			}
+
+		}
+	}
+	return mdFile, nil
+
 }
 
 func AddTest(db *gorm.DB, t *Tests) error {

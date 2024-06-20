@@ -58,14 +58,14 @@ func FindSamePost(c *gin.Context) {
 
 	// 查询不重复的选择题ID
 	var distinctChoiceIDs []int
-	if err := db.Table("choice_questions").Select("id").Where("id NOT IN ?", choiceIDs).Scan(&distinctChoiceIDs).Error; err != nil {
+	if err := db.Table("choicequestions").Select("id").Where("id NOT IN ?", choiceIDs).Scan(&distinctChoiceIDs).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Failed to fetch distinct choice question IDs"})
 		return
 	}
 
 	// 查询不重复的主观题ID
 	var distinctSubjectiveIDs []int
-	if err := db.Table("subjective_questions").Select("id").Where("id NOT IN ?", subjectiveIDs).Scan(&distinctSubjectiveIDs).Error; err != nil {
+	if err := db.Table("subjectivequestions").Select("id").Where("id NOT IN ?", subjectiveIDs).Scan(&distinctSubjectiveIDs).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Failed to fetch distinct subjective question IDs"})
 		return
 	}
@@ -79,16 +79,38 @@ func FindSamePost(c *gin.Context) {
 	var questions []QuestionSummary
 	questions = append(questions, choicesQuestion...)
 	questions = append(questions, subjectiveQuestion...)
-	c.JSON(http.StatusOK, gin.H{"success": true, "questions": questions})
+
+	var retQuestions []QuestionSummary
+	for _, ques := range questions {
+		var temp QuestionSummary
+		temp.ID = ques.ID
+		if ques.QuestionType == "choicequestions" {
+			temp.QuestionType = "choice_questions"
+		} else {
+			temp.QuestionType = "subjective_questions"
+		}
+		temp.Subject = ques.Subject
+		temp.Content = ques.Content
+		temp.Difficulty = ques.Difficulty
+		temp.Author = ques.Author
+		retQuestions = append(retQuestions, temp)
+
+	}
+	if len(retQuestions) == 0 {
+		c.JSON(http.StatusOK, gin.H{"success": false, "reason": "No questions found"})
+		return
+	}
+	mdFile, _ := GenerateMdByQuestions(db, retQuestions)
+	c.JSON(http.StatusOK, gin.H{"success": true, "test": mdFile})
 }
 
 func GetAllKeywords(db *gorm.DB, questionIDs []int) map[int][]string {
 	questionKeywordsMap := make(map[int][]string)
 	for _, qID := range questionIDs {
 		var keywords []string
-		db.Table("choice_questions").Joins("JOIN choice_question_keywords ON choice_questions.id = choice_question_keywords.question_id").
+		db.Table("choicequestions").Joins("JOIN choice_question_keywords ON choicequestions.id = choice_question_keywords.question_id").
 			Joins("JOIN keywords ON choice_question_keywords.keyword_id = keywords.id").
-			Where("choice_questions.id = ?", qID).
+			Where("choicequestions.id = ?", qID).
 			Pluck("keywords.keyword", &keywords)
 		questionKeywordsMap[qID] = keywords
 	}

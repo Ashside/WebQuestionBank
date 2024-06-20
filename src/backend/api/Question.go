@@ -321,18 +321,21 @@ func getQuestionsByTypeID(db *gorm.DB, questionType string, ids []int) ([]Questi
 	var questions []QuestionSummary
 
 	var tableName string
+	var sql string
 	switch questionType {
 	case "Choice":
-		tableName = "choice_questions"
+		tableName = "choicequestions"
+		sql = "id, ? AS question_type, subject, content, options, difficulty, author"
 	case "Subjective":
-		tableName = "subjective_questions"
+		tableName = "subjectivequestions"
+		sql = "id, ? AS question_type, subject, content, difficulty, author"
 	default:
 		return nil, fmt.Errorf("unsupported question type: %s", questionType)
 	}
 
 	// 调整Select子句，使question_type字段动态反映表名
 	if err := db.Table(tableName).
-		Select("id, ? AS question_type, subject, content, options, difficulty, author", tableName).
+		Select(sql, tableName).
 		Where("id IN (?)", ids).
 		Scan(&questions).Error; err != nil {
 		return nil, err
