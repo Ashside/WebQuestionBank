@@ -29,6 +29,10 @@
 
 数据库使用 MySQL 数据库。
 
+### AI 模块
+
+AI 模块需要安装 Python 3.7 或更高版本，并安装 numpy, gensim 以及 flask 库以运行。
+
 ## 实现功能
 
 ## 如何部署和配置
@@ -71,6 +75,21 @@ VUE_APP_API_URL = http://localhost:8081
 ```
 
 重新启动并运行。
+
+### AI 模块部署
+
+AI 模块需要安装版本大于等于 3.7 的 Python。安装完成后运行以下指令安装依赖：
+
+```
+pip install Flask gensim
+```
+
+我们使用腾讯开源词向量进行分析，你可以在[这里](https://ai.tencent.com/ailab/nlp/en/embedding.html)获取。你也可以替换成其他的词向量源，在以下位置完成替换：
+
+```python
+# 替换成你需要的源
+file_path = '/home/user/tencent-embedding/tencent-ailab-embedding-zh-d100-v0.2.0-s.txt'
+```
 
 ## OpenAPI
 

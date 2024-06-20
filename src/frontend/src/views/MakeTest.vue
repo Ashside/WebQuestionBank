@@ -134,7 +134,7 @@
       </ul>
     </div>
     <div class="button-container">
-      <button @click="openModal">提交选中的题目</button>
+      <button v-if="aiSubmitButton" @click="openModal">提交选中的题目</button>
       <transition name="fade">
         <button v-if="submissionSuccess" @click="viewPDFDocument">查看试卷PDF文档</button>
       </transition>
@@ -180,7 +180,8 @@ export default {
       selectedSubject: 'all',
       selectedDifficulty: 'all',
       aiGeneratedQuestions: [],
-      aiModalOpen: false
+      aiModalOpen: false,
+      aiSubmitButton: false,
     }
   },
 
@@ -302,6 +303,7 @@ export default {
         const response = await axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/aiGenerate');
         if (response.data.success) {
           this.aiGeneratedQuestions = response.data.questions;
+          this.aiSubmitButton = true;
         } else {
           console.error('AI组卷失败:', response.data.reason);
         }
