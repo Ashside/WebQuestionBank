@@ -10,7 +10,7 @@ import (
 func FindSamePost(c *gin.Context) {
 	var form struct {
 		Username string `form:"username" binding:"required"`
-		Id       int    `form:"id" binding:"required"`
+		TestId   int    `form:"testId" binding:"required"`
 	}
 
 	if err := c.ShouldBindJSON(&form); err != nil {
@@ -38,7 +38,7 @@ func FindSamePost(c *gin.Context) {
 
 	}
 	//获取id列表
-	inputIDs := queryTestByID(db, form.Id)
+	inputIDs := queryTestByID(db, form.TestId)
 
 	//分割
 	var choiceIDs []int

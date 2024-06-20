@@ -83,7 +83,12 @@ func main() {
 	// 输入：form表单，包含username字段
 	// 输出：json格式，包含success、reason、test字段，test字段是一个数组，包含多个试卷
 	questionBankGroup.POST("/queryAllTests", api.QueryAllTestsPost)
-	
+
+	//处理/api/questionBank/queryTestByID的OPTIONS请求
+	// 该请求用于查询试卷下所有题目
+	// 输入：form表单，包含username, id字段，id为试卷编号
+	// 输出：json格式，包含success、reason、test字段，test字段是一个字符串
+	questionBankGroup.POST("/queryTestByID", api.QueryTestByIDPost)
 	//处理/api/questionBank/findSameTestByID的OPTIONS请求
 	// 该请求用于查找相似试卷
 	// 输入：form表单，包含username,id字段，id为试卷编号

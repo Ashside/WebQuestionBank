@@ -54,14 +54,14 @@ func TestGeneratePDF(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := GenerateMD(tt.args.db, tt.args.id)
+			got, err := GenerateMdByTestID(tt.args.db, tt.args.id)
 			log.Println(got)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GenerateMD() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GenerateMdByTestID() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("GenerateMD() got = %v, want %v", got, tt.want)
+				t.Errorf("GenerateMdByTestID() got = %v, want %v", got, tt.want)
 			}
 		})
 	}

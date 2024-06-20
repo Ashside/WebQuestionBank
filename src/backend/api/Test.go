@@ -26,7 +26,7 @@ func findAvailableTestsId(db *gorm.DB) int {
 	id = int(maxId + 1)
 	return id
 }
-func GenerateMD(db *gorm.DB, id int) (string, error) {
+func GenerateMdByTestID(db *gorm.DB, id int) (string, error) {
 	// 先查询所有题目
 	var tests []Tests
 	if err := db.Table("tests").Where("id = ?", id).Find(&tests).Error; err != nil {
