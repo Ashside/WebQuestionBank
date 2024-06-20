@@ -58,6 +58,15 @@ type Tests struct {
 	Grade      float64
 	Author     string
 }
+type QuestionSummary struct {
+	ID           int    `json:"id"`
+	QuestionType string `json:"question_type"`
+	Subject      string `json:"subject"`
+	Content      string `json:"content"`
+	Options      string `json:"options,omitempty"` // 选择题有值
+	Difficulty   int    `json:"difficulty"`
+	Author       string `json:"author"`
+}
 
 func getDatabase() (*gorm.DB, error) {
 

@@ -1,6 +1,8 @@
 package api
 
 import (
+	"errors"
+	"fmt"
 	"gorm.io/gorm"
 	"log"
 )
@@ -295,4 +297,46 @@ func findAvailableQuesID(db *gorm.DB) int {
 			return i
 		}
 	}
+}
+
+func getQuestionTypeByID(db *gorm.DB, id int) (string, error) {
+	// 尝试查询选择题
+	var choice QuestionSummary
+	if err := db.Table("choicequestions").Where("id = ?", id).Take(&choice).Error; err == nil {
+		return "choice", nil
+	}
+
+	// 如果不是选择题，则尝试查询主观题
+	var subjective QuestionSummary
+	if err := db.Table("subjectivequestions").Where("id = ?", id).Take(&subjective).Error; err == nil {
+		return "subjective", nil
+	} else if errors.Is(err, gorm.ErrRecordNotFound) {
+		return "", err
+	}
+
+	// 未知类型
+	return "unknown", nil
+}
+func getQuestionsByTypeID(db *gorm.DB, questionType string, ids []int) ([]QuestionSummary, error) {
+	var questions []QuestionSummary
+
+	var tableName string
+	switch questionType {
+	case "Choice":
+		tableName = "choice_questions"
+	case "Subjective":
+		tableName = "subjective_questions"
+	default:
+		return nil, fmt.Errorf("unsupported question type: %s", questionType)
+	}
+
+	// 调整Select子句，使question_type字段动态反映表名
+	if err := db.Table(tableName).
+		Select("id, ? AS question_type, subject, content, options, difficulty, author", tableName).
+		Where("id IN (?)", ids).
+		Scan(&questions).Error; err != nil {
+		return nil, err
+	}
+
+	return questions, nil
 }

@@ -85,3 +85,16 @@ func QueryAllTests(db *gorm.DB, username string, userType string) ([]Tests, erro
 	}
 	return tests, nil
 }
+func queryTestByID(db *gorm.DB, id int) []int {
+	// 返回该测试下所有题目的id
+
+	var test []Tests
+	var quesId []int
+	if err := db.Table("tests").Where("id = ?", id).Find(&test).Error; err != nil {
+		return nil
+	}
+	for _, t := range test {
+		quesId = append(quesId, t.QuestionId)
+	}
+	return quesId
+}
