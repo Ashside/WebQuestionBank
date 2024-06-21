@@ -51,7 +51,8 @@ export default {
       fullScore: 10,
       teacherScore: 8,
       studentUsername: "",
-      questionID: -1
+      questionID: -1,
+      testID: -1
     }
   },
 
@@ -72,6 +73,7 @@ export default {
             this.question = response.data.question;
             this.studentUsername = response.data.studentUsername;
             this.questionID = response.data.questionID;
+            this.testID = response.data.testID
           } else {
             console.error('Failed to fetch questions:', response.data.reason);
             // 处理API返回的错误
@@ -88,7 +90,8 @@ export default {
           username: store.state.username,
           questionID: this.questionID,
           studentUsername: this.studentUsername,
-          score: this.teacherScore
+          score: this.teacherScore,
+          testID: this.testID
         });
         if (response.data.success) {
           alert('分数提交成功');
