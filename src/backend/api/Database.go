@@ -13,7 +13,7 @@ const (
 	DatabaseName = "SEProject"
 
 	DatabaseAddress = "121.43.124.218:3306"
-	// DatabaseAddress = "localhost:3306"
+	//DatabaseAddress = "localhost:3306"
 )
 
 type Users struct {
@@ -66,6 +66,16 @@ type QuestionSummary struct {
 	Options      string `json:"options,omitempty"` // 选择题有值
 	Difficulty   int    `json:"difficulty"`
 	Author       string `json:"author"`
+}
+
+type Assignments struct {
+	TestId     int    `gorm:"primaryKey"`
+	QuestionId int    `gorm:"primaryKey"`
+	StuName    string `gorm:"primaryKey"`
+	Score      float64
+	StuAnswer  string
+	StuScore   float64
+	AssignName string
 }
 
 func getDatabase() (*gorm.DB, error) {
