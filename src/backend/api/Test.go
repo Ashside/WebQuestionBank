@@ -92,6 +92,16 @@ func GenerateMdByQuestions(db *gorm.DB, questions []QuestionSummary) (string, er
 }
 
 func AddTest(db *gorm.DB, t *Tests) error {
+	// 查看name是否重复
+	var tests []Tests
+	if err := db.Table("tests").Where("name = ?", t.Name).Find(&tests).Error; err != nil {
+		return err
+
+	}
+	if len(tests) != 0 {
+		t.Name = t.Name + "1"
+
+	}
 	// 添加测试
 	err := db.Table("tests").Create(t).Error
 	if err != nil {
