@@ -10,22 +10,19 @@
     </li>
   </ul>
   <div v-if="showModal" class="modal">
-    <div class="modal-content">
-      <div class="markdown-container">
-        <div class="test-details">
-          <MarkdownRenderer :content="testDetails"></MarkdownRenderer>
-          <br><br>
-          <center>
-            <button @click="findSameTest(testID)">显示相似试卷</button>
-          </center>
-        </div>
-        <div class="same-test-details" v-if="showSameTest">
-          <MarkdownRenderer :content="sameTestDetails"></MarkdownRenderer>
-        </div>
+    <div class="markdown-container">
+      <div>
+        <MarkdownRenderer :content="testDetails"></MarkdownRenderer>
+        <br><br>
+        <center>
+          <button @click="findSameTest(testID)">显示相似试卷</button>
+        </center>
       </div>
+      <MarkdownRenderer v-if="showSameTest" :content="sameTestDetails"></MarkdownRenderer>
     </div>
   </div>
 </template>
+
 
 <script>
 import axios from 'axios';
@@ -48,26 +45,26 @@ export default {
       sameTestDetails: '',
       showSameTest: false,
       testID: -1,
+
     }
   },
 
   methods: {
     onEscKey(event) {
-      if (event.keyCode === 27) {
+      if (event.keyCode === 27) { // 27 是 Esc 键的键码
         this.closeModal();
       }
     },
 
     closeModal() {
       this.showModal = false;
-      document.removeEventListener('keydown', this.onEscKey);
+      document.removeEventListener('keydown', this.onEscKey); // 移除监听器
     },
 
     openModal() {
       this.showModal = true;
-      document.addEventListener('keydown', this.onEscKey);
+      document.addEventListener('keydown', this.onEscKey); // 添加监听器
     },
-
     async fetchTests() {
       try {
         const response = await axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/queryAllTests');
@@ -101,7 +98,7 @@ export default {
           });
     },
 
-    findSameTest(testId) {
+    findSameTest(testId){
       this.showSameTest = true;
       axios.post(process.env["VUE_APP_API_URL"] + `/api/questionBank/findSameTestByID`, {
         testId: testId,
@@ -171,33 +168,25 @@ button:hover {
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.7);
+  background-color: rgba(0,0,0,0.7); /* 深色背景透明度调整 */
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.modal-content {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  max-width: 90%;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  display: flex;
-  flex-direction: column;
-  width: 80%; /* 调整模态框的宽度 */
+div.modal > div {
+  background-color: white; /* 添加背景颜色以区分内容区 */
+  padding: 20px; /* 内部 padding 增加 */
+  border-radius: 8px; /* 圆角设计 */
+  max-width: 90%; /* 限制最大宽度，使内容更集中 */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* 增加阴影效果 */
 }
 
-.markdown-container {
-  display: flex;
-  justify-content: space-between; /* 水平分布子元素 */
-  width: 100%;
-}
-
-.test-details,
-.same-test-details {
-  flex: 1; /* 两个子元素平分宽度 */
-  margin: 0 10px; /* 调整间距 */
+div.markdown-container {
+  gap: 10px;
+  margin-bottom: 30px; /* 设置较大的底部边距 */
+  display: flex;  /* 启用flex布局 */
+  justify-content: center;  /* 水平居中 */
 }
 
 </style>

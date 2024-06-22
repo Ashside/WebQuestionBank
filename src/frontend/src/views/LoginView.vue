@@ -33,11 +33,6 @@
       <h1 class="text-center mb-4">注册</h1>
       <form @submit.prevent="handleRegister">
         <div class="form-floating mb-3 text-center">
-          <div><label for="new-email">姓名</label></div>
-          <p></p>
-          <input class="form-control text-center" id="new-name" v-model="newName" required />
-        </div>
-        <div class="form-floating mb-3 text-center">
           <div><label for="new-email">电子邮箱地址</label></div>
           <p></p>
           <input type="email" class="form-control text-center" id="new-email" v-model="newEmail" required />
@@ -85,7 +80,6 @@ const newPassword = ref('');
 const isLoading = ref(false);
 const isLogin = ref(true);  // 初始为登录视图
 const role = ref('user');  // 默认为用户角色
-const newName = ref('');  // 默认为用户角色
 
 const handleLogin = async () => {
   isLoading.value = true;
@@ -116,7 +110,6 @@ const handleRegister = async () => {
     const response = await axios.post(process.env['VUE_APP_API_URL'] + '/api/usr/registerCheck', {
           username: newEmail.value,
           password: newPassword.value,
-          name: newName.value,
           type: role.value,
         },
         {

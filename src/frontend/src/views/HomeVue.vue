@@ -9,7 +9,6 @@
       <CustomCard v-if="isStudent" title="完成试卷" cover="/exam.png" @card-click="navigateTo('/MakeTest')"></CustomCard>
       <CustomCard title="查看试卷" cover="/view_test.png" @card-click="navigateTo('/ViewAllTests')"></CustomCard>
       <CustomCard v-if="!isStudent" title="批阅试卷" cover="/test_score.png" @card-click="navigateTo('/CheckStudentAnswer')"></CustomCard>
-      <CustomCard v-if="!isStudent" title="分发试卷" cover="/distribute_exam.png" @card-click="navigateTo('/DistributeTest')"></CustomCard>
     </div>
   </div>
 </template>

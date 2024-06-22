@@ -66,14 +66,6 @@ const routes = [
         }
     },
     {
-        path: '/DistributeTest',
-        name: 'DistributeTest',
-        component: () => import('@/views/DistributeTest.vue'),
-        meta: {
-            requiresAuth: true  // 需要认证
-        }
-    },
-    {
         path: '/ViewAllTests',
         name: 'ViewAllTests',
         component: () => import('@/views/ViewAllTests.vue'),
