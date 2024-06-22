@@ -95,5 +95,10 @@ func main() {
 	// 输出：json格式，包含success、reason、questions字段，questions字段是一个数组，包含多个题目
 	questionBankGroup.POST("/findSameTestByID", api.FindSamePost)
 
+	//处理/api/questionBank/getStudentAnswers
+	// 该请求用于获取学生答案
+	// 输入：form表单，包含username
+	// 输出：json格式，包含success、reason、其他字段
+	questionBankGroup.POST("/getStudentAnswers", api.GetStudentAnswersPost)
 	_ = r.Run(":8081")
 }

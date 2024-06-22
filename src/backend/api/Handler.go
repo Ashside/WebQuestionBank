@@ -585,3 +585,67 @@ func QueryTestByIDPost(context *gin.Context) {
 	context.JSON(http.StatusOK, response)
 
 }
+
+func GetStudentAnswersPost(context *gin.Context) {
+	type Request struct {
+		// 教师邮箱
+		Username string `form:"username" binding:"required"`
+	}
+	type Response struct {
+		// 标准答案
+		Answer string `json:"answer"`
+		// 问题
+		Question string `json:"question"`
+		// 问题 ID
+		QuestionID int64 `json:"questionID"`
+		// 原因，原因，如果成功则不需要填写
+		Reason string `json:"reason"`
+		// 本题分值
+		Score int64 `json:"score"`
+		// 学生答案
+		StudentAnswer string `json:"studentAnswer"`
+		// 学生邮箱
+		StudentUsername string `json:"studentUsername"`
+		// 是否成功
+		Success bool `json:"success"`
+		// 试卷 ID
+		TestID int64 `json:"testID"`
+	}
+
+	log.Println("GetStudentAnswersPost")
+	var request Request
+
+	if err := context.ShouldBind(&request); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"success": false, "reason": "Invalid form", "test": ""})
+		return
+	}
+
+	db, err := getDatabase()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error", "test": ""})
+		return
+	}
+
+	// 用户是否存在
+	var user Users
+	if err := GetUserByUsername(db, request.Username, &user); err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Users not found"})
+		return
+	}
+
+	// 鉴权
+	if user.Type == STUDENT {
+		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Permission denied"})
+		return
+	}
+
+	// 查询学生答案
+	var assign Assignments
+	assign, _ = GetAssignsByAssignName(db, request.Username)
+
+	var response []Response
+	for _, a := range assign {
+		var res Response
+
+	}
+}
