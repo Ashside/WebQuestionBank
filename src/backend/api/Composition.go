@@ -2,22 +2,15 @@ package api
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+	"log"
 	"math/rand"
+	"net/http"
 	"strings"
 	"time"
-	"gorm.io/gorm"
-	"net/http"
-	"log"
 )
-type QuestionSummary struct {
-	ID            int    `json:"id"`
-	Type  		  string `json:"type"`
-	Subject       string `json:"subject"`
-	Question      string `json:"question"`
-	Options       string `json:"options,omitempty"` // 选择题有值
-	Difficulty    int 	 `json:"difficulty"`
-	Author        string `json:"author"`
-}
+
 // 从题目列表中随机选择指定数量的题目
 func SelectRandomQuestions(questions []QuestionSummary, count int) []QuestionSummary {
 	if len(questions) <= count {
@@ -32,6 +25,7 @@ func SelectRandomQuestions(questions []QuestionSummary, count int) []QuestionSum
 
 	return questions[:count]
 }
+
 // 根据不同的条件查询题目
 func QueryQuestions(db *gorm.DB, tableName, selectFields string, conditions []string, args ...interface{}) ([]QuestionSummary, error) {
 	log.Printf("Querying %s with conditions: %v", tableName, conditions)
@@ -45,7 +39,7 @@ func QueryQuestions(db *gorm.DB, tableName, selectFields string, conditions []st
 	joinClause := fmt.Sprintf(`
 		JOIN %s_keywords ON %s_keywords.question_id = %s.id
 		JOIN keywords ON keywords.id = %s_keywords.keyword_id
-	`, tableName, tableName, tableName, tableName) 
+	`, tableName, tableName, tableName, tableName)
 
 	if tableName == "choice_questions" {
 		selectFields = fmt.Sprintf("%s.id as id, 'Choice' as type, %s.content as question, %s.options, %s.subject, %s.difficulty, %s.author", tableName, tableName, tableName, tableName, tableName, tableName)
@@ -57,7 +51,7 @@ func QueryQuestions(db *gorm.DB, tableName, selectFields string, conditions []st
 		Select(selectFields).
 		Joins(joinClause).
 		Where(whereClause, args...).
-		Group(tableName + ".id"). 
+		Group(tableName + ".id").
 		Scan(&questions).Error
 
 	if err != nil {
@@ -71,7 +65,7 @@ func QueryQuestions(db *gorm.DB, tableName, selectFields string, conditions []st
 func SearchQuestions(c *gin.Context) {
 	var form struct {
 		Username   string `form:"username" binding:"required"`
-		Difficulty int `form:"difficulty,omitempty"` // 可选参数，使用omitempty避免未提供时产生错误
+		Difficulty int    `form:"difficulty,omitempty"` // 可选参数，使用omitempty避免未提供时产生错误
 		Subject    string `form:"subject,omitempty"`    // 可选参数
 		Keyword    string `form:"keyword,omitempty"`    // 可选参数
 	}
@@ -98,8 +92,8 @@ func SearchQuestions(c *gin.Context) {
 	var conditions1 []string
 	var conditions2 []string
 	args := make([]interface{}, 0)
-	
-	if form.Difficulty != 0 { 
+
+	if form.Difficulty != 0 {
 		conditions1 = append(conditions1, "choice_questions.difficulty = ?")
 		conditions2 = append(conditions2, "subjective_questions.difficulty = ?")
 		args = append(args, form.Difficulty)
@@ -138,14 +132,13 @@ func SearchQuestions(c *gin.Context) {
 	// 返回结果
 	if len(questions) == 0 {
 		c.JSON(http.StatusOK, gin.H{
-			"success": true,
-			"message": "No questions matched the given criteria.",
+			"success":   true,
+			"message":   "No questions matched the given criteria.",
 			"questions": []QuestionSummary{},
 		})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"success": true, "questions": questions})
-	
+
 	log.Println("Question search completed successfully")
 }
-

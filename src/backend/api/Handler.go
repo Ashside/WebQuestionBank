@@ -651,13 +651,12 @@ func GetStudentAnswersPost(context *gin.Context) {
 			return
 		}
 		if ques.Options == "" {
+
 			response.StudentAnswer = a.StuAnswer
 			response.Score, _ = GetGradeByTestIdAndQuestionId(db, a.TestId, a.QuestionId)
 			response.StudentUsername = a.StuName
 			response.TestID = a.TestId
-
 			response.QuestionID = a.QuestionId
-
 			response.Question = ques.Content
 			response.Answer = ques.Answer
 			response.Success = true
@@ -669,5 +668,68 @@ func GetStudentAnswersPost(context *gin.Context) {
 		}
 	}
 	context.JSON(http.StatusOK, gin.H{"success": false, "reason": "No answer found"})
+
+}
+
+func SubmitScorePost(context *gin.Context) {
+	type Request struct {
+		// 题目 ID，提交的题目 ID
+		QuestionID int `json:"questionID"`
+		// 成绩
+		Score int `json:"score"`
+		// 学生用户名
+		StudentUsername string `json:"studentUsername"`
+		// 试卷 ID
+		TestID int `json:"testID"`
+		// 用户名，要查询的用户名
+		Username string `json:"username"`
+	}
+	type Response struct {
+		// 原因，如果失败返回原因，如果成功则为 null
+		Reason string `json:"reason"`
+		// 是否成功
+		Success bool `json:"success"`
+	}
+
+	log.Println("SubmitScorePost")
+	var request Request
+
+	if err := context.ShouldBind(&request); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"success": false, "reason": "Invalid form"})
+		return
+	}
+
+	db, err := getDatabase()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+		return
+	}
+
+	// 用户是否存在
+	var user Users
+	if err := GetUserByUsername(db, request.Username, &user); err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Users not found"})
+		return
+	}
+
+	// 鉴权
+	if user.Type == STUDENT {
+		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Permission denied"})
+		return
+	}
+
+	// 提交分数
+	var assign Assignments
+	assign.QuestionId = request.QuestionID
+	assign.Score = float64(request.Score)
+	assign.StuName = request.StudentUsername
+	assign.TestId = request.TestID
+
+	if err := assign.UpdateScore(db); err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"success": true, "reason": ""})
 
 }

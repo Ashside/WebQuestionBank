@@ -109,6 +109,10 @@ func main() {
 	// else 包含questions（	ID*int，QuestionType*string ）字段
 	// if questions空 包含message字段
 	questionBankGroup.POST("/aiGenerate", api.SearchQuestions)
-	
+
+	// 处理/api/questionBank/submitScore的OPTIONS请求
+	// 该请求用于提交分数
+	queryQuestionGroup.POST("/submitScore", api.SubmitScorePost)
+
 	_ = r.Run(":8081")
 }
