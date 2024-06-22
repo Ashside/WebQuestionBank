@@ -112,7 +112,15 @@ func main() {
 
 	// 处理/api/questionBank/submitScore的OPTIONS请求
 	// 该请求用于提交分数
-	queryQuestionGroup.POST("/submitScore", api.SubmitScorePost)
+	questionBankGroup.POST("/submitScore", api.SubmitScorePost)
+
+	// 处理/api/questionBank/distributeTest
+	// 该请求用于分发试卷
+	questionBankGroup.POST("/distributeTest", api.DistributeTestPost)
+
+	// 处理/api/usr/findAllStudents
+	// 该请求用于查询所有学生
+	usrGroup.POST("/findAllStudents", api.FindAllStudentsPost)
 
 	_ = r.Run(":8081")
 }
