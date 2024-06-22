@@ -651,13 +651,12 @@ func GetStudentAnswersPost(context *gin.Context) {
 			return
 		}
 		if ques.Options == "" {
+
 			response.StudentAnswer = a.StuAnswer
 			response.Score, _ = GetGradeByTestIdAndQuestionId(db, a.TestId, a.QuestionId)
 			response.StudentUsername = a.StuName
 			response.TestID = a.TestId
-
 			response.QuestionID = a.QuestionId
-
 			response.Question = ques.Content
 			response.Answer = ques.Answer
 			response.Success = true
