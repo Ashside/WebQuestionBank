@@ -101,7 +101,7 @@ pip install Flask gensim numpy jieba
     "keywords": [
         {"keyword": "中国", "weight": 1},
         {"keyword": "疫情", "weight": 2},
-        // ... 其他关键词 ...
+      	...
     ]
 }
 ```
@@ -120,7 +120,7 @@ pip install Flask gensim numpy jieba
 ```json
 {
     "word": "中国",
-    "vector": [0.123, -0.234, 0.456, ...]  # 具体的向量值
+    "vector": [0.123, -0.234, 0.456, ...]  
 }
 ```
 我们使用腾讯开源词向量进行分析，你可以在[这里](https://ai.tencent.com/ailab/nlp/en/embedding.html)获取。你也可以替换成其他的词向量源，在以下位置完成替换：
