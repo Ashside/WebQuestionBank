@@ -597,11 +597,11 @@ func GetStudentAnswersPost(context *gin.Context) {
 		// 问题
 		Question string `json:"question"`
 		// 问题 ID
-		QuestionID int64 `json:"questionID"`
+		QuestionID int `json:"questionID"`
 		// 原因，原因，如果成功则不需要填写
 		Reason string `json:"reason"`
 		// 本题分值
-		Score int64 `json:"score"`
+		Score int `json:"score"`
 		// 学生答案
 		StudentAnswer string `json:"studentAnswer"`
 		// 学生邮箱
@@ -609,7 +609,7 @@ func GetStudentAnswersPost(context *gin.Context) {
 		// 是否成功
 		Success bool `json:"success"`
 		// 试卷 ID
-		TestID int64 `json:"testID"`
+		TestID int `json:"testID"`
 	}
 
 	log.Println("GetStudentAnswersPost")
@@ -640,12 +640,34 @@ func GetStudentAnswersPost(context *gin.Context) {
 	}
 
 	// 查询学生答案
-	var assign Assignments
+	var assign []Assignments
 	assign, _ = GetAssignsByAssignName(db, request.Username)
 
-	var response []Response
+	var response Response
 	for _, a := range assign {
-		var res Response
+		ques, bExist := QueryQuestionFromId(db, a.QuestionId)
+		if !bExist {
+			context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Question not found"})
+			return
+		}
+		if ques.Options == "" {
+			response.StudentAnswer = a.StuAnswer
+			response.Score, _ = GetGradeByTestIdAndQuestionId(db, a.TestId, a.QuestionId)
+			response.StudentUsername = a.StuName
+			response.TestID = a.TestId
 
+			response.QuestionID = a.QuestionId
+
+			response.Question = ques.Content
+			response.Answer = ques.Answer
+			response.Success = true
+			response.Reason = ""
+			context.JSON(http.StatusOK, response)
+			return
+		} else {
+			continue
+		}
 	}
+	context.JSON(http.StatusOK, gin.H{"success": false, "reason": "No answer found"})
+
 }
