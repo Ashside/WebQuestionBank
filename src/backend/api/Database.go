@@ -1,19 +1,19 @@
 package api
 
 import (
+	"fmt"
+	"gopkg.in/yaml.v2"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"io/ioutil"
 	"log"
 )
 
-const (
-	DatabaseUserName = "root"
-	DatabasePassword = "Aa=12345678"
-	//DatabasePassword = "123456"
-	DatabaseName = "SEProject"
-
-	DatabaseAddress = "121.43.124.218:3306"
-	//DatabaseAddress = "localhost:3306"
+var (
+	DatabasePassword string
+	DatabaseName     string
+	DatabaseAddress  string
+	DatabaseUserName string
 )
 
 type Users struct {
@@ -78,10 +78,37 @@ type Assignments struct {
 	StuScore   float64
 	AssignName string
 }
+type conf struct {
+	DatabaseUserName string `yaml:"DatabaseUserName"`
+	DatabasePassword string `yaml:"DatabasePassword"`
+	DatabaseName     string `yaml:"DatabaseName"`
+	DatabaseAddress  string `yaml:"DatabaseAddress"`
+}
+
+func (c *conf) getConf() *conf {
+	yamlFile, err := ioutil.ReadFile("../config/config.yaml")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	err = yaml.Unmarshal(yamlFile, c)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	return c
+}
 
 func getDatabase() (*gorm.DB, error) {
 
 	log.Println("Connecting to database")
+	if DatabaseUserName == "" {
+		var c conf
+		c.getConf()
+		DatabaseUserName = c.DatabaseUserName
+		DatabasePassword = c.DatabasePassword
+		DatabaseName = c.DatabaseName
+		DatabaseAddress = c.DatabaseAddress
+	}
+
 	dsn := DatabaseUserName + ":" + DatabasePassword + "@tcp(" + DatabaseAddress + ")/" + DatabaseName + "?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
