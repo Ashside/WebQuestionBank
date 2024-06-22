@@ -86,7 +86,7 @@ pip install Flask gensim numpy jieba
 
 #### AI 提取题目关键词
 
-目前使用[textrank](https://github.com/abner-wong/textrank)来进行题目的关键词提取。关键词提取的实现在 `src/AI/findOutKeyword.py` 中实现，以 Flask 框架运行在服务器的 `5050` 端口。要获取题目关键词，你可以用以下方式请求 `5050` 端口的 `/extract` 路径，请求的 json 文件格式示例如下：
+目前使用[textrank](https://github.com/abner-wong/textrank)来进行题目的关键词提取。关键词提取的实现在 `src/AI/findOutKeyword.py` 中实现，以 Flask 框架运行在服务器的 `5000` 端口。要获取题目关键词，你可以用以下方式请求 `5000` 端口的 `/extract` 路径，请求的 json 文件格式示例如下：
 
 ```json
 {
