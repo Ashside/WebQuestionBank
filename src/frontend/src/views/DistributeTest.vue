@@ -1,27 +1,33 @@
 <template>
   <NavigateBar></NavigateBar>
-  <h1>查看所有测试</h1>
+  <h1>分发测试</h1>
   <ul>
     <li v-for="(test, index) in tests" :key="index">
       <div class="question-header">
         <h3>{{ test.name }}</h3>
-        <button @click="viewTestDetails(test.id)">查看试卷</button>
+        <button @click="distributeTest(test.id)">分发试卷</button>
       </div>
     </li>
   </ul>
   <div v-if="showModal" class="modal">
     <div class="modal-content">
-      <div class="markdown-container">
-        <div class="test-details">
-          <MarkdownRenderer :content="testDetails"></MarkdownRenderer>
-          <br><br>
-          <center>
-            <button @click="findSameTest(testID)">显示相似试卷</button>
-          </center>
-        </div>
-        <div class="same-test-details" v-if="showSameTest">
-          <MarkdownRenderer :content="sameTestDetails"></MarkdownRenderer>
-        </div>
+      <div class="test-details">
+        <center>
+          <h2>分发试卷</h2>
+        </center>
+        <MarkdownRenderer :content="testDetails"></MarkdownRenderer>
+      </div>
+      <div class="students-list">
+        <h3>选择学生</h3>
+        <ul>
+          <li v-for="(student, index) in students" :key="index">
+            <input type="checkbox" :id="student.studentID" v-model="selectedStudents" :value="student.studentID">
+            <label :for="student.studentID">{{ student.student }}</label>
+          </li>
+        </ul>
+        <center>
+          <button @click="submitDistribute(testID)">提交分发</button>
+        </center>
       </div>
     </div>
   </div>
@@ -32,6 +38,7 @@ import axios from 'axios';
 import NavigateBar from "@/components/NavigateBar.vue";
 import store from "@/store";
 import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
+import router from "@/router";
 
 export default {
   components: {MarkdownRenderer, NavigateBar},
@@ -48,6 +55,8 @@ export default {
       sameTestDetails: '',
       showSameTest: false,
       testID: -1,
+      students: [],
+      selectedStudents: [],
     }
   },
 
@@ -66,6 +75,7 @@ export default {
     openModal() {
       this.showModal = true;
       document.addEventListener('keydown', this.onEscKey);
+      this.fetchStudents();
     },
 
     async fetchTests() {
@@ -81,7 +91,22 @@ export default {
       }
     },
 
-    viewTestDetails(testId) {
+    async fetchStudents() {
+      try {
+        const response = await axios.post(process.env["VUE_APP_API_URL"] + '/api/usr/findAllStudents', {
+          username: store.state.username
+        });
+        if (response.data.success) {
+          this.students = response.data.students;
+        } else {
+          console.error('Failed to fetch students:', response.data.reason);
+        }
+      } catch (error) {
+        console.error('Error fetching students:', error);
+      }
+    },
+
+    distributeTest(testId) {
       axios.post(process.env["VUE_APP_API_URL"] + `/api/questionBank/queryTestByID`, {
         testId: testId,
         username: store.state.username
@@ -92,6 +117,7 @@ export default {
               this.openModal();
               this.testID = testId;
               this.showSameTest = false;
+              this.fetchStudents(); // Fetch students when opening the modal
             } else {
               console.error('Failed to fetch test details:', response.data.reason);
             }
@@ -101,16 +127,16 @@ export default {
           });
     },
 
-    findSameTest(testId) {
+    submitDistribute(testId){
       this.showSameTest = true;
-      axios.post(process.env["VUE_APP_API_URL"] + `/api/questionBank/findSameTestByID`, {
-        testId: testId,
-        username: store.state.username
+      axios.post(process.env["VUE_APP_API_URL"] + `/api/questionBank/distributeTest`, {
+        testID: testId,
+        username: store.state.username,
+        students: this.selectedStudents, // Pass selected students
       })
           .then(response => {
             if (response.data.success) {
-              this.sameTestDetails = response.data.test;
-              this.showSameTest = true;
+              router.push('/home');
             } else {
               console.error('Failed to fetch test details:', response.data.reason);
             }
@@ -124,7 +150,7 @@ export default {
 </script>
 
 <style scoped>
-
+/* 保持现有样式不变 */
 li {
   border: 1px solid #ccc;
   margin-top: 10px;
@@ -178,26 +204,41 @@ button:hover {
 }
 
 .modal-content {
+  display: flex;
+  flex-direction: row;
   background-color: white;
   padding: 20px;
   border-radius: 8px;
   max-width: 90%;
   box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  display: flex;
-  flex-direction: column;
-  width: 80%; /* 调整模态框的宽度 */
-}
-
-.markdown-container {
-  display: flex;
-  justify-content: space-between; /* 水平分布子元素 */
-  width: 100%;
 }
 
 .test-details,
-.same-test-details {
-  flex: 1; /* 两个子元素平分宽度 */
-  margin: 0 10px; /* 调整间距 */
+.students-list {
+  flex: 1;
+  margin: 0 10px;
+}
+
+div.markdown-container {
+  gap: 10px;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.students-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.students-list li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.students-list input[type="checkbox"] {
+  margin-right: 10px;
 }
 
 </style>
