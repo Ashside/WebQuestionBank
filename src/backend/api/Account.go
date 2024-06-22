@@ -54,3 +54,9 @@ func (user *Users) IsTeacher() bool {
 func (user *Users) IsAdmin() bool {
 	return user.Type == ADMIN
 }
+
+func QueryAllStudents(db *gorm.DB) ([]Users, error) {
+	var students []Users
+	err := db.Where("type = ?", STUDENT).Find(&students).Error
+	return students, err
+}

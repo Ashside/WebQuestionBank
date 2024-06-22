@@ -733,3 +733,134 @@ func SubmitScorePost(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{"success": true, "reason": ""})
 
 }
+
+func DistributeTestPost(context *gin.Context) {
+	type Request struct {
+		// 学生 ID 数组
+		Students []string `form:"students" binding:"required"`
+		// 测试名
+		TestID int `form:"testID" binding:"required"`
+		// 提交教师名
+		Username string `form:"username" binding:"required"`
+	}
+	type Response struct {
+		// 原因，成功原因为空串
+		Reason string `json:"reason"`
+		// 是否成功
+		Success bool `json:"success"`
+	}
+
+	log.Println("DistributeTestPost")
+	var request Request
+
+	if err := context.ShouldBind(&request); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"success": false, "reason": "Invalid form"})
+		return
+
+	}
+
+	db, err := getDatabase()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+		return
+	}
+
+	// 用户是否存在
+	var user Users
+	if err := GetUserByUsername(db, request.Username, &user); err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Users not found"})
+		return
+
+	}
+
+	// 鉴权
+	if user.Type == STUDENT {
+		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Permission denied"})
+		return
+
+	}
+
+	// 分发试卷
+	for _, student := range request.Students {
+		var assign Assignments
+		quesId := QueryQuesIdByTestID(db, request.TestID)
+		for _, q := range quesId {
+			assign.QuestionId = q
+			assign.StuName = student
+			assign.TestId = request.TestID
+			if err := assign.AddAssign(db); err != nil {
+				context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+				return
+			}
+
+		}
+
+	}
+
+}
+
+func FindAllStudentsPost(context *gin.Context) {
+	type Request struct {
+		// 老师 username
+		Username string `form:"username" binding:"required"`
+	}
+	type Student struct {
+		// 学生姓名
+		Student string `json:"student"`
+		// 学生邮箱
+		StudentUsername string `json:"studentUsername"`
+	}
+	type Response struct {
+		// 原因，如果成功原因为空
+		Reason string `json:"reason"`
+		// 学生数组
+		Students []Student `json:"students"`
+		// 是否成功
+		Success bool `json:"success"`
+	}
+
+	log.Println("FindAllStudentsPost")
+	var request Request
+
+	if err := context.ShouldBind(&request); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"success": false, "reason": "Invalid form"})
+		return
+	}
+
+	db, err := getDatabase()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+		return
+	}
+
+	// 用户是否存在
+	var user Users
+	if err := GetUserByUsername(db, request.Username, &user); err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Users not found"})
+		return
+	}
+
+	// 鉴权
+	if user.Type == STUDENT {
+		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Permission denied"})
+		return
+	}
+
+	// 查询学生
+	var students []Users
+	students, err = QueryAllStudents(db)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+		return
+	}
+
+	var response Response
+	response.Success = true
+	response.Reason = ""
+	for _, s := range students {
+		response.Students = append(response.Students, Student{Student: s.Name, StudentUsername: s.Username})
+
+	}
+	context.JSON(http.StatusOK, response)
+
+}

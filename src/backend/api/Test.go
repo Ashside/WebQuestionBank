@@ -133,7 +133,7 @@ func QueryAllTests(db *gorm.DB, username string, userType string) ([]Tests, erro
 	}
 	return tests, nil
 }
-func queryTestByID(db *gorm.DB, id int) []int {
+func QueryQuesIdByTestID(db *gorm.DB, id int) []int {
 	// 返回该测试下所有题目的id
 
 	var test []Tests

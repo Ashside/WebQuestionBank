@@ -87,8 +87,8 @@ func Test_queryTestByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := queryTestByID(tt.args.db, tt.args.id); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("queryTestByID() = %v, want %v", got, tt.want)
+			if got := QueryQuesIdByTestID(tt.args.db, tt.args.id); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("QueryQuesIdByTestID() = %v, want %v", got, tt.want)
 			}
 		})
 	}

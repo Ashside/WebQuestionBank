@@ -20,6 +20,7 @@ type Users struct {
 	Username string `gorm:"primaryKey"`
 	Password string
 	Type     string
+	Name     string
 }
 type Keywords struct {
 	Id      int `gorm:"primaryKey"`
