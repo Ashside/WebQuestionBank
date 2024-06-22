@@ -2,8 +2,8 @@ package api
 
 import "gorm.io/gorm"
 
-func GetAssignsByAssignName(db *gorm.DB, assignName string) (Assignments, error) {
-	var assign Assignments
+func GetAssignsByAssignName(db *gorm.DB, assignName string) ([]Assignments, error) {
+	var assign []Assignments
 	if err := db.Table("assignments").Where("assign_name = ?", assignName).Find(&assign).Error; err != nil {
 		return assign, err
 	}
