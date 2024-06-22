@@ -1,10 +1,12 @@
 package api
 
 import (
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"log"
 	"net/http"
+	"sync"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func FindSamePost(c *gin.Context) {
@@ -38,7 +40,7 @@ func FindSamePost(c *gin.Context) {
 
 	}
 	//获取id列表
-	inputIDs := QueryQuesIdByTestID(db, form.TestId)
+	inputIDs := queryTestByID(db, form.TestId)
 
 	//分割
 	var choiceIDs []int
@@ -55,23 +57,23 @@ func FindSamePost(c *gin.Context) {
 			log.Printf("Unknown question type for ID %d", id)
 		}
 	}
-
+	log.Println("begin searching")
 	// 查询不重复的选择题ID
 	var distinctChoiceIDs []int
-	if err := db.Table("choicequestions").Select("id").Where("id NOT IN ?", choiceIDs).Scan(&distinctChoiceIDs).Error; err != nil {
+	if err := db.Table("choicequestions").Select("id").Where("id NOT IN ?", append(choiceIDs, 0)).Scan(&distinctChoiceIDs).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Failed to fetch distinct choice question IDs"})
 		return
 	}
 
 	// 查询不重复的主观题ID
 	var distinctSubjectiveIDs []int
-	if err := db.Table("subjectivequestions").Select("id").Where("id NOT IN ?", subjectiveIDs).Scan(&distinctSubjectiveIDs).Error; err != nil {
+	if err := db.Table("subjectivequestions").Select("id").Where("id NOT IN ?", append(subjectiveIDs, 0)).Scan(&distinctSubjectiveIDs).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Failed to fetch distinct subjective question IDs"})
 		return
 	}
 
-	ChoicesNodes := MaxFlow(db, choiceIDs, distinctChoiceIDs)
-	SubjectiveNodes := MaxFlow(db, subjectiveIDs, distinctSubjectiveIDs)
+	ChoicesNodes := MaxFlow(db, choiceIDs, distinctChoiceIDs, "choice")
+	SubjectiveNodes := MaxFlow(db, subjectiveIDs, distinctSubjectiveIDs, "subjective")
 
 	choicesQuestion, _ := getQuestionsByTypeID(db, "Choice", ChoicesNodes)
 	subjectiveQuestion, _ := getQuestionsByTypeID(db, "Subjective", SubjectiveNodes)
@@ -80,6 +82,7 @@ func FindSamePost(c *gin.Context) {
 	questions = append(questions, choicesQuestion...)
 	questions = append(questions, subjectiveQuestion...)
 
+	log.Println("finish searching")
 	var retQuestions []QuestionSummary
 	for _, ques := range questions {
 		var temp QuestionSummary
@@ -96,6 +99,7 @@ func FindSamePost(c *gin.Context) {
 		retQuestions = append(retQuestions, temp)
 
 	}
+	// fmt.Println(len(retQuestions))
 	if len(retQuestions) == 0 {
 		c.JSON(http.StatusOK, gin.H{"success": false, "reason": "No questions found"})
 		return
@@ -104,14 +108,21 @@ func FindSamePost(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "test": mdFile})
 }
 
-func GetAllKeywords(db *gorm.DB, questionIDs []int) map[int][]string {
+func GetAllKeywords(db *gorm.DB, questionIDs []int, questionType string) map[int][]string {
 	questionKeywordsMap := make(map[int][]string)
 	for _, qID := range questionIDs {
 		var keywords []string
-		db.Table("choicequestions").Joins("JOIN choice_question_keywords ON choicequestions.id = choice_question_keywords.question_id").
-			Joins("JOIN keywords ON choice_question_keywords.keyword_id = keywords.id").
-			Where("choicequestions.id = ?", qID).
-			Pluck("keywords.keyword", &keywords)
+		if questionType == "choice" {
+			db.Table("choicequestions").Joins("JOIN choice_question_keywords ON choicequestions.id = choice_question_keywords.question_id").
+				Joins("JOIN keywords ON choice_question_keywords.keyword_id = keywords.id").
+				Where("choicequestions.id = ?", qID).
+				Pluck("keywords.keyword", &keywords)
+		} else {
+			db.Table("subjectivequestions").Joins("JOIN subjective_question_keywords ON subjectivequestions.id = subjective_question_keywords.question_id").
+				Joins("JOIN keywords ON subjective_question_keywords.keyword_id = keywords.id").
+				Where("subjectivequestions.id = ?", qID).
+				Pluck("keywords.keyword", &keywords)
+		}
 		questionKeywordsMap[qID] = keywords
 	}
 	return questionKeywordsMap
@@ -153,11 +164,12 @@ func NewGraph(n int) *Graph {
 
 // addEdge 添加有向边u->v，容量cap，费用cost
 func (g *Graph) addEdge(u, v, cap, cost int) {
+	// fmt.Println("edge", u, v, cap, cost)
 	g.List[u] = append(g.List[u], Edge{V: v, Cap: cap, Cost: cost, Rev: len(g.List[v])})
 	g.List[v] = append(g.List[v], Edge{V: u, Cap: 0, Cost: -cost, Rev: len(g.List[u]) - 1}) // 反向边
 }
 
-func MaxFlow(db *gorm.DB, IDs []int, distinctIDs []int) []int {
+func MaxFlow(db *gorm.DB, IDs []int, distinctIDs []int, questionType string) []int {
 	var num int
 	for _, fromID := range IDs {
 		num = mmax(num, fromID)
@@ -173,17 +185,22 @@ func MaxFlow(db *gorm.DB, IDs []int, distinctIDs []int) []int {
 	for _, fromID := range IDs {
 		g.addEdge(s, fromID, 1, 0)
 	}
+	// fmt.Println(IDs)
 	for _, toID := range distinctIDs {
 		g.addEdge(toID, t, 1, 0)
 	}
+	// fmt.Println(distinctIDs)
+	questionKeywordsMap := GetAllKeywords(db, append(IDs, distinctIDs...), questionType)
 
-	questionKeywordsMap := GetAllKeywords(db, append(IDs, distinctIDs...))
+	var wg sync.WaitGroup
 
 	for _, fromID := range IDs {
 		for _, toID := range distinctIDs {
+			wg.Add(1)
 			go func(fid, tid int) {
-				//defer wg.Done()
+				defer wg.Done()
 				similarity := calculateSharedKeywordCount(questionKeywordsMap[fid], questionKeywordsMap[tid])
+
 				if similarity > 0 {
 					g.addEdge(fid, tid, 1, similarity+5)
 				} else {
@@ -193,6 +210,10 @@ func MaxFlow(db *gorm.DB, IDs []int, distinctIDs []int) []int {
 		}
 	}
 
+	// 等待所有加边goroutine完成
+	wg.Wait()
+
+	// fmt.Println(s, t)
 	_, _ = g.dinic(s, t)
 	// fmt.Printf("最大流: %d, 最小费用: %d\n", flow, cost)
 	rightnodes := g.RightNodes(t)
