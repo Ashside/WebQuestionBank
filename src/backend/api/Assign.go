@@ -25,3 +25,11 @@ func (a *Assignments) AddAssign(db *gorm.DB) error {
 	}
 	return nil
 }
+
+func (a *Assignments) UpdateScore(db *gorm.DB) error {
+	err := db.Table("assignments").Where("test_id = ? AND question_id = ? AND stu_name = ?", a.TestId, a.QuestionId, a.StuName).Update("stu_score", a.StuScore).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
