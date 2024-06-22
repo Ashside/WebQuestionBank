@@ -100,5 +100,15 @@ func main() {
 	// 输入：form表单，包含username
 	// 输出：json格式，包含success、reason、其他字段
 	questionBankGroup.POST("/getStudentAnswers", api.GetStudentAnswersPost)
+
+	// 处理/api/questionBank/aiGenerate的OPTIONS请求
+	// 该请求用于题目查询（组卷）
+	// 输入：form表单，包含difficulty, subject, keyword, username字段
+	// 输出：json格式，包含success字段
+	// if success = false 包含reason字段
+	// else 包含questions（	ID*int，QuestionType*string ）字段
+	// if questions空 包含message字段
+	questionBankGroup.POST("/aiGenerate", api.SearchQuestions)
+	
 	_ = r.Run(":8081")
 }
