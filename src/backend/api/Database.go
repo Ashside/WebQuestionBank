@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 	"io/ioutil"
 	"log"
+	"os"
 )
 
 var (
@@ -100,6 +101,13 @@ func (c *conf) getConf() *conf {
 func getDatabase() (*gorm.DB, error) {
 
 	log.Println("Connecting to database")
+	// 打印当前目录
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+
+	}
+	log.Println("Current dir: ", dir)
 	if DatabaseUserName == "" {
 		var c conf
 		c.getConf()
