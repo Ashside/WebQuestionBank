@@ -95,5 +95,32 @@ func main() {
 	// 输出：json格式，包含success、reason、questions字段，questions字段是一个数组，包含多个题目
 	questionBankGroup.POST("/findSameTestByID", api.FindSamePost)
 
+	//处理/api/questionBank/getStudentAnswers
+	// 该请求用于获取学生答案
+	// 输入：form表单，包含username
+	// 输出：json格式，包含success、reason、其他字段
+	questionBankGroup.POST("/getStudentAnswers", api.GetStudentAnswersPost)
+
+	// 处理/api/questionBank/aiGenerate的OPTIONS请求
+	// 该请求用于题目查询（组卷）
+	// 输入：form表单，包含difficulty, subject, keyword, username字段
+	// 输出：json格式，包含success字段
+	// if success = false 包含reason字段
+	// else 包含questions（	ID*int，QuestionType*string ）字段
+	// if questions空 包含message字段
+	questionBankGroup.POST("/aiGenerate", api.SearchQuestions)
+
+	// 处理/api/questionBank/submitScore的OPTIONS请求
+	// 该请求用于提交分数
+	questionBankGroup.POST("/submitScore", api.SubmitScorePost)
+
+	// 处理/api/questionBank/distributeTest
+	// 该请求用于分发试卷
+	questionBankGroup.POST("/distributeTest", api.DistributeTestPost)
+
+	// 处理/api/usr/findAllStudents
+	// 该请求用于查询所有学生
+	usrGroup.POST("/findAllStudents", api.FindAllStudentsPost)
+
 	_ = r.Run(":8081")
 }
