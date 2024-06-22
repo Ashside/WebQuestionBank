@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/api"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 )
 
@@ -23,6 +24,7 @@ func corsMiddleware() gin.HandlerFunc {
 func main() {
 
 	r := gin.Default()
+	log.Println("Server started")
 	r.Use(corsMiddleware())
 
 	apiGroup := r.Group("/api")

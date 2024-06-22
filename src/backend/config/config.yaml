@@ -1,0 +1,4 @@
+DatabaseUserName: "root"
+DatabasePassword: "Aa=12345678"
+DatabaseName: "SEProject"
+DatabaseAddress: "121.43.124.218:3306"
