@@ -21,8 +21,8 @@
         <h3>选择学生</h3>
         <ul>
           <li v-for="(student, index) in students" :key="index">
-            <input type="checkbox" :id="student.studentID" v-model="selectedStudents" :value="student.studentID">
-            <label :for="student.studentID">{{ student.student }}</label>
+            <input type="checkbox" :id="student.studentUsername" v-model="selectedStudents" :value="student.studentUsername">
+            <label :for="student.studentUsername">{{ student.student }}</label>
           </li>
         </ul>
         <center>
