@@ -2,6 +2,7 @@ package api
 
 import (
 	"log"
+	"math"
 	"net/http"
 	"sync"
 
@@ -153,12 +154,16 @@ type Edge struct {
 type Graph struct {
 	List [][]Edge // 邻接表存储图
 	N    int      // 顶点数
+	S    int
+	T    int
 }
 
 func NewGraph(n int) *Graph {
 	return &Graph{
 		List: make([][]Edge, n+10),
 		N:    n,
+		S:    n - 1,
+		T:    n,
 	}
 }
 
@@ -179,15 +184,13 @@ func MaxFlow(db *gorm.DB, IDs []int, distinctIDs []int, questionType string) []i
 	}
 
 	g := NewGraph(num + 2)
-	s := num + 1 // 源点
-	t := num + 2 // 汇点
 
 	for _, fromID := range IDs {
-		g.addEdge(s, fromID, 1, 0)
+		g.addEdge(g.S, fromID, 1, 0)
 	}
 	// fmt.Println(IDs)
 	for _, toID := range distinctIDs {
-		g.addEdge(toID, t, 1, 0)
+		g.addEdge(toID, g.T, 1, 0)
 	}
 	// fmt.Println(distinctIDs)
 	questionKeywordsMap := GetAllKeywords(db, append(IDs, distinctIDs...), questionType)
@@ -202,9 +205,9 @@ func MaxFlow(db *gorm.DB, IDs []int, distinctIDs []int, questionType string) []i
 				similarity := calculateSharedKeywordCount(questionKeywordsMap[fid], questionKeywordsMap[tid])
 
 				if similarity > 0 {
-					g.addEdge(fid, tid, 1, similarity+5)
+					g.addEdge(fid, tid, 1, -(similarity + 5))
 				} else {
-					g.addEdge(fid, tid, 1, 1)
+					g.addEdge(fid, tid, 1, -1)
 				}
 			}(fromID, toID)
 		}
@@ -214,68 +217,89 @@ func MaxFlow(db *gorm.DB, IDs []int, distinctIDs []int, questionType string) []i
 	wg.Wait()
 
 	// fmt.Println(s, t)
-	_, _ = g.dinic(s, t)
+	_, _ = g.MCMF()
 	// fmt.Printf("最大流: %d, 最小费用: %d\n", flow, cost)
-	rightnodes := g.RightNodes(t)
+	rightnodes := g.RightNodes(g.T)
 	return rightnodes
 }
 
-func (g *Graph) dinicDfs(v, t, f int, level []int, iter []int, currentCost int) (int, int) {
-	if v == t {
-		return f, currentCost * f // 累加当前路径的费用
+func SPFA(g *Graph, s int) ([]int, []int, bool, []int) {
+	dis := make([]int, g.N+10)
+	incf := make([]int, g.N+10)
+	pre := make([]int, g.N+10)
+	vis := make([]bool, g.N+10)
+
+	for i := range dis {
+		dis[i] = math.MaxInt32
+		incf[i] = 0
 	}
-	for i := iter[v]; i < len(g.List[v]); i++ {
-		e := &g.List[v][i]
-		if e.Cap > 0 && level[v] < level[e.V] {
-			d, pathCost := g.dinicDfs(e.V, t, mmin(f, e.Cap), level, iter, currentCost+e.Cost)
-			if d > 0 {
-				e.Cap -= d
-				g.List[e.V][e.Rev].Cap += d
-				return d, pathCost // 返回当前路径的流量和费用
+	dis[s] = 0
+	incf[s] = math.MaxInt32
+	vis[s] = true
+	pre[g.T] = -1
+
+	q := []int{s}
+
+	for len(q) > 0 {
+		u := q[0]
+		q = q[1:]
+		vis[u] = false
+
+		for _, e := range g.List[u] {
+			if e.Cap == 0 {
+				continue
+			}
+			v := e.V
+			if dis[v] > dis[u]+e.Cost {
+				dis[v] = dis[u] + e.Cost
+				incf[v] = mmin(incf[u], e.Cap)
+				pre[v] = u
+				if !vis[v] {
+					vis[v] = true
+					q = append(q, v)
+				}
 			}
 		}
 	}
-	return 0, 0
+	// fmt.Println(dis[g.T])
+	if pre[g.T] == -1 {
+		return nil, nil, false, nil
+	}
+	return dis, incf, true, pre
 }
 
-func (g *Graph) dinic(s, t int) (int, int) {
-	flow, cost := 0, 0
+// MCMF 利用SPFA寻找最小费用最大流
+func (g *Graph) MCMF() (int, int) {
+	maxFlow := 0
+	minCost := 0
 	for {
-		level := make([]int, g.N+10)
-		iter := make([]int, g.N+10)
-		maxLevel := g.bfs(s, t, level)
-		if maxLevel == -1 {
+		dis, incf, hasPath, pre := SPFA(g, g.S)
+		if !hasPath {
 			break
 		}
-		for {
-			f, c := g.dinicDfs(s, t, 1<<60, level, iter, 0)
-			if f == 0 {
-				break
-			}
-			flow += f
-			cost += c
+		// fmt.Println(incf[g.T])
+		maxFlow += incf[g.T]
+		minCost += dis[g.T] * incf[g.T]
+		x := g.T
+		for x != g.S {
+			i := pre[x]
+			g.List[i][findEdge(g.List[i], x)].Cap -= incf[g.T]
+			g.List[x][g.List[i][findEdge(g.List[i], x)].Rev].Cap += incf[g.T] // 更新反向边容量
+			x = i
 		}
 	}
-	return flow, cost
+
+	return maxFlow, minCost
 }
 
-func (g *Graph) bfs(s, t int, level []int) int {
-	for i := range level {
-		level[i] = -1
-	}
-	level[s] = 0
-	queue := []int{s}
-	for len(queue) > 0 {
-		v := queue[0]
-		queue = queue[1:]
-		for _, e := range g.List[v] {
-			if e.Cap > 0 && level[e.V] < 0 {
-				level[e.V] = level[v] + 1
-				queue = append(queue, e.V)
-			}
+// 辅助函数 findEdge 在边列表中查找目标顶点对应的边
+func findEdge(edges []Edge, target int) int {
+	for i, e := range edges {
+		if e.V == target {
+			return i
 		}
 	}
-	return level[t]
+	return -1
 }
 func (g *Graph) RightNodes(t int) []int {
 	var rightnodes []int
