@@ -54,6 +54,7 @@ func RegisterCheckPost(c *gin.Context) {
 		Username string `form:"username" binding:"required"`
 		Password string `form:"password" binding:"required"`
 		Type     string `form:"type" binding:"required"`
+		Name     string `form:"name" binding:"required"`
 	}
 	log.Println("Binding form")
 	if err := c.ShouldBind(&form); err != nil {
@@ -78,6 +79,7 @@ func RegisterCheckPost(c *gin.Context) {
 	user.Username = form.Username
 	user.Password = form.Password
 	user.Type = form.Type
+	user.Name = form.Name
 	if err := AddUser(db, &user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
 		return
