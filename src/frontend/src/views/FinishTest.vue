@@ -9,7 +9,7 @@
           <n-tag v-if="test.state === 'to_be_finish'" type="error">待完成</n-tag>
           <n-tag v-if="test.state === 'finish'" type="success">已完成</n-tag>
         </div>
-        <button v-if="test.state === 'to_be_finish'">去完成试卷</button>
+        <button v-if="test.state === 'to_be_finish'" @click="handleFinishTest(test.id)">去完成试卷</button>
         <button v-if="test.state === 'finish'">查看试卷评阅进度</button>
       </div>
     </li>
@@ -35,11 +35,13 @@ export default {
       testDetails: '',
       sameTestDetails: '',
       showSameTest: false,
-      testID: -1,
     }
   },
 
   methods: {
+    handleFinishTest(testID){
+      this.$router.push({ path: '/finishOneTest', query: { testID } });
+    },
 
     async fetchTests() {
       try {
