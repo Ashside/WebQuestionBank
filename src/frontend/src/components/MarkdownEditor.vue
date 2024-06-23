@@ -1,5 +1,5 @@
 <template>
-  <div class="markdown-editor">
+  <div class="markdown-editor" :style="{ height: containerHeight }">
     <div class="container">
       <h2>{{ title }}</h2>
       <div class="editor-preview-container">
@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { ref, watch } from 'vue';
+import {computed, ref, watch} from 'vue';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import autoResize from '@/directives/autoResize';
 
@@ -47,8 +47,17 @@ export default {
       emit('update:modelValue', newValue);
     });
 
+    // 计算容器高度，最小为30vh，最大为70vh
+    const containerHeight = computed(() => {
+      const baseHeight = 15; // 最小高度
+      const lineHeight = 1.4; // 行高
+      const extraHeight = (localInputText.value.split('\n').length * lineHeight) + 15; // 额外高度计算
+      return `${Math.min(baseHeight + extraHeight, 70)}vh`; // 限制最大高度为70vh
+    });
+
     return {
       localInputText,
+      containerHeight
     };
   },
 };

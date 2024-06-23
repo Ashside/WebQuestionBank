@@ -66,6 +66,22 @@ const routes = [
         }
     },
     {
+        path: '/FinishOneTest',
+        name: 'FinishOneTest',
+        component: () => import('@/views/FinishOneTest.vue'),
+        meta: {
+            requiresAuth: true  // 需要认证
+        }
+    },
+    {
+        path: '/FinishTest',
+        name: 'FinishTest',
+        component: () => import('@/views/FinishTest.vue'),
+        meta: {
+            requiresAuth: true  // 需要认证
+        }
+    },
+    {
         path: '/DistributeTest',
         name: 'DistributeTest',
         component: () => import('@/views/DistributeTest.vue'),
