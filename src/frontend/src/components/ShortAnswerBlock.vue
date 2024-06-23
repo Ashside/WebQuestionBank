@@ -5,6 +5,8 @@
       <div class="editor-preview-container">
         <div class="display-pane">
           <MarkdownRenderer :content="question" />
+        </div>
+        <div class="editor-pane">
           <div v-if="questionType === 'multiple-choice'" class="choices">
             <div v-for="(option, index) in internalOptions" :key="index" class="choice">
               <input type="checkbox" :id="'option-' + index" v-model="option.selected">
@@ -13,15 +15,8 @@
               </label>
             </div>
           </div>
-        </div>
-        <div class="editor-pane">
-          <div v-if="!isMarkdown">
-            <textarea v-model="answer" v-auto-resize placeholder="请输入答案..." v-if="questionType === 'short-answer'"></textarea>
-            <div v-if="questionType === 'multiple-choice'">
-              <div v-for="(option, index) in internalOptions" :key="index" class="choice">
-                <textarea v-model="option.content" v-auto-resize placeholder="请输入选项内容..."></textarea>
-              </div>
-            </div>
+          <div v-if="!isMarkdown && questionType === 'short-answer'">
+            <textarea v-model="answer" v-auto-resize placeholder="请输入答案..."></textarea>
           </div>
           <div v-if="isMarkdown">
             <MarkdownRenderer :content="answer" v-if="questionType === 'short-answer'" />
@@ -31,7 +26,7 @@
               </div>
             </div>
           </div>
-          <button @click="toggleMarkdown">
+          <button @click="toggleMarkdown" v-if="questionType === 'short-answer'">
             {{ isMarkdown ? '编辑' : '渲染' }}
           </button>
         </div>
@@ -102,8 +97,17 @@ export default {
     const containerHeight = computed(() => {
       const baseHeight = 15;
       const lineHeight = 1.4;
-      const content = typeof answer.value === 'string' ? answer.value : '';
-      const extraHeight = (content.split('\n').length * lineHeight) + 15;
+      let extraHeight = 0;
+
+      if (props.questionType === 'short-answer') {
+        const content = typeof answer.value === 'string' ? answer.value : '';
+        extraHeight = (content.split('\n').length * lineHeight) + 15;
+      } else if (props.questionType === 'multiple-choice') {
+        extraHeight = internalOptions.value.reduce((total, option) => {
+          return total + (option.content.split('\n').length * lineHeight) + 2;
+        }, 15);
+      }
+
       return `${Math.min(baseHeight + extraHeight, 70)}vh`;
     });
 
@@ -117,6 +121,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 .markdown-editor {
@@ -228,5 +233,34 @@ button:hover {
 
 .choice label {
   flex: 1;
+}
+
+/* 自定义复选框样式 */
+input[type="checkbox"] {
+  -webkit-appearance: none; /* 移除默认外观 */
+  appearance: none;
+  background-color: #fff;
+  margin: 0 10px 0 0;
+  font-size: 1.5em;
+  color: #42a5f5;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #42a5f5;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #42a5f5;
+}
+
+input[type="checkbox"]:checked::after {
+  content: "✔";
+  position: absolute;
+  top: -2px;
+  left: 2px;
+  color: #fff;
+  font-size: 16px;
 }
 </style>
