@@ -102,7 +102,7 @@ export default {
     },
 
     findSameTest(testId) {
-      this.showSameTest = true;
+      this.sameTestDetails = '';
       axios.post(process.env["VUE_APP_API_URL"] + `/api/questionBank/findSameTestByID`, {
         testId: testId,
         username: store.state.username
@@ -112,10 +112,12 @@ export default {
               this.sameTestDetails = response.data.test;
               this.showSameTest = true;
             } else {
+              alert("匹配失败。原因：" + response.data.reason);
               console.error('Failed to fetch test details:', response.data.reason);
             }
           })
           .catch(error => {
+            alert("匹配失败", error);
             console.error('Error fetching test details:', error);
           });
     }

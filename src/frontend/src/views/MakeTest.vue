@@ -1,79 +1,79 @@
 <template>
   <NavigateBar />
   <div v-if="!aiModalOpen">
-  <div>
-    <h1>问题列表</h1>
-    <div class="button-container">
-      <button @click="toggleAIGeneration" class="ai-generate-btn">找题太麻烦？不如试试 AI 组卷</button>
-    </div>
-    <div class="subject-selector-container">
-      <div class="subject-selector">
-        <label for="subject">选择科目:</label>
-        <select id="subject" v-model="selectedSubject">
-          <option value="all">所有科目</option>
-          <option v-for="subject in subjects" :key="subject.value" :value="subject.value">{{ subject.label }}</option>
-        </select>
+    <div>
+      <h1>问题列表</h1>
+      <div class="button-container">
+        <button @click="toggleAIGeneration" class="ai-generate-btn">找题太麻烦？不如试试 AI 组卷</button>
       </div>
-      <div class="difficulty-selector">
-        <label for="difficulty">选择难度:</label>
-        <select id="difficulty" v-model="selectedDifficulty">
-          <option value="all">所有难度</option>
-          <option value="1">简单</option>
-          <option value="2">中等</option>
-          <option value="3">困难</option>
-        </select>
+      <div class="subject-selector-container">
+        <div class="subject-selector">
+          <label for="subject">选择科目:</label>
+          <select id="subject" v-model="selectedSubject">
+            <option value="all">所有科目</option>
+            <option v-for="subject in subjects" :key="subject.value" :value="subject.value">{{ subject.label }}</option>
+          </select>
+        </div>
+        <div class="difficulty-selector">
+          <label for="difficulty">选择难度:</label>
+          <select id="difficulty" v-model="selectedDifficulty">
+            <option value="all">所有难度</option>
+            <option value="1">简单</option>
+            <option value="2">中等</option>
+            <option value="3">困难</option>
+          </select>
+        </div>
       </div>
-    </div>
-    <ul>
-      <!-- 渲染接收到的问题的描述 -->
-      <li v-for="(item, index) in filteredQuestions" :key="index">
-        <div class="question-header">
-          <input type="checkbox" v-model="item.selected">
-          <h3>题目{{ index + 1 }}</h3>
-          本题分数：<input type="number" v-model="item.score" class="score-input">
-        </div>
-        <div v-if="item.type === 'simpleAnswer'">
-          <MarkdownRenderer :content="item.question" />
-        </div>
-        <div v-else-if="item.type === 'multipleChoice'">
-          <MarkdownRenderer :content="item.question + '<br>' +
+      <ul>
+        <!-- 渲染接收到的问题的描述 -->
+        <li v-for="(item, index) in filteredQuestions" :key="index">
+          <div class="question-header">
+            <input type="checkbox" v-model="item.selected">
+            <h3>题目{{ index + 1 }}</h3>
+            本题分数：<input type="number" v-model="item.score" class="score-input">
+          </div>
+          <div v-if="item.type === 'simpleAnswer'">
+            <MarkdownRenderer :content="item.question" />
+          </div>
+          <div v-else-if="item.type === 'multipleChoice'">
+            <MarkdownRenderer :content="item.question + '<br>' +
           'option1: ' + item.option.option1 + '<br>' +
           'option2: ' + item.option.option2 + '<br>' +
           'option3: ' + item.option.option3 + '<br>' +
           'option4: ' + item.option.option4" />
-        </div>
-        <div class="tag-container">
-          <n-tag v-if="item.subject === 'history'" style="background-color: #ffa726">历史</n-tag>
-          <n-tag v-else-if="item.subject === 'math'" style="background-color: #66bb6a">数学</n-tag>
-          <n-tag v-else-if="item.subject === 'english'" style="background-color: #42a5f5">英语</n-tag>
+          </div>
+          <div class="tag-container">
+            <n-tag v-if="item.subject === 'history'" style="background-color: #ffa726">历史</n-tag>
+            <n-tag v-else-if="item.subject === 'math'" style="background-color: #66bb6a">数学</n-tag>
+            <n-tag v-else-if="item.subject === 'english'" style="background-color: #42a5f5">英语</n-tag>
 
-          <n-tag v-if="item.difficulty === 1" type="success">简单</n-tag>
-          <n-tag v-else-if="item.difficulty === 2" type="warning">中等</n-tag>
-          <n-tag v-else-if="item.difficulty === 3" type="error">困难</n-tag>
-          <n-tag v-for="(keywordObj, i_keyword) in item.keywords.slice(0, 3)" :key="i_keyword">
-            {{ keywordObj.keyword }}
-          </n-tag>
-        </div>
-      </li>
-    </ul>
-  </div>
-  <div class="button-container">
-    <button @click="openModal">提交选中的题目</button>
-    <transition name="fade">
-      <button v-if="submissionSuccess" @click="viewPDFDocument">查看试卷PDF文档</button>
-    </transition>
-  </div>
-  <div v-if="isModalOpen" class="modal">
-    <div class="modal-content">
-      <span class="close" @click="closeModal">&times;</span>
-      <center>
-      <h2>请输入试卷信息</h2>
-      <input type="text" v-model="testName" placeholder="试卷名称">
-        <br><br>
-      <button @click="submitSelectedQuestions">确认提交</button>
-      </center>
+            <n-tag v-if="item.difficulty === 1" type="success">简单</n-tag>
+            <n-tag v-else-if="item.difficulty === 2" type="warning">中等</n-tag>
+            <n-tag v-else-if="item.difficulty === 3" type="error">困难</n-tag>
+            <n-tag v-for="(keywordObj, i_keyword) in item.keywords.slice(0, 3)" :key="i_keyword">
+              {{ keywordObj.keyword }}
+            </n-tag>
+          </div>
+        </li>
+      </ul>
     </div>
-  </div>
+    <div class="button-container">
+      <button @click="openModal">提交选中的题目</button>
+      <transition name="fade">
+        <button v-if="submissionSuccess" @click="viewPDFDocument">查看试卷PDF文档</button>
+      </transition>
+    </div>
+    <div v-if="isModalOpen" class="modal">
+      <div class="modal-content">
+        <span class="close" @click="closeModal">&times;</span>
+        <center>
+          <h2>请输入试卷信息</h2>
+          <input type="text" v-model="testName" placeholder="试卷名称">
+          <br><br>
+          <button @click="submitSelectedQuestions">确认提交</button>
+        </center>
+      </div>
+    </div>
   </div>
   <!-- AI组卷模态窗口 -->
   <div v-if="aiModalOpen">
@@ -95,9 +95,13 @@
             <option value="3">困难</option>
           </select>
         </div>
-        <button @click="generateAIQuestions">AI组卷</button>
       </div>
       <center>
+        <div class="keywords-input">
+          <label for="keywords">输入关键词:</label>
+          <input id="keywords" v-model="keyword" placeholder="请输入关键词">
+        </div>
+        <button @click="generateAIQuestions">AI组卷</button>
         <h2>AI组卷结果</h2>
       </center>
       <ul>
@@ -157,13 +161,11 @@
   </div>
 </template>
 
-
 <script>
 import axios from 'axios';
 import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
 import NavigateBar from "@/components/NavigateBar.vue";
 import store from "@/store";
-// import router from "@/router";
 
 export default {
   name: 'ViewQuestions',
@@ -182,6 +184,7 @@ export default {
       aiGeneratedQuestions: [],
       aiModalOpen: false,
       aiSubmitButton: false,
+      keyword: '',  // 新增关键词数据绑定
     }
   },
 
@@ -300,10 +303,18 @@ export default {
 
     async generateAIQuestions() {
       try {
-        const response = await axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/aiGenerate');
+        const response = await axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/aiGenerate', {
+          subject: this.selectedSubject,
+          difficulty: this.selectedDifficulty,
+          keyword: this.keyword === '' ? null : this.keyword
+        });
         if (response.data.success) {
           this.aiGeneratedQuestions = response.data.questions;
           this.aiSubmitButton = true;
+          this.aiGeneratedQuestions = response.data.questions.map(q => {
+            q.selected = true; // 设置所有生成的问题为选中状态
+            return q;
+          });
         } else {
           console.error('AI组卷失败:', response.data.reason);
         }
@@ -458,7 +469,4 @@ input[type="checkbox"] {
   border-radius: 10px; /* 移除边框圆角 */
   z-index: 1000; /* 确保在最前面 */
 }
-
-
-
 </style>
