@@ -6,7 +6,7 @@
       <CustomCard v-if="!isStudent" title="录入选择题" cover="/multiple_choice.png" @card-click="navigateTo('LoadQuestion/multipleChoice')"></CustomCard>
       <CustomCard v-if="!isStudent" title="查看题库" cover="/question_bank.png" @card-click="navigateTo('/ViewQuestion')"></CustomCard>
       <CustomCard v-if="!isStudent" title="组卷" cover="/make_test.png" @card-click="navigateTo('/MakeTest')"></CustomCard>
-      <CustomCard v-if="isStudent" title="完成试卷" cover="/exam.png" @card-click="navigateTo('/MakeTest')"></CustomCard>
+      <CustomCard v-if="isStudent" title="完成试卷" cover="/exam.png" @card-click="navigateTo('/FinishTest')"></CustomCard>
       <CustomCard title="查看试卷" cover="/view_test.png" @card-click="navigateTo('/ViewAllTests')"></CustomCard>
       <CustomCard v-if="!isStudent" title="批阅试卷" cover="/test_score.png" @card-click="navigateTo('/CheckStudentAnswer')"></CustomCard>
       <CustomCard v-if="!isStudent" title="分发试卷" cover="/distribute_exam.png" @card-click="navigateTo('/DistributeTest')"></CustomCard>
