@@ -2,8 +2,10 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"log"
 	"net/http"
 	"strconv"
@@ -655,7 +657,7 @@ func GetStudentAnswersPost(context *gin.Context) {
 		if ques.Options == "" {
 
 			response.StudentAnswer = a.StuAnswer
-			response.Score, _ = GetGradeByTestIdAndQuestionId(db, a.TestId, a.QuestionId)
+			response.Score, _ = QueryGradeByTestIdAndQuestionId(db, a.TestId, a.QuestionId)
 			response.StudentUsername = a.StuName
 			response.TestID = a.TestId
 			response.QuestionID = a.QuestionId
@@ -790,14 +792,23 @@ func DistributeTestPost(context *gin.Context) {
 			assign.QuestionId = q
 			assign.StuName = student
 			assign.TestId = request.TestID
+			quesScore, _ := QueryGradeByTestIdAndQuestionId(db, request.TestID, q)
+			assign.Score = float64(quesScore)
+			assign.StuAnswer = ""
+			assign.StuScore = 0
+			assign.AssignName = request.Username
 			if err := assign.AddAssign(db); err != nil {
-				context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
-				return
+				if errors.Is(err, gorm.ErrDuplicatedKey) {
+					log.Println("Duplicated key")
+					continue
+				}
 			}
 
 		}
 
 	}
+
+	context.JSON(http.StatusOK, gin.H{"success": true, "reason": ""})
 
 }
 
