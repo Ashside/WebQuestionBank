@@ -10,8 +10,8 @@ func GetAssignsByAssignName(db *gorm.DB, assignName string) ([]Assignments, erro
 	return assign, nil
 }
 
-func GetStuAnswerByStuName(db *gorm.DB, stuName string) (Assignments, error) {
-	var assign Assignments
+func GetAssignsByStuName(db *gorm.DB, stuName string) ([]Assignments, error) {
+	var assign []Assignments
 	if err := db.Table("assignments").Where("stu_name = ?", stuName).Find(&assign).Error; err != nil {
 		return assign, err
 	}

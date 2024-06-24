@@ -934,4 +934,32 @@ func QueryAllTestsByStudentIDPost(context *gin.Context) {
 		return
 	}
 
+	// 查询试卷
+	var assign []Assignments
+	assign, _ = GetAssignsByStuName(db, request.Username)
+
+	// 获得互异的试卷ID
+	var testIdMap = make(map[int]bool)
+	var testId []int
+	for _, a := range assign {
+		if _, ok := testIdMap[a.TestId]; !ok {
+			testIdMap[a.TestId] = true
+			testId = append(testId, a.TestId)
+		}
+
+	}
+
+	var response Response
+	for _, t := range testId {
+		if isTestFinished(db, t, request.Username) {
+			response.Test = append(response.Test, Test{ID: int64(t), Name: QueryTestNameByTestId(db, t), State: "finish"})
+		} else {
+			response.Test = append(response.Test, Test{ID: int64(t), Name: QueryTestNameByTestId(db, t), State: "to_be_finish"})
+		}
+	}
+
+	response.Success = true
+	response.Reason = ""
+	context.JSON(http.StatusOK, response)
+
 }

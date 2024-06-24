@@ -167,3 +167,15 @@ func QueryTestsByStuName(db *gorm.DB, username string) ([]Tests, error) {
 	}
 	return tests, nil
 }
+func QueryTestNameByTestId(db *gorm.DB, t int) string {
+	var test Tests
+	if err := db.Table("tests").Where("id = ?", t).First(&test).Error; err != nil {
+		return ""
+	}
+	return test.Name
+}
+
+func isTestFinished(db *gorm.DB, t int, username string) bool {
+	// TODO:待完成
+	return false
+}
