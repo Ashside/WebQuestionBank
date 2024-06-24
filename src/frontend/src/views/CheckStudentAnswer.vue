@@ -95,6 +95,7 @@ export default {
         });
         if (response.data.success) {
           alert('分数提交成功');
+          await this.getStudentAnswer();
         } else {
           console.error('Failed to submit score:', response.data.reason);
         }
