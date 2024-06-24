@@ -649,6 +649,9 @@ func GetStudentAnswersPost(context *gin.Context) {
 	//log.Println(assign)
 	var response Response
 	for _, a := range assign {
+		if a.StuScore != -1 {
+			continue
+		}
 		ques, bExist := QueryQuestionFromId(db, a.QuestionId)
 		if !bExist {
 			context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Question not found"})
@@ -807,7 +810,7 @@ func DistributeTestPost(context *gin.Context) {
 			quesScore, _ := QueryGradeByTestIdAndQuestionId(db, request.TestID, q)
 			assign.Score = float64(quesScore)
 			assign.StuAnswer = ""
-			assign.StuScore = 0
+			assign.StuScore = -1
 			assign.AssignName = request.Username
 			if err := assign.AddAssign(db); err != nil {
 				if errors.Is(err, gorm.ErrDuplicatedKey) {

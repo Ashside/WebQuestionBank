@@ -98,8 +98,11 @@ func AddTest(db *gorm.DB, t *Tests) error {
 		return err
 
 	}
-	if len(tests) != 0 {
-		t.Name = t.Name + "1"
+	// 如果有多个id不同的test的name相同，那么name+id
+	for _, test := range tests {
+		if test.Name == t.Name && test.Id != t.Id {
+			t.Name += strconv.Itoa(t.Id)
+		}
 
 	}
 	// 添加测试
