@@ -41,7 +41,7 @@ func FindSamePost(c *gin.Context) {
 
 	}
 	//获取id列表
-	inputIDs := queryTestByID(db, form.TestId)
+	inputIDs := QueryQuesIdByTestID(db, form.TestId)
 
 	//分割
 	var choiceIDs []int
