@@ -33,3 +33,11 @@ func (a *Assignments) UpdateScore(db *gorm.DB) error {
 	}
 	return nil
 }
+
+func QueryAssignsByTestAndStu(db *gorm.DB, testId int, stuName string) ([]Assignments, error) {
+	var assign []Assignments
+	if err := db.Table("assignments").Where("test_id = ? AND stu_name = ?", testId, stuName).Find(&assign).Error; err != nil {
+		return assign, err
+	}
+	return assign, nil
+}

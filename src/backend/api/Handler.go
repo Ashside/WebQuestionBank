@@ -963,3 +963,137 @@ func QueryAllTestsByStudentIDPost(context *gin.Context) {
 	context.JSON(http.StatusOK, response)
 
 }
+
+func QueryTestStateByStudentIDPost(context *gin.Context) {
+	type Request struct {
+		// 要查的学生 ID
+		StudentUsername string `form:"studentUsername"`
+		// 要查的测试 ID
+		TestID int `form:"testID"`
+	}
+	// 选择题选项，选择题需要填写，简答题不需要
+	type Option struct {
+		Option1 string `json:"option1"`
+		Option2 string `json:"option2"`
+		Option3 string `json:"option3"`
+		Option4 string `json:"option4"`
+	}
+	type Question struct {
+		// 答案
+		Answer string `json:"answer"`
+		// 题目id
+		ID int64 `json:"id"`
+		// 选择题选项，选择题需要填写，简答题不需要
+		Option *Option `json:"option,omitempty"`
+		// 问题内容
+		Question string `json:"question"`
+		// 学生存储中的答案
+		StudentAnswer string `json:"studentAnswer"`
+		// 问题类型，简答题和选择题两种
+		Type string `json:"type"`
+	}
+	type Response struct {
+		// 问题列表
+		Questions []Question `json:"questions"`
+		// 原因，如果失败返回原因，如果成功则为 null
+		Reason string `json:"reason"`
+		// 是否成功
+		Success bool `json:"success"`
+	}
+
+	log.Println("QueryTestStateByStudentIDPost")
+	var request Request
+	if err := context.ShouldBind(&request); err != nil {
+		log.Println(err)
+		context.JSON(http.StatusBadRequest, gin.H{"success": false, "reason": "Invalid form"})
+		return
+	}
+
+	db, err := getDatabase()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+		return
+	}
+
+	// 查询用户是否存在
+	var user Users
+	if err := GetUserByUsername(db, request.StudentUsername, &user); err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Users not found"})
+		return
+	}
+
+	// 查询试卷
+	var assign []Assignments
+
+	assign, _ = QueryAssignsByTestAndStu(db, request.TestID, request.StudentUsername)
+
+	var response Response
+	for _, a := range assign {
+		ques, bExist := QueryQuestionFromId(db, a.QuestionId)
+		if !bExist {
+			context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Question not found"})
+			return
+		}
+		if ques.Options == "" {
+			response.Questions = append(response.Questions, Question{
+				Answer:        ques.Answer,
+				ID:            int64(ques.Id),
+				Option:        nil,
+				Question:      ques.Content,
+				StudentAnswer: a.StuAnswer,
+				Type:          "simpleAnswer",
+			})
+		} else {
+			var option Option
+			err := json.Unmarshal([]byte(ques.Options), &option)
+			if err != nil {
+				fmt.Println("Error unmarshalling option:", err)
+				return
+			}
+			response.Questions = append(response.Questions, Question{
+				Answer: ques.Answer,
+				ID:     int64(ques.Id),
+				Option: &option,
+
+				Question:      ques.Content,
+				StudentAnswer: a.StuAnswer,
+				Type:          "multipleChoice",
+			})
+		}
+
+	}
+
+	response.Success = true
+	response.Reason = ""
+	context.JSON(http.StatusOK, response)
+
+}
+
+func SaveTestAnswerByStudentIDPost(context *gin.Context) {
+	type RequestElement struct {
+		// 题目ID
+		ID int64 `json:"id"`
+		// 学生答案
+		StudentAnswer string `json:"studentAnswer"`
+		// 题目类型
+		Type string `json:"type"`
+	}
+	type Request []RequestElement
+
+	type Response struct {
+		// 原因，如果失败返回原因，如果成功则为 null
+		Reason string `json:"reason"`
+		// 是否成功
+		Success bool `json:"success"`
+	}
+
+	log.Println("SaveTestAnswerByStudentIDPost")
+	var request Request
+	if err := context.ShouldBind(&request); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"success": false, "reason": "Invalid form"})
+		return
+	}
+
+	// 查询用户是否存在
+
+}

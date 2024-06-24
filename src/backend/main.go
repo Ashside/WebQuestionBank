@@ -128,5 +128,13 @@ func main() {
 	// 该请求用于查询所有学生的试卷
 	questionBankGroup.POST("/queryAllTestsByStudentID", api.QueryAllTestsByStudentIDPost)
 
+	// 处理/api/questionBank/queryTestStateByStudentID
+	// 该请求用于查询学生的试卷状态
+	questionBankGroup.POST("/queryTestStateByStudentID", api.QueryTestStateByStudentIDPost)
+
+	// 处理/api/questionBank/saveTestAnswerByStudentID
+	// 该请求用于保存学生的试卷答案
+	questionBankGroup.POST("/saveTestAnswerByStudentID", api.SaveTestAnswerByStudentIDPost)
+
 	_ = r.Run(":8081")
 }
