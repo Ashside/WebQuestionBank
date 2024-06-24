@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import ShortAnswerBlock from "@/components/ShortAnswerBlock.vue";
+import ShortAnswerBlock from "@/components/AnswerBlock.vue";
 
 export default {
   components: { ShortAnswerBlock },
