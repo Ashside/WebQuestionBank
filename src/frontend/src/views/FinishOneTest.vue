@@ -4,13 +4,13 @@
         title="Markdown 编辑器"
         :question="questionText"
         v-model="answerText"
-        questionType="short-answer"
+        questionType="simpleAnswer"
     />
     <ShortAnswerBlock
         title="选择题示例"
         question="以下哪项是Vue.js的特性？"
         v-model="selectedOptions"
-        questionType="multiple-choice"
+        questionType="multipleChoice"
         :options="selectedOptions"
     />
   </div>

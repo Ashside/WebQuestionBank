@@ -7,7 +7,7 @@
           <MarkdownRenderer :content="question" />
         </div>
         <div class="editor-pane">
-          <div v-if="questionType === 'multiple-choice'" class="choices">
+          <div v-if="questionType === 'multipleChoice'" class="choices">
             <div v-for="(option, index) in internalOptions" :key="index" class="choice">
               <input type="checkbox" :id="'option-' + index" v-model="option.selected">
               <label :for="'option-' + index">
@@ -15,18 +15,18 @@
               </label>
             </div>
           </div>
-          <div v-if="!isMarkdown && questionType === 'short-answer'">
+          <div v-if="!isMarkdown && questionType === 'simpleAnswer'">
             <textarea v-model="answer" v-auto-resize placeholder="请输入答案..."></textarea>
           </div>
           <div v-if="isMarkdown">
-            <MarkdownRenderer :content="answer" v-if="questionType === 'short-answer'" />
-            <div v-if="questionType === 'multiple-choice'">
+            <MarkdownRenderer :content="answer" v-if="questionType === 'simpleAnswer'" />
+            <div v-if="questionType === 'multipleChoice'">
               <div v-for="(option, index) in internalOptions" :key="index" class="choice">
                 <MarkdownRenderer :content="option.content" />
               </div>
             </div>
           </div>
-          <button @click="toggleMarkdown" v-if="questionType === 'short-answer'">
+          <button @click="toggleMarkdown" v-if="questionType === 'simpleAnswer'">
             {{ isMarkdown ? '编辑' : '渲染' }}
           </button>
         </div>
@@ -99,10 +99,10 @@ export default {
       const lineHeight = 1.4;
       let extraHeight = 0;
 
-      if (props.questionType === 'short-answer') {
+      if (props.questionType === 'simpleAnswer') {
         const content = typeof answer.value === 'string' ? answer.value : '';
         extraHeight = (content.split('\n').length * lineHeight) + 15;
-      } else if (props.questionType === 'multiple-choice') {
+      } else if (props.questionType === 'multipleChoice') {
         extraHeight = internalOptions.value.reduce((total, option) => {
           return total + (option.content.split('\n').length * lineHeight) + 2;
         }, 15);
