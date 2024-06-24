@@ -62,7 +62,7 @@ export default {
     },
     questionType: {
       type: String,
-      default: 'short-answer',
+      default: 'simpleAnswer',
     },
     options: {
       type: Array,
@@ -72,6 +72,13 @@ export default {
   setup(props, { emit }) {
     const answer = ref(props.modelValue);
     const isMarkdown = ref(false);
+    const internalOptions = ref(
+        props.options.map((option, index) => ({
+          content: option.content || '',
+          selected: option.selected || false,
+          index: index,
+        }))
+    );
 
     watch(() => props.modelValue, (newValue) => {
       answer.value = newValue;
@@ -82,13 +89,21 @@ export default {
     });
 
     watch(() => props.options, (newValue) => {
-      internalOptions.value = newValue;
+      internalOptions.value = newValue.map((option, index) => ({
+        content: option.content || '',
+        selected: option.selected || false,
+        index: index,
+      }));
     }, { deep: true });
 
-    const internalOptions = ref(props.options.map(option => ({
-      content: option.content || '',
-      selected: option.selected || false,
-    })));
+    watch(internalOptions, (newOptions) => {
+      if (props.questionType === 'multipleChoice') {
+        const selectedOptions = newOptions
+            .filter(option => option.selected)
+            .map(option => `option${option.index + 1}`);
+        answer.value = selectedOptions.join(', ');
+      }
+    }, { deep: true });
 
     const toggleMarkdown = () => {
       isMarkdown.value = !isMarkdown.value;
@@ -121,7 +136,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 .markdown-editor {

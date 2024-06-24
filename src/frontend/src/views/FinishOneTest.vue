@@ -12,6 +12,10 @@
         :options="question.options"
     />
   </div>
+  <div class="button-container">
+    <button @click="saveAnswers">保存答案</button>
+    <button @click="submitAnswers">提交答案</button>
+  </div>
 </template>
 
 
@@ -48,6 +52,44 @@ export default {
         console.error('Error fetching questions:', error);
       }
     },
+
+    async saveAnswers() {
+      const formattedAnswers = this.questions.map(q => {
+        if (q.type === 'multipleChoice') {
+          return {
+            id: q.id,
+            type: q.type,
+            studentAnswer: q.studentAnswer,
+          };
+        } else {
+          return {
+            id: q.id,
+            type: q.type,
+            studentAnswer: q.studentAnswer,
+          };
+        }
+      });
+
+      try {
+        const response = await axios.post('/api/questionBank/saveTestAnswerByStudentID', formattedAnswers);
+        if (response.data.success) {
+          console.log('Answers submitted successfully');
+        } else {
+          console.error('Failed to submit answers:', response.data.reason);
+        }
+      } catch (error) {
+        console.error('Error submitting answers:', error);
+      }
+    },
+
+    submitAnswers() {
+      // 提交答案的逻辑
+      console.log('Submitting answers:', this.questions);
+      // 可以通过API提交答案
+      // axios.post('/api/submitAnswers', { answers: this.questions })
+      //   .then(response => { ... })
+      //   .catch(error => { ... });
+    },
   },
   mounted() {
     this.fetchQuestions();
@@ -59,5 +101,22 @@ export default {
 <style scoped>
 #app {
   margin: 20px;
+}
+
+button {
+  background-color: #1e88e5;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: block;
+  text-align: center;
+}
+
+button:hover {
+  background-color: #2a2a72;
 }
 </style>
