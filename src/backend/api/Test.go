@@ -147,7 +147,7 @@ func QueryQuesIdByTestID(db *gorm.DB, id int) []int {
 	return quesId
 }
 
-func GetGradeByTestIdAndQuestionId(db *gorm.DB, testId int, questionId int) (int, error) {
+func QueryGradeByTestIdAndQuestionId(db *gorm.DB, testId int, questionId int) (int, error) {
 	// 查询该题目的分数
 	var test Tests
 	if err := db.Table("tests").Where("id = ? AND question_id = ?", testId, questionId).Find(&test).Error; err != nil {
