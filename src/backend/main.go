@@ -124,5 +124,9 @@ func main() {
 	// 该请求用于查询所有学生
 	usrGroup.POST("/findAllStudents", api.FindAllStudentsPost)
 
+	// 处理/api/questionBank/queryAllTestsByStudentID
+	// 该请求用于查询所有学生的试卷
+	questionBankGroup.POST("/queryAllTestsByStudentID", api.QueryAllTestsByStudentIDPost)
+
 	_ = r.Run(":8081")
 }
