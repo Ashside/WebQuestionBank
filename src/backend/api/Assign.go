@@ -41,3 +41,18 @@ func QueryAssignsByTestAndStu(db *gorm.DB, testId int, stuName string) ([]Assign
 	}
 	return assign, nil
 }
+
+func (a *Assignments) UpdateAnswer(db *gorm.DB) error {
+	err := db.Table("assignments").Where("test_id = ? AND question_id = ? AND stu_name = ?", a.TestId, a.QuestionId, a.StuName).Update("stu_answer", a.StuAnswer).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (a *Assignments) UpdateFinished(db *gorm.DB) error {
+	err := db.Table("assignments").Where("test_id = ? AND question_id = ? AND stu_name = ?", a.TestId, a.QuestionId, a.StuName).Update("finished", a.Finished).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
