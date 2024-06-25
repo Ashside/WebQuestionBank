@@ -1,16 +1,25 @@
 <template>
-
-<!--  题目模块-->
   <div class="markdown-editor" :style="{ height: containerHeight }">
+    <!--  题目模块-->
     <div class="container">
-      <h2>{{ title }}</h2>
+      <div class="header">
+        <div class="tags">
+          <n-tag v-if="isReviewComplete" type="success">批卷完成</n-tag>
+          <n-tag v-if="!isReviewComplete" type="warning">批卷正在进行</n-tag>
+        </div>
+        <h2>{{ title }}</h2>
+        <div class="scores">
+          <div class="score">满分: {{ fullScore }}</div>
+          <div class="score">你的得分: {{ studentScore }}</div>
+        </div>
+      </div>
       <div class="editor-preview-container">
         <div class="display-pane">
           <h2>题目</h2>
           <MarkdownRenderer :content="question" />
         </div>
 
-<!--        标准答案模块-->
+        <!-- 标准答案模块 -->
         <div class="display-pane">
           <h2>标准答案</h2>
           <div v-if="questionType === 'multipleChoice'" class="choices">
@@ -21,10 +30,10 @@
               </label>
             </div>
           </div>
-            <MarkdownRenderer :content="answer" v-if="questionType === 'simpleAnswer'" />
+          <MarkdownRenderer :content="answer" v-if="questionType === 'simpleAnswer'" />
         </div>
 
-<!--        学生答案模块-->
+        <!-- 学生答案模块 -->
         <div class="editor-pane">
           <h2>你的答案</h2>
           <div v-if="questionType === 'multipleChoice'" class="choices">
@@ -87,6 +96,18 @@ export default {
       type: Array,
       default: () => [],
     },
+    isReviewComplete: {
+      type: Boolean,
+      default: false,
+    },
+    fullScore: {
+      type: Number,
+      required: true,
+    },
+    studentScore: {
+      type: Number,
+      required: true,
+    }
   },
   setup(props) {
     const answer = ref(props.modelValue);
@@ -105,7 +126,6 @@ export default {
           index: index,
         }))
     );
-
 
     const toggleMarkdown = () => {
       isMarkdown.value = !isMarkdown.value;
@@ -158,6 +178,29 @@ export default {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   overflow: hidden;
   padding: 15px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tags {
+  display: flex;
+  gap: 10px;
+}
+
+.scores {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.score {
+  font-size: 14px;
+  color: #333;
 }
 
 .container h2 {

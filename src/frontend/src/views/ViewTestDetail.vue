@@ -1,4 +1,5 @@
 <template>
+  <h1>查看作答情况</h1>
   <div>
     <div v-if="loading">加载中...</div>
     <div v-else>
@@ -12,6 +13,9 @@
             :studentOptions="getStudentOptions(question)"
             :answer="question.answer"
             :studentAnswer="question.studentAnswer"
+            :isReviewComplete="question.isReviewComplete"
+            :fullScore="question.fullScore"
+            :student-score="question.studentScore"
         />
       </div>
     </div>
