@@ -176,6 +176,16 @@ func QueryTestNameByTestId(db *gorm.DB, t int) string {
 }
 
 func isTestFinished(db *gorm.DB, t int, username string) bool {
-	// TODO:待完成
-	return false
+	// 在assignments表中查询该学生是否完成了该测试
+	var assign []Assignments
+	if err := db.Table("assignments").Where("test_id = ? AND stu_name = ?", t, username).Find(&assign).Error; err != nil {
+		return false
+	}
+	for _, a := range assign {
+		if a.Finished == false {
+			return false
+		}
+
+	}
+	return true
 }

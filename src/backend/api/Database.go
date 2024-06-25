@@ -77,6 +77,7 @@ type Assignments struct {
 	StuAnswer  string
 	StuScore   float64
 	AssignName string
+	Finished   bool
 }
 type conf struct {
 	DatabaseUserName string `yaml:"DatabaseUserName"`
