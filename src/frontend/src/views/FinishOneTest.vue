@@ -71,7 +71,7 @@ export default {
       });
 
       try {
-        const response = await axios.post('/api/questionBank/saveTestAnswerByStudentID', {testID: parseInt(this.$route.query.testID, 10) , questions: formattedAnswers});
+        const response = await axios.post('/api/questionBank/saveTestAnswerByStudentID', {testID: parseInt(this.$route.query.testID, 10), studentUsername: store.state.username, questions: formattedAnswers});
         if (response.data.success) {
           console.log('Answers submitted successfully');
         } else {
