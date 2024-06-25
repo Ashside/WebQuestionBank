@@ -57,13 +57,13 @@ export default {
       const formattedAnswers = this.questions.map(q => {
         if (q.type === 'multipleChoice') {
           return {
-            id: q.id,
+            id: parseInt(q.id, 10),  // 确保ID为整数类型
             type: q.type,
             studentAnswer: q.studentAnswer,
           };
         } else {
           return {
-            id: q.id,
+            id: parseInt(q.id, 10),  // 确保ID为整数类型
             type: q.type,
             studentAnswer: q.studentAnswer,
           };
@@ -71,7 +71,7 @@ export default {
       });
 
       try {
-        const response = await axios.post('/api/questionBank/saveTestAnswerByStudentID', formattedAnswers);
+        const response = await axios.post('/api/questionBank/saveTestAnswerByStudentID', {testID: parseInt(this.$route.query.testID, 10) , questions: formattedAnswers});
         if (response.data.success) {
           console.log('Answers submitted successfully');
         } else {
