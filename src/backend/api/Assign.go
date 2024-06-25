@@ -10,8 +10,8 @@ func GetAssignsByAssignName(db *gorm.DB, assignName string) ([]Assignments, erro
 	return assign, nil
 }
 
-func GetStuAnswerByStuName(db *gorm.DB, stuName string) (Assignments, error) {
-	var assign Assignments
+func GetAssignsByStuName(db *gorm.DB, stuName string) ([]Assignments, error) {
+	var assign []Assignments
 	if err := db.Table("assignments").Where("stu_name = ?", stuName).Find(&assign).Error; err != nil {
 		return assign, err
 	}
@@ -32,4 +32,12 @@ func (a *Assignments) UpdateScore(db *gorm.DB) error {
 		return err
 	}
 	return nil
+}
+
+func QueryAssignsByTestAndStu(db *gorm.DB, testId int, stuName string) ([]Assignments, error) {
+	var assign []Assignments
+	if err := db.Table("assignments").Where("test_id = ? AND stu_name = ?", testId, stuName).Find(&assign).Error; err != nil {
+		return assign, err
+	}
+	return assign, nil
 }

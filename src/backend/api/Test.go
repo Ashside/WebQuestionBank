@@ -158,3 +158,24 @@ func QueryGradeByTestIdAndQuestionId(db *gorm.DB, testId int, questionId int) (i
 	}
 	return int(test.Grade), nil
 }
+
+func QueryTestsByStuName(db *gorm.DB, username string) ([]Tests, error) {
+	// 查询学生的所有测试
+	var tests []Tests
+	if err := db.Table("tests").Where("stu_name = ?", username).Find(&tests).Error; err != nil {
+		return nil, err
+	}
+	return tests, nil
+}
+func QueryTestNameByTestId(db *gorm.DB, t int) string {
+	var test Tests
+	if err := db.Table("tests").Where("id = ?", t).First(&test).Error; err != nil {
+		return ""
+	}
+	return test.Name
+}
+
+func isTestFinished(db *gorm.DB, t int, username string) bool {
+	// TODO:待完成
+	return false
+}
