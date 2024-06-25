@@ -98,8 +98,11 @@ func AddTest(db *gorm.DB, t *Tests) error {
 		return err
 
 	}
-	if len(tests) != 0 {
-		t.Name = t.Name + "1"
+	// 如果有多个id不同的test的name相同，那么name+id
+	for _, test := range tests {
+		if test.Name == t.Name && test.Id != t.Id {
+			t.Name += strconv.Itoa(t.Id)
+		}
 
 	}
 	// 添加测试
@@ -147,11 +150,32 @@ func QueryQuesIdByTestID(db *gorm.DB, id int) []int {
 	return quesId
 }
 
-func GetGradeByTestIdAndQuestionId(db *gorm.DB, testId int, questionId int) (int, error) {
+func QueryGradeByTestIdAndQuestionId(db *gorm.DB, testId int, questionId int) (int, error) {
 	// 查询该题目的分数
 	var test Tests
 	if err := db.Table("tests").Where("id = ? AND question_id = ?", testId, questionId).Find(&test).Error; err != nil {
 		return 0, err
 	}
 	return int(test.Grade), nil
+}
+
+func QueryTestsByStuName(db *gorm.DB, username string) ([]Tests, error) {
+	// 查询学生的所有测试
+	var tests []Tests
+	if err := db.Table("tests").Where("stu_name = ?", username).Find(&tests).Error; err != nil {
+		return nil, err
+	}
+	return tests, nil
+}
+func QueryTestNameByTestId(db *gorm.DB, t int) string {
+	var test Tests
+	if err := db.Table("tests").Where("id = ?", t).First(&test).Error; err != nil {
+		return ""
+	}
+	return test.Name
+}
+
+func isTestFinished(db *gorm.DB, t int, username string) bool {
+	// TODO:待完成
+	return false
 }
