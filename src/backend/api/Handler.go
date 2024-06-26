@@ -812,6 +812,7 @@ func DistributeTestPost(context *gin.Context) {
 			assign.StuAnswer = ""
 			assign.StuScore = -1
 			assign.AssignName = request.Username
+			assign.Finished = false
 			if err := assign.AddAssign(db); err != nil {
 				if errors.Is(err, gorm.ErrDuplicatedKey) {
 					log.Println("Duplicated key")
@@ -969,7 +970,7 @@ func QueryTestStateByStudentIDPost(context *gin.Context) {
 		// 要查的学生 ID
 		StudentUsername string `form:"studentUsername"`
 		// 要查的测试 ID
-		TestID int `form:"testID"`
+		TestID string `form:"testID"`
 	}
 	// 选择题选项，选择题需要填写，简答题不需要
 	type Option struct {
@@ -1024,8 +1025,8 @@ func QueryTestStateByStudentIDPost(context *gin.Context) {
 
 	// 查询试卷
 	var assign []Assignments
-
-	assign, _ = QueryAssignsByTestAndStu(db, request.TestID, request.StudentUsername)
+	tId, _ := strconv.Atoi(request.TestID)
+	assign, _ = QueryAssignsByTestAndStu(db, tId, request.StudentUsername)
 
 	var response Response
 	for _, a := range assign {
@@ -1070,7 +1071,7 @@ func QueryTestStateByStudentIDPost(context *gin.Context) {
 }
 
 func SaveTestAnswerByStudentIDPost(context *gin.Context) {
-	type RequestElement struct {
+	type Question struct {
 		// 题目ID
 		ID int64 `json:"id"`
 		// 学生答案
@@ -1078,7 +1079,13 @@ func SaveTestAnswerByStudentIDPost(context *gin.Context) {
 		// 题目类型
 		Type string `json:"type"`
 	}
-	type Request []RequestElement
+	type Request struct {
+		Questions []Question `form:"questions"`
+		// 学生用户名
+		StudentUsername string `form:"studentUsername"`
+		// 测试ID
+		TestID int64 `form:"testID"`
+	}
 
 	type Response struct {
 		// 原因，如果失败返回原因，如果成功则为 null
@@ -1094,6 +1101,38 @@ func SaveTestAnswerByStudentIDPost(context *gin.Context) {
 		return
 	}
 
-	// 查询用户是否存在
+	// 查询试卷
+	db, err := getDatabase()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+		return
+	}
 
+	// 查询用户是否存在
+	var user Users
+	if err := GetUserByUsername(db, request.StudentUsername, &user); err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Users not found"})
+		return
+	}
+
+	// 更新学生答案
+	for _, q := range request.Questions {
+		var assign Assignments
+		assign.QuestionId = int(q.ID)
+		assign.StuName = request.StudentUsername
+		assign.TestId = int(request.TestID)
+		assign.StuAnswer = q.StudentAnswer
+		assign.Finished = true
+		if err := assign.UpdateAnswer(db); err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+			return
+		}
+		if err := assign.UpdateFinished(db); err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+			return
+		}
+
+	}
+
+	context.JSON(http.StatusOK, gin.H{"success": true, "reason": ""})
 }
