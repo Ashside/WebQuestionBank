@@ -18,11 +18,11 @@
   </div>
 </template>
 
-
 <script>
 import ShortAnswerBlock from "@/components/AnswerBlock.vue";
 import axios from 'axios';
 import store from "@/store";
+import router from "@/router";
 
 export default {
   components: { ShortAnswerBlock },
@@ -35,8 +35,8 @@ export default {
     async fetchQuestions() {
       try {
         const response = await axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/queryTestStateByStudentID', {
-            studentUsername: store.state.username, // 将占位符替换为实际的学生ID
-            testID: this.$route.query.testID || -1,
+          studentUsername: store.state.username, // 将占位符替换为实际的学生ID
+          testID: this.$route.query.testID || -1,
         });
 
         if (response.data.success) {
@@ -71,9 +71,14 @@ export default {
       });
 
       try {
-        const response = await axios.post(process.env["VUE_APP_API_URL"]+'/api/questionBank/saveTestAnswerByStudentID', {testID: parseInt(this.$route.query.testID, 10), studentUsername: store.state.username, questions: formattedAnswers});
+        const response = await axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/saveTestAnswerByStudentID', {
+          testID: parseInt(this.$route.query.testID, 10),
+          studentUsername: store.state.username,
+          questions: formattedAnswers
+        });
         if (response.data.success) {
           console.log('Answers submitted successfully');
+          router.push('/home');
         } else {
           console.error('Failed to submit answers:', response.data.reason);
         }
@@ -82,13 +87,43 @@ export default {
       }
     },
 
-    submitAnswers() {
-      // 提交答案的逻辑
-      console.log('Submitting answers:', this.questions);
-      // 可以通过API提交答案
-      // axios.post('/api/submitAnswers', { answers: this.questions })
-      //   .then(response => { ... })
-      //   .catch(error => { ... });
+    async submitAnswers() {
+      const confirmSubmit = window.confirm('确定要提交答案吗？提交后将无法修改。');
+      if (!confirmSubmit) {
+        return;
+      }
+
+      const formattedAnswers = this.questions.map(q => {
+        if (q.type === 'multipleChoice') {
+          return {
+            id: parseInt(q.id, 10),  // 确保ID为整数类型
+            type: q.type,
+            studentAnswer: q.studentAnswer,
+          };
+        } else {
+          return {
+            id: parseInt(q.id, 10),  // 确保ID为整数类型
+            type: q.type,
+            studentAnswer: q.studentAnswer,
+          };
+        }
+      });
+
+      try {
+        const response = await axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/submitTestAnswerByStudentID', {
+          testID: parseInt(this.$route.query.testID, 10),
+          studentUsername: store.state.username,
+          questions: formattedAnswers
+        });
+        if (response.data.success) {
+          console.log('Answers submitted successfully');
+          router.push('/home');
+        } else {
+          console.error('Failed to submit answers:', response.data.reason);
+        }
+      } catch (error) {
+        console.error('Error submitting answers:', error);
+      }
     },
   },
   mounted() {
@@ -96,7 +131,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 #app {
