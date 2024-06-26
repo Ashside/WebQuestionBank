@@ -60,7 +60,7 @@
     <div class="button-container">
       <button @click="openModal">提交选中的题目</button>
       <transition name="fade">
-        <button v-if="submissionSuccess" @click="viewPDFDocument">查看试卷PDF文档</button>
+        <button v-if="submissionSuccess" @click="goToViewTestDocument">查看试卷</button>
       </transition>
     </div>
     <div v-if="isModalOpen" class="modal">
@@ -140,7 +140,7 @@
     <div class="button-container">
       <button v-if="aiSubmitButton" @click="openModal">提交选中的题目</button>
       <transition name="fade">
-        <button v-if="submissionSuccess" @click="viewPDFDocument">查看试卷PDF文档</button>
+        <button v-if="submissionSuccess" @click="goToViewTestDocument">查看试卷</button>
       </transition>
     </div>
     <div v-if="isModalOpen" class="modal">
@@ -166,6 +166,7 @@ import axios from 'axios';
 import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
 import NavigateBar from "@/components/NavigateBar.vue";
 import store from "@/store";
+import router from "@/router";
 
 export default {
   name: 'ViewQuestions',
@@ -289,8 +290,8 @@ export default {
       }
     },
 
-    viewPDFDocument() {
-      window.location.href = this.pdfURL;
+    goToViewTestDocument() {
+      router.push('/viewAllTests');
     },
 
     toggleAIGeneration() {
