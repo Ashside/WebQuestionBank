@@ -24,7 +24,7 @@
           <h2>标准答案</h2>
           <div v-if="questionType === 'multipleChoice'" class="choices">
             <div v-for="(option, index) in internalOptions" :key="index" class="choice">
-              <input type="checkbox" :id="'option-' + index" :checked="option.selected">
+              <input type="checkbox" :id="'option-' + index" :checked="option.selected" disabled>
               <label :for="'option-' + index">
                 <MarkdownRenderer :content="option.content" />
               </label>
@@ -38,7 +38,7 @@
           <h2>你的答案</h2>
           <div v-if="questionType === 'multipleChoice'" class="choices">
             <div v-for="(studentOption, index) in internalStudentOptions" :key="index" class="choice">
-              <input type="checkbox" :id="'option-' + index" :checked="studentOption.selected">
+              <input type="checkbox" :id="'option-' + index" :checked="studentOption.selected" disabled>
               <label :for="'option-' + index">
                 <MarkdownRenderer :content="studentOption.content" />
               </label>
