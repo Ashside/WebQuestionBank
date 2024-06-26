@@ -1,4 +1,5 @@
 <template>
+  <NavigateBar></NavigateBar>
   <h1>查看作答情况</h1>
   <div>
     <div v-if="loading">加载中...</div>
@@ -20,15 +21,21 @@
       </div>
     </div>
   </div>
+  <center>
+    <button @click="goBackToTestsView()">返回</button>
+  </center>
 </template>
 
 <script>
 import axios from 'axios';
 import AnsweringSituation from "@/components/AnsweringSituation.vue";
 import store from "@/store";
+import NavigateBar from "@/components/NavigateBar.vue";
+import router from "@/router";
 
 export default {
   components: {
+    NavigateBar,
     AnsweringSituation,
   },
   data() {
@@ -38,6 +45,9 @@ export default {
     };
   },
   methods: {
+    router() {
+      return router
+    },
     getOptions(question) {
       if (question.type === 'multipleChoice' && question.option) {
         return Object.keys(question.option).map(key => ({
@@ -74,6 +84,9 @@ export default {
           .finally(() => {
             this.loading = false;
           });
+    },
+    goBackToTestsView() {
+      this.$router.push({path: '/FinishTest'});
     }
   },
   created() {
@@ -83,5 +96,22 @@ export default {
 </script>
 
 <style scoped>
-/* 父组件样式 */
+/* 提交按钮样式 */
+button {
+  background-color: #1e88e5; /* 绿色背景 */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: block;
+  text-align: center;
+  margin-top: 20px; /* 增加顶部的间距 */
+}
+
+button:hover {
+  background-color: #2a2a72; /* 深绿色背景 */
+}
 </style>
