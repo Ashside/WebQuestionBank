@@ -82,20 +82,20 @@ export default {
     },
 
     viewTestDetails(testId) {
-      axios.post(process.env["VUE_APP_API_URL"] + `/api/questionBank/queryTestByID`, {
+      axios.post(process.env["VUE_APP_API_URL"] + "/api/questionBank/queryTestByID", {
         testId: testId,
         username: store.state.username
       })
-          .then(response => {
-            if (response.data.success) {
-              this.testDetails = response.data.test;
-              this.openModal();
-              this.testID = testId;
-              this.showSameTest = false;
-            } else {
-              console.error('Failed to fetch test details:', response.data.reason);
-            }
-          })
+    .then(response => {
+        if (response.data.success) {
+          this.testDetails = response.data.test;
+          this.openModal();
+          this.testID = testId;
+          this.showSameTest = false;
+        } else {
+          console.error('Failed to fetch test details:', response.data.reason);
+        }
+      })
           .catch(error => {
             console.error('Error fetching test details:', error);
           });
@@ -103,19 +103,19 @@ export default {
 
     findSameTest(testId) {
       this.sameTestDetails = '';
-      axios.post(process.env["VUE_APP_API_URL"] + `/api/questionBank/findSameTestByID`, {
+      axios.post(process.env["VUE_APP_API_URL"] + "/api/questionBank/findSameTestByID", {
         testId: testId,
         username: store.state.username
       })
-          .then(response => {
-            if (response.data.success) {
-              this.sameTestDetails = response.data.test;
-              this.showSameTest = true;
-            } else {
-              alert("匹配失败。原因：" + response.data.reason);
-              console.error('Failed to fetch test details:', response.data.reason);
-            }
-          })
+    .then(response => {
+        if (response.data.success) {
+          this.sameTestDetails = response.data.test;
+          this.showSameTest = true;
+        } else {
+          alert("匹配失败。原因：" + response.data.reason);
+          console.error('Failed to fetch test details:', response.data.reason);
+        }
+      })
           .catch(error => {
             alert("匹配失败", error);
             console.error('Error fetching test details:', error);
@@ -200,6 +200,8 @@ button:hover {
 .same-test-details {
   flex: 1; /* 两个子元素平分宽度 */
   margin: 0 10px; /* 调整间距 */
+  max-height: 400px; /* 固定高度 */
+  overflow-y: auto; /* 启用滚动条 */
 }
 
 </style>
