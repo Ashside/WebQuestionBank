@@ -2,10 +2,8 @@ package api
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"log"
 	"net/http"
 	"strconv"
@@ -814,10 +812,8 @@ func DistributeTestPost(context *gin.Context) {
 			assign.AssignName = request.Username
 			assign.Finished = false
 			if err := assign.AddAssign(db); err != nil {
-				if errors.Is(err, gorm.ErrDuplicatedKey) {
-					log.Println("Duplicated key")
-					continue
-				}
+				context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Error in distributing test"})
+				return
 			}
 
 		}
@@ -1122,7 +1118,7 @@ func SaveTestAnswerByStudentIDPost(context *gin.Context) {
 		assign.StuName = request.StudentUsername
 		assign.TestId = int(request.TestID)
 		assign.StuAnswer = q.StudentAnswer
-		assign.Finished = true
+		assign.Finished = false
 		if err := assign.UpdateAnswer(db); err != nil {
 			context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
 			return
@@ -1135,4 +1131,194 @@ func SaveTestAnswerByStudentIDPost(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusOK, gin.H{"success": true, "reason": ""})
+}
+
+func SubmitTestAnswerByStudentIDPost(context *gin.Context) {
+
+	type Question struct {
+		// 题目ID
+		ID int64 `json:"id"`
+		// 学生答案
+		StudentAnswer string `json:"studentAnswer"`
+		// 题目类型
+		Type string `json:"type"`
+	}
+	type Request struct {
+		Questions []Question `form:"questions"`
+		// 学生用户名
+		StudentUsername string `form:"studentUsername"`
+		// 测试ID
+		TestID int64 `form:"testID"`
+	}
+
+	type Response struct {
+		// 原因，如果失败返回原因，如果成功则为 null
+		Reason string `json:"reason"`
+		// 是否成功
+		Success bool `json:"success"`
+	}
+
+	log.Println("SubmitTestAnswerByStudentIDPost")
+	var request Request
+	if err := context.ShouldBind(&request); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"success": false, "reason": "Invalid form"})
+		return
+	}
+
+	// 查询试卷
+	db, err := getDatabase()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+		return
+	}
+
+	// 查询用户是否存在
+	var user Users
+	if err := GetUserByUsername(db, request.StudentUsername, &user); err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Users not found"})
+		return
+	}
+
+	// 更新学生答案
+	for _, q := range request.Questions {
+		var assign Assignments
+		assign.QuestionId = int(q.ID)
+		assign.StuName = request.StudentUsername
+		assign.TestId = int(request.TestID)
+		assign.StuAnswer = q.StudentAnswer
+		assign.Finished = true
+		assign.StuScore = CheckScore(db, assign)
+
+		if err := assign.UpdateAnswer(db); err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+			return
+		}
+		if err := assign.UpdateScore(db); err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+			return
+		}
+		if err := assign.UpdateFinished(db); err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+			return
+		}
+
+	}
+
+	context.JSON(http.StatusOK, gin.H{"success": true, "reason": ""})
+}
+
+func QueryTestDetailByStudentIDPost(context *gin.Context) {
+	type Request struct {
+		// 学生用户名
+		StudentUsername string `form:"studentUsername"`
+		// 测试 ID
+		TestID string `form:"testID"`
+	}
+	// 选项
+	type Option struct {
+		Option1 string `json:"option1"`
+		Option2 string `json:"option2"`
+		Option3 string `json:"option3"`
+		Option4 string `json:"option4"`
+	}
+	type Question struct {
+		// 问题标准答案
+		Answer string `json:"answer"`
+		// 满分
+		FullScore int64 `json:"fullScore"`
+		// 问题 ID
+		ID int64 `json:"id"`
+		// 判卷是否完成
+		IsReviewComplete bool `json:"isReviewComplete"`
+		// 选项
+		Option *Option `json:"option,omitempty"`
+		// 问题题干
+		Question string `json:"question"`
+		// 学生答案
+		StudentAnswer string `json:"studentAnswer"`
+		// 学生得分
+		StudentScore int64 `json:"studentScore"`
+		// 问题类型
+		Type string `json:"type"`
+	}
+	type Response struct {
+		// 问题列表
+		Questions []Question `json:"questions"`
+		// 原因
+		Reason string `json:"reason"`
+		// 是否成功
+		Success bool `json:"success"`
+	}
+
+	log.Println("QueryTestDetailByStudentIDPost")
+	var request Request
+	if err := context.ShouldBind(&request); err != nil {
+
+		context.JSON(http.StatusBadRequest, gin.H{"success": false, "reason": "Invalid form"})
+		return
+	}
+
+	db, err := getDatabase()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+		return
+	}
+
+	// 查询用户是否存在
+	var user Users
+	if err := GetUserByUsername(db, request.StudentUsername, &user); err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Users not found"})
+		return
+	}
+
+	// 查询试卷
+	var assign []Assignments
+	tID, _ := strconv.Atoi(request.TestID)
+	assign, _ = QueryAssignsByTestAndStu(db, tID, request.StudentUsername)
+
+	var response Response
+
+	for _, a := range assign {
+		ques, bExist := QueryQuestionFromId(db, a.QuestionId)
+		if !bExist {
+			context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Question not found"})
+			return
+		}
+		if ques.Options == "" {
+			response.Questions = append(response.Questions, Question{
+				Answer:           ques.Answer,
+				FullScore:        int64(a.Score),
+				ID:               int64(ques.Id),
+				IsReviewComplete: a.StuScore != -1,
+				Option:           nil,
+				Question:         ques.Content,
+				StudentAnswer:    a.StuAnswer,
+				StudentScore:     int64(a.StuScore),
+				Type:             "simpleAnswer",
+			})
+		} else {
+			var option Option
+			err := json.Unmarshal([]byte(ques.Options), &option)
+			if err != nil {
+				fmt.Println("Error unmarshalling option:", err)
+				return
+			}
+			response.Questions = append(response.Questions, Question{
+				Answer:           ques.Answer,
+				FullScore:        int64(a.Score),
+				ID:               int64(ques.Id),
+				IsReviewComplete: a.StuScore != -1,
+				Option:           &option,
+				Question:         ques.Content,
+				StudentAnswer:    a.StuAnswer,
+				StudentScore:     int64(a.StuScore),
+				Type:             "multipleChoice",
+			})
+		}
+	}
+
+	response.Success = true
+	response.Reason = ""
+	context.JSON(http.StatusOK, response)
+
 }

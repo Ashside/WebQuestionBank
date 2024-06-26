@@ -56,3 +56,19 @@ func (a *Assignments) UpdateFinished(db *gorm.DB) error {
 	}
 	return nil
 }
+func CheckScore(db *gorm.DB, assign Assignments) float64 {
+	bChoice := isChoiceQuestion(db, assign.QuestionId)
+	if bChoice {
+		// choice
+		ques, _ := QueryQuestionFromId(db, assign.QuestionId)
+		if ques.Answer == assign.StuAnswer {
+			return assign.Score
+		} else {
+			return 0
+		}
+	} else {
+		// subjective
+		return -1
+	}
+
+}
