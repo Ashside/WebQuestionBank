@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify
 from textrank.TextRank import textRank
 
+
+
 app = Flask(__name__)
 
 @app.route('/extract', methods=['POST'])

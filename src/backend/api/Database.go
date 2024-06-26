@@ -84,6 +84,8 @@ type conf struct {
 	DatabasePassword string `yaml:"DatabasePassword"`
 	DatabaseName     string `yaml:"DatabaseName"`
 	DatabaseAddress  string `yaml:"DatabaseAddress"`
+	AccessToken      string `yaml:"AccessToken"`
+	KeyNum           string `yaml:"KeyNum"`
 }
 
 func (c *conf) getConf() *conf {
