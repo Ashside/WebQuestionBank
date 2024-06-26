@@ -343,3 +343,19 @@ func getQuestionsByTypeID(db *gorm.DB, questionType string, ids []int) ([]Questi
 
 	return questions, nil
 }
+
+func isChoiceQuestion(db *gorm.DB, id int) bool {
+	var choice ChoiceQuestions
+	if err := db.Table("choicequestions").Where("id = ?", id).Take(&choice).Error; err != nil {
+		return false
+	}
+	return true
+}
+
+func isSubjectiveQuestion(db *gorm.DB, id int) bool {
+	var subjective SubjectiveQuestions
+	if err := db.Table("subjectivequestions").Where("id = ?", id).Take(&subjective).Error; err != nil {
+		return false
+	}
+	return true
+}
