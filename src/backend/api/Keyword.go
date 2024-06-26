@@ -11,9 +11,6 @@ import (
 	"strings"
 )
 
-const AccessToken = "24.dcc9972f075b3221c78daffd648b02d8.2592000.1720265395.282335-79244792"
-const KeyNum = "5"
-
 type keywordResponse struct {
 	Keyword string
 	Score   float64
@@ -21,6 +18,10 @@ type keywordResponse struct {
 
 func getKeyword(text string) ([]keywordResponse, error) {
 
+	var c conf
+	c.getConf()
+	AccessToken := c.AccessToken
+	KeyNum := c.KeyNum
 	url := "https://aip.baidubce.com/rpc/2.0/nlp/v1/txt_keywords_extraction?access_token=" + AccessToken
 	payload := strings.NewReader(`{"text":["` + text + `"],"num":` + KeyNum + `}`)
 	client := &http.Client{}
@@ -191,4 +192,54 @@ func GetKeywordsByQuestionId(db *gorm.DB, id int, bChoiceQues bool) ([]Keywords,
 	log.Println("Successfully get keywords")
 	return keywords, nil
 
+}
+
+func getKeywordFromLocal(text string) ([]keywordResponse, error) {
+	type request struct {
+		Text string `json:"text"`
+	}
+	type response struct {
+		Keywords []keywordResponse `json:"keywords"`
+	}
+	var req request
+	req.Text = text
+
+	var c conf
+	c.getConf()
+	url := "http://" + c.DatabaseAddress[:len(c.DatabaseAddress)-4] + "5000/keyword"
+	payload, err := json.Marshal(req)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	client := &http.Client{}
+	req1, err := http.NewRequest("POST", url, strings.NewReader(string(payload)))
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	req1.Header.Add("Content-Type", "application/json")
+	res, err := client.Do(req1)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}(res.Body)
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	var resp response
+	err = json.Unmarshal(body, &resp)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return resp.Keywords, nil
 }
