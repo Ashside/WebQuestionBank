@@ -806,7 +806,7 @@ func DistributeTestPost(context *gin.Context) {
 			assign.StuName = student
 			assign.TestId = request.TestID
 			quesScore, _ := QueryGradeByTestIdAndQuestionId(db, request.TestID, q)
-			assign.Score = float64(quesScore)
+			assign.Score = quesScore
 			assign.StuAnswer = ""
 			assign.StuScore = -1
 			assign.AssignName = request.Username
@@ -1118,8 +1118,14 @@ func SaveTestAnswerByStudentIDPost(context *gin.Context) {
 		assign.StuName = request.StudentUsername
 		assign.TestId = int(request.TestID)
 		assign.StuAnswer = q.StudentAnswer
+		assign.StuScore = CheckScore(db, assign)
+		log.Println(assign.StuScore)
 		assign.Finished = false
 		if err := assign.UpdateAnswer(db); err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+			return
+		}
+		if err := assign.UpdateScore(db); err != nil {
 			context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
 			return
 		}

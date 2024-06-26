@@ -1,6 +1,8 @@
 package api
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 func GetAssignsByAssignName(db *gorm.DB, assignName string) ([]Assignments, error) {
 	var assign []Assignments
@@ -61,8 +63,10 @@ func CheckScore(db *gorm.DB, assign Assignments) float64 {
 	if bChoice {
 		// choice
 		ques, _ := QueryQuestionFromId(db, assign.QuestionId)
+
 		if ques.Answer == assign.StuAnswer {
-			return assign.Score
+			score, _ := QueryGradeByTestIdAndQuestionId(db, assign.TestId, assign.QuestionId)
+			return score
 		} else {
 			return 0
 		}
