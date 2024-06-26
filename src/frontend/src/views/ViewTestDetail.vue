@@ -58,7 +58,8 @@ export default {
     },
     fetchQuestions() {
       axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/queryTestDetailByStudentID', {
-        studentUsername: store.state.username
+        studentUsername: store.state.username,
+        testID: this.$route.query.testID || -1,
       })
           .then(response => {
             if (response.data.success) {
