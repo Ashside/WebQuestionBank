@@ -4,8 +4,8 @@
     <label for="math" class="math">Math</label>
     <input type="radio" id="history" value="history" v-model="localSubject" @change="updateValue" />
     <label for="history" class="history">History</label>
-    <input type="radio" id="english" value="english" v-model="localSubject" @change="updateValue" />
-    <label for="english" class="english">English</label>
+    <input type="radio" id="chinese" value="chinese" v-model="localSubject" @change="updateValue" />
+    <label for="chinese" class="chinese">chinese</label>
   </div>
 </template>
 
@@ -71,7 +71,7 @@ export default {
   color: white;
 }
 
-.load-subject-selector label.english {
+.load-subject-selector label.chinese {
   background-color: #333333;
   color: white;
 }
@@ -88,7 +88,7 @@ export default {
   box-shadow: 0 0 15px rgba(251, 140, 0, 0.5);
 }
 
-.load-subject-selector input[type="radio"]:checked + label.english {
+.load-subject-selector input[type="radio"]:checked + label.chinese {
   background-color: #8e24aa;
   color: #fff;
   box-shadow: 0 0 15px rgba(142, 36, 170, 0.5);
