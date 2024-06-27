@@ -1,7 +1,7 @@
 <template>
   <nav class="navigate">
     <ul>
-      <li v-for="item in items" :key="item.text" @click="navigate(item.link)">
+      <li v-for="item in items" :key="item.text" @click="navigate(item.link, item.text)">
         <a href="#">
           <span>{{ item.text }}</span>
           <i :class="item.icon"></i>
@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import router from "@/router";
+import { mapActions } from 'vuex';
 
 export default {
   name: 'NavigateBar',
@@ -23,15 +23,19 @@ export default {
       default: () => [
         { text: 'Home', link: '/home', icon: 'fas fa-home' },
         { text: 'About', link: '/about', icon: 'fas fa-user' },
-        { text: 'Services', link: '/services', icon: 'fas fa-cog' },
+        { text: 'Logout', link: '/', icon: 'fas fa-sign-out-alt' },
         { text: 'Contact', link: '/contact', icon: 'fas fa-envelope' },
       ],
     },
   },
   methods: {
-    navigate(link) {
+    ...mapActions(['logout']),
+    navigate(link, text) {
+      if (text === 'Logout') {
+        this.logout();
+      }
       this.$emit('navigate', link);
-      router.push(link);
+      this.$router.push(link);
     },
   },
 };

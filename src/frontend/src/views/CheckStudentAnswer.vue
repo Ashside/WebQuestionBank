@@ -23,14 +23,14 @@
         </div>
         <div class="score-item">
           <h2>老师给的分数：
-          <input type="number" v-model="teacherScore" class="score-input">
+            <input type="number" v-model="teacherScore" class="score-input" :min="0" :max="fullScore">
           </h2>
         </div>
         <div class="submit-section">
           <button @click="submitScore" class="submit-button">提交</button>
         </div>
       </div>
-      </div>
+    </div>
   </div>
 </template>
 
@@ -62,29 +62,34 @@ export default {
 
   methods: {
     async getStudentAnswer() {
-        try{
-          const response = await axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/getStudentAnswers', {
-            username: store.state.username
-          });
-          if (response.data.success) {
-            this.standardAnswer = response.data.answer;
-            this.studentAnswer = response.data.studentAnswer;
-            this.fullScore = response.data.score;
-            this.question = response.data.question;
-            this.studentUsername = response.data.studentUsername;
-            this.questionID = response.data.questionID;
-            this.testID = response.data.testID
-          } else {
-            console.error('Failed to fetch questions:', response.data.reason);
-            // 处理API返回的错误
-          }
-        } catch (error) {
-          console.error('Error fetching questions:', error);
+      try{
+        const response = await axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/getStudentAnswers', {
+          username: store.state.username
+        });
+        if (response.data.success) {
+          this.standardAnswer = response.data.answer;
+          this.studentAnswer = response.data.studentAnswer;
+          this.fullScore = response.data.score;
+          this.question = response.data.question;
+          this.studentUsername = response.data.studentUsername;
+          this.questionID = response.data.questionID;
+          this.testID = response.data.testID
+        } else {
+          console.error('Failed to fetch questions:', response.data.reason);
+          // 处理API返回的错误
+        }
+      } catch (error) {
+        console.error('Error fetching questions:', error);
         // 处理请求错误
       }
     },
 
     async submitScore() {
+      if (this.teacherScore < 0 || this.teacherScore > this.fullScore) {
+        alert(`分数必须在 0 和 ${this.fullScore} 之间`);
+        return;
+      }
+
       try {
         const response = await axios.post(process.env["VUE_APP_API_URL"] + '/api/questionBank/submitScore', {
           username: store.state.username,
@@ -105,8 +110,6 @@ export default {
     }
   }
 }
-
-
 </script>
 
 <style scoped>
@@ -152,7 +155,7 @@ input[type="number"] {
 
 /* 提交按钮样式 */
 button {
-  background-color: #1e88e5; /* 绿色背景 */
+  background-color: #1e88e5; /* 蓝色背景 */
   color: white;
   border: none;
   padding: 10px 20px;
@@ -165,7 +168,7 @@ button {
 }
 
 button:hover {
-  background-color: #2a2a72; /* 深绿色背景 */
+  background-color: #2a2a72; /* 深蓝色背景 */
 }
 
 .answers-section {
