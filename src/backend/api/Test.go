@@ -52,10 +52,10 @@ func GenerateMdByTestID(db *gorm.DB, id int) (string, error) {
 					log.Println("Failed to unmarshal options")
 					return "", err
 				}
-				for k, v := range options {
-					mdFile += k + " : " + v + "\n"
-					mdFile += "\n"
-				}
+				mdFile += "Option1: " + options["option1"] + "\n\n"
+				mdFile += "Option2: " + options["option2"] + "\n\n"
+				mdFile += "Option3: " + options["option3"] + "\n\n"
+				mdFile += "Option4: " + options["option4"] + "\n\n"
 
 			}
 		} else {
