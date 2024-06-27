@@ -359,3 +359,10 @@ func isSubjectiveQuestion(db *gorm.DB, id int) bool {
 	}
 	return true
 }
+func isQuestionInTest(db *gorm.DB, id int) (bool, error) {
+	var test Tests
+	if err := db.Table("tests").Where("question_id = ?", id).First(&test).Error; err == nil {
+		return true, nil
+	}
+	return false, nil
+}

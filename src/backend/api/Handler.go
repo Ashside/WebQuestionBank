@@ -345,6 +345,16 @@ func DeleteQuestionPost(context *gin.Context) {
 	log.Println("Delete Questions: ", request.Questions)
 
 	for _, question := range request.Questions {
+		// 如果题目在试卷中，不允许删除
+		bExist, err := isQuestionInTest(db, question.ID)
+		if err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+			return
+		}
+		if bExist {
+			context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Question in test"})
+			return
+		}
 		// 查询题目是否存在
 		var choiceQuestion ChoiceQuestions
 		if err := db.Table("choicequestions").Where("id = ?", question.ID).First(&choiceQuestion).Error; err == nil {
