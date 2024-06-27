@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from textrank.TextRank import textRank
+from textrank import textRank
 
 
 
