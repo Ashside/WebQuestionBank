@@ -217,6 +217,8 @@ button:hover {
 .students-list {
   flex: 1;
   margin: 0 10px;
+  max-height: 400px; /* 固定高度 */
+  overflow-y: auto; /* 启用滚动条 */
 }
 
 div.markdown-container {

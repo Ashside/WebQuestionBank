@@ -45,7 +45,7 @@
           <div class="tag-container">
             <n-tag v-if="item.subject === 'history'" style="background-color: #ffa726">历史</n-tag>
             <n-tag v-else-if="item.subject === 'math'" style="background-color: #66bb6a">数学</n-tag>
-            <n-tag v-else-if="item.subject === 'english'" style="background-color: #42a5f5">英语</n-tag>
+            <n-tag v-else-if="item.subject === 'chinese'" style="background-color: #42a5f5">语文</n-tag>
 
             <n-tag v-if="item.difficulty === 1" type="success">简单</n-tag>
             <n-tag v-else-if="item.difficulty === 2" type="warning">中等</n-tag>
@@ -125,7 +125,7 @@
           <div class="tag-container">
             <n-tag v-if="item.subject === 'history'" style="background-color: #ffa726">历史</n-tag>
             <n-tag v-else-if="item.subject === 'math'" style="background-color: #66bb6a">数学</n-tag>
-            <n-tag v-else-if="item.subject === 'english'" style="background-color: #42a5f5">英语</n-tag>
+            <n-tag v-else-if="item.subject === 'chinese'" style="background-color: #42a5f5">语文</n-tag>
 
             <n-tag v-if="item.difficulty === 1" type="success">简单</n-tag>
             <n-tag v-else-if="item.difficulty === 2" type="warning">中等</n-tag>
@@ -179,7 +179,7 @@ export default {
       pdfURL: '',
       isModalOpen: false,  // 控制模态框是否显示
       testName: '',  // 存储输入的试卷名称
-      subjects: [{label: '历史', value: 'history'}, {label: '数学', value: 'math'}, {label: '英语', value: 'english'}],
+      subjects: [{label: '历史', value: 'history'}, {label: '数学', value: 'math'}, {label: '语文', value: 'chinese'}],
       selectedSubject: 'all',
       selectedDifficulty: 'all',
       aiGeneratedQuestions: [],
