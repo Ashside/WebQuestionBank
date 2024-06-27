@@ -95,8 +95,8 @@ func findAvailableKeywordId(db *gorm.DB) int {
 	if cnt == 0 {
 		id = 1
 	} else {
-		// 否则从id开始递增
-		for i := 1; i <= int(cnt)+1; i++ {
+		// 否则从cnt+1开始递增
+		for i := int(cnt) + 1; i < int(cnt)+100; i++ {
 			var existingKeyword Keywords
 			if err := db.Table("keywords").Where("id = ?", i).First(&existingKeyword).Error; err != nil {
 				id = i
@@ -104,6 +104,7 @@ func findAvailableKeywordId(db *gorm.DB) int {
 			}
 
 		}
+
 	}
 
 	return id
@@ -241,6 +242,10 @@ func getKeywordFromLocal(text string) ([]keywordResponse, error) {
 	if err != nil {
 		log.Println(err)
 		return nil, err
+	}
+	// 只返回不超过5个关键词
+	if len(resp.Keywords) > 5 {
+		return resp.Keywords[:5], nil
 	}
 	return resp.Keywords, nil
 }
