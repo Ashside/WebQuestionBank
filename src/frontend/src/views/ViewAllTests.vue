@@ -4,6 +4,7 @@
   <ul>
     <li v-for="(test, index) in tests" :key="index">
       <div class="question-header">
+        <input v-if="isAdmin" type="checkbox" v-model="test.selected">
         <h3>{{ test.name }}</h3>
         <button @click="viewTestDetails(test.id)">查看试卷</button>
       </div>
@@ -25,6 +26,9 @@
       </div>
     </div>
   </div>
+  <div class="button-container" v-if="isAdmin">
+    <button @click="submitDeleteTests">删除选中的试卷</button>
+  </div>
 </template>
 
 <script>
@@ -32,9 +36,13 @@ import axios from 'axios';
 import NavigateBar from "@/components/NavigateBar.vue";
 import store from "@/store";
 import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
+import { computed } from "vue";
+
+const storeRole = computed(() => store.state.role);
+const isAdmin = computed(() => storeRole.value === 'admin');
 
 export default {
-  components: {MarkdownRenderer, NavigateBar},
+  components: { MarkdownRenderer, NavigateBar },
 
   created() {
     this.fetchTests();
@@ -48,6 +56,7 @@ export default {
       sameTestDetails: '',
       showSameTest: false,
       testID: -1,
+      isAdmin
     }
   },
 
@@ -86,16 +95,16 @@ export default {
         testId: testId,
         username: store.state.username
       })
-    .then(response => {
-        if (response.data.success) {
-          this.testDetails = response.data.test;
-          this.openModal();
-          this.testID = testId;
-          this.showSameTest = false;
-        } else {
-          console.error('Failed to fetch test details:', response.data.reason);
-        }
-      })
+          .then(response => {
+            if (response.data.success) {
+              this.testDetails = response.data.test;
+              this.openModal();
+              this.testID = testId;
+              this.showSameTest = false;
+            } else {
+              console.error('Failed to fetch test details:', response.data.reason);
+            }
+          })
           .catch(error => {
             console.error('Error fetching test details:', error);
           });
@@ -107,18 +116,38 @@ export default {
         testId: testId,
         username: store.state.username
       })
-    .then(response => {
-        if (response.data.success) {
-          this.sameTestDetails = response.data.test;
-          this.showSameTest = true;
-        } else {
-          alert("匹配失败。原因：" + response.data.reason);
-          console.error('Failed to fetch test details:', response.data.reason);
-        }
-      })
+          .then(response => {
+            if (response.data.success) {
+              this.sameTestDetails = response.data.test;
+              this.showSameTest = true;
+            } else {
+              alert("匹配失败。原因：" + response.data.reason);
+              console.error('Failed to fetch test details:', response.data.reason);
+            }
+          })
           .catch(error => {
             alert("匹配失败", error);
             console.error('Error fetching test details:', error);
+          });
+    },
+
+    submitDeleteTests() {
+      const selectedTests = this.tests.filter(test => test.selected);
+      const selectedTestIds = selectedTests.map(test => test.id);
+      axios.post(process.env["VUE_APP_API_URL"] + "/api/questionBank/deleteTestByID", {
+        username: store.state.username,
+        id: selectedTestIds
+      })
+          .then(response => {
+            if (response.data.success) {
+              alert('Deleted successfully!');
+              this.fetchTests();
+            } else {
+              alert('Failed to delete tests.');
+            }
+          })
+          .catch(error => {
+            console.error('Error deleting tests:', error);
           });
     }
   }
@@ -126,7 +155,6 @@ export default {
 </script>
 
 <style scoped>
-
 li {
   border: 1px solid #ccc;
   margin-top: 10px;
@@ -143,14 +171,19 @@ li:hover {
 
 .question-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 }
 
 .question-header h3 {
   margin: 0;
   color: #333;
   font-size: 18px;
+  flex-grow: 1;
+}
+
+.question-header button {
+  margin-left: 10px;
 }
 
 button {
@@ -165,6 +198,34 @@ button {
 
 button:hover {
   background-color: #2a2a72;
+}
+
+input[type="checkbox"] {
+  -webkit-appearance: none; /* 移除默认外观 */
+  appearance: none;
+  background-color: #fff;
+  margin: 0 10px 0 0;
+  font-size: 1.5em;
+  color: #f44336; /* 红色 */
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f44336; /* 红色边框 */
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #f44336; /* 红色背景 */
+}
+
+input[type="checkbox"]:checked::after {
+  content: "✖"; /* 改为叉 */
+  position: absolute;
+  top: -4px; /* 根据叉的大小微调位置 */
+  left: 4px;
+  color: #fff;
+  font-size: 16px;
 }
 
 .modal {
@@ -202,6 +263,11 @@ button:hover {
   margin: 0 10px; /* 调整间距 */
   max-height: 400px; /* 固定高度 */
   overflow-y: auto; /* 启用滚动条 */
+}
+
+.button-container {
+  text-align: center;
+  margin-top: 20px;
 }
 
 </style>
