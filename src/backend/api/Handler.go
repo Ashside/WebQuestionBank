@@ -1341,8 +1341,8 @@ func QueryTestDetailByStudentIDPost(context *gin.Context) {
 
 func DeleteTestByIDPost(context *gin.Context) {
 	type Request struct {
-		// 试卷ID，要查询的试卷ID
-		ID int64 `form:"id"`
+		// 删除的试卷ID
+		ID []int64 `form:"id"`
 		// 用户名，要查询的用户名
 		Username string `form:"username"`
 	}
@@ -1379,18 +1379,22 @@ func DeleteTestByIDPost(context *gin.Context) {
 		return
 	}
 
-	// 删除试卷
-	err = DeleteTestByID(db, int(request.ID))
-	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
-		return
-	}
+	for _, id := range request.ID {
+		log.Println("Delete Test: ", id)
+		// 删除试卷
+		err = DeleteTestByID(db, int(id))
+		if err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+			return
+		}
 
-	// 删除指派
-	err = DeleteAssignByTestID(db, int(request.ID))
-	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
-		return
+		// 删除指派
+		err = DeleteAssignByTestID(db, int(id))
+		if err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+			return
+		}
+
 	}
 
 	context.JSON(http.StatusOK, gin.H{"success": true, "reason": ""})
