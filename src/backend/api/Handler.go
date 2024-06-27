@@ -694,7 +694,7 @@ func SubmitScorePost(context *gin.Context) {
 		// 题目 ID，提交的题目 ID
 		QuestionID int64 `form:"questionID" binding:"required"`
 		// 成绩
-		Score int64 `form:"score" binding:"required"`
+		Score int64 `form:"score" `
 		// 学生用户名
 		StudentUsername string `form:"studentUsername" binding:"required"`
 		// 试卷 ID
@@ -707,6 +707,7 @@ func SubmitScorePost(context *gin.Context) {
 	var request Request
 
 	if err := context.ShouldBind(&request); err != nil {
+		log.Println(err)
 		context.JSON(http.StatusBadRequest, gin.H{"success": false, "reason": "Invalid form"})
 		return
 	}
