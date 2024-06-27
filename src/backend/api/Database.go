@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 	"io/ioutil"
 	"log"
+	"os"
 )
 
 var (
@@ -80,16 +81,29 @@ type Assignments struct {
 	Finished   bool
 }
 type conf struct {
-	DatabaseUserName string `yaml:"DatabaseUserName"`
-	DatabasePassword string `yaml:"DatabasePassword"`
-	DatabaseName     string `yaml:"DatabaseName"`
-	DatabaseAddress  string `yaml:"DatabaseAddress"`
-	AccessToken      string `yaml:"AccessToken"`
-	KeyNum           string `yaml:"KeyNum"`
+	DatabaseUserName     string `yaml:"DatabaseUserName"`
+	DatabasePassword     string `yaml:"DatabasePassword"`
+	DatabaseName         string `yaml:"DatabaseName"`
+	DatabaseAddress      string `yaml:"DatabaseAddress"`
+	AccessToken          string `yaml:"AccessToken"`
+	KeyNum               string `yaml:"KeyNum"`
+	KeywordServerAddress string `yaml:"KeywordServerAddress"`
 }
 
 func (c *conf) getConf() *conf {
-	yamlFile, err := ioutil.ReadFile("./config/config.yaml")
+	// 查看当前目录
+	dir, err := os.Getwd()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	var yamlFile []byte
+	// 如果dir是以api结尾的，说明是在api目录下
+	if dir[len(dir)-3:] == "api" {
+		yamlFile, err = ioutil.ReadFile("../config/config.yaml")
+	} else {
+		yamlFile, err = ioutil.ReadFile("./config/config.yaml")
+	}
+
 	if err != nil {
 		fmt.Println(err.Error())
 	}

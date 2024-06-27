@@ -206,7 +206,8 @@ func getKeywordFromLocal(text string) ([]keywordResponse, error) {
 
 	var c conf
 	c.getConf()
-	url := "http://" + c.DatabaseAddress[:len(c.DatabaseAddress)-4] + "5000/keyword"
+	url := c.KeywordServerAddress + "/extract"
+
 	payload, err := json.Marshal(req)
 	if err != nil {
 		log.Println(err)

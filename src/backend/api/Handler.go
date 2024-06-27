@@ -140,7 +140,7 @@ func AddSimpleAnswerPost(context *gin.Context) {
 	}
 	context.JSON(http.StatusOK, gin.H{"success": true, "reason": nil})
 
-	keywords, err := getKeyword(form.Question)
+	keywords, err := getKeywordFromLocal(form.Question)
 	if err != nil {
 		return
 	}
@@ -213,7 +213,7 @@ func AddChoiceAnswerPost(context *gin.Context) {
 	// 添加成功
 	context.JSON(http.StatusOK, gin.H{"success": true, "reason": nil})
 
-	keywords, err := getKeyword(form.Question)
+	keywords, err := getKeywordFromLocal(form.Question)
 	if err != nil {
 		return
 	}
