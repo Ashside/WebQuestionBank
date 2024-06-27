@@ -91,6 +91,7 @@ func FindSamePost(c *gin.Context) {
 		temp.Content = ques.Content
 		temp.Difficulty = ques.Difficulty
 		temp.Author = ques.Author
+		temp.Options = ques.Options
 		retQuestions = append(retQuestions, temp)
 
 	}
