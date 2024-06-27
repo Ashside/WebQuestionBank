@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify
-from textrank.TextRank import textRank
+from textrank import textRank
+
+
 
 app = Flask(__name__)
 
@@ -23,4 +25,4 @@ def extract_keywords_and_summary():
     return jsonify(response)
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    app.run(host='0.0.0.0', port=5000, debug = True)

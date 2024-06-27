@@ -93,3 +93,29 @@ func Test_queryTestByID(t *testing.T) {
 		})
 	}
 }
+
+func TestDeleteTestByID(t *testing.T) {
+	type args struct {
+		db *gorm.DB
+		i  int
+	}
+	dbT, _ := getDatabase()
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name:    "1",
+			args:    args{db: dbT, i: 1},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := DeleteTestByID(tt.args.db, tt.args.i); (err != nil) != tt.wantErr {
+				t.Errorf("DeleteTestByID() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

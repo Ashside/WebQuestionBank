@@ -52,10 +52,10 @@ func GenerateMdByTestID(db *gorm.DB, id int) (string, error) {
 					log.Println("Failed to unmarshal options")
 					return "", err
 				}
-				for k, v := range options {
-					mdFile += k + " : " + v + "\n"
-					mdFile += "\n"
-				}
+				mdFile += "Option1: " + options["option1"] + "\n\n"
+				mdFile += "Option2: " + options["option2"] + "\n\n"
+				mdFile += "Option3: " + options["option3"] + "\n\n"
+				mdFile += "Option4: " + options["option4"] + "\n\n"
 
 			}
 		} else {
@@ -150,13 +150,13 @@ func QueryQuesIdByTestID(db *gorm.DB, id int) []int {
 	return quesId
 }
 
-func QueryGradeByTestIdAndQuestionId(db *gorm.DB, testId int, questionId int) (int, error) {
+func QueryGradeByTestIdAndQuestionId(db *gorm.DB, testId int, questionId int) (float64, error) {
 	// 查询该题目的分数
 	var test Tests
 	if err := db.Table("tests").Where("id = ? AND question_id = ?", testId, questionId).Find(&test).Error; err != nil {
 		return 0, err
 	}
-	return int(test.Grade), nil
+	return test.Grade, nil
 }
 
 func QueryTestsByStuName(db *gorm.DB, username string) ([]Tests, error) {
@@ -188,4 +188,22 @@ func isTestFinished(db *gorm.DB, t int, username string) bool {
 
 	}
 	return true
+}
+
+func DeleteTestByID(db *gorm.DB, i int) error {
+	var test Tests
+	test.Id = i
+	if err := test.DeleteTest(db); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (t *Tests) DeleteTest(db *gorm.DB) error {
+	// 删除测试
+	if err := db.Table("tests").Where("id = ?", t.Id).Delete(t).Error; err != nil {
+		return err
+	}
+	return nil
 }

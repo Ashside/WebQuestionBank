@@ -34,12 +34,6 @@ func FindSamePost(c *gin.Context) {
 		return
 	}
 
-	// 鉴权，学生无法操作
-	if user.Type == STUDENT {
-		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Permission denied"})
-		return
-
-	}
 	//获取id列表
 	inputIDs := QueryQuesIdByTestID(db, form.TestId)
 
@@ -97,6 +91,7 @@ func FindSamePost(c *gin.Context) {
 		temp.Content = ques.Content
 		temp.Difficulty = ques.Difficulty
 		temp.Author = ques.Author
+		temp.Options = ques.Options
 		retQuestions = append(retQuestions, temp)
 
 	}
