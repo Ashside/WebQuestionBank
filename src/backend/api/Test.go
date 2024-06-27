@@ -189,3 +189,21 @@ func isTestFinished(db *gorm.DB, t int, username string) bool {
 	}
 	return true
 }
+
+func DeleteTestByID(db *gorm.DB, i int) error {
+	var test Tests
+	test.Id = i
+	if err := test.DeleteTest(db); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (t *Tests) DeleteTest(db *gorm.DB) error {
+	// 删除测试
+	if err := db.Table("tests").Where("id = ?", t.Id).Delete(t).Error; err != nil {
+		return err
+	}
+	return nil
+}

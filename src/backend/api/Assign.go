@@ -76,3 +76,11 @@ func CheckScore(db *gorm.DB, assign Assignments) float64 {
 	}
 
 }
+
+func DeleteAssignByTestID(db *gorm.DB, testID int) error {
+	err := db.Table("assignments").Where("test_id = ?", testID).Delete(&Assignments{}).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}

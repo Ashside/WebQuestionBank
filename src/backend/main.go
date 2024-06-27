@@ -144,5 +144,9 @@ func main() {
 	// 该请求用于查询学生的试卷详情
 	questionBankGroup.POST("/queryTestDetailByStudentID", api.QueryTestDetailByStudentIDPost)
 
+	// 处理/api/questionBank/deleteTestByID
+	// 该请求用于删除试卷
+	questionBankGroup.POST("/deleteTestByID", api.DeleteTestByIDPost)
+
 	_ = r.Run(":8081")
 }

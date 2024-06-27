@@ -35,3 +35,33 @@ func TestCheckScore(t *testing.T) {
 		})
 	}
 }
+
+func TestDeleteAssignByTestID(t *testing.T) {
+	type args struct {
+		db     *gorm.DB
+		testID int
+	}
+	dbT, _ := getDatabase()
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Test1",
+			args: args{
+				db:     dbT,
+				testID: 1,
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := DeleteAssignByTestID(tt.args.db, tt.args.testID); (err != nil) != tt.wantErr {
+				t.Errorf("DeleteAssignByTestID() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

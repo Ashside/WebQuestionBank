@@ -1328,3 +1328,60 @@ func QueryTestDetailByStudentIDPost(context *gin.Context) {
 	context.JSON(http.StatusOK, response)
 
 }
+
+func DeleteTestByIDPost(context *gin.Context) {
+	type Request struct {
+		// 试卷ID，要查询的试卷ID
+		ID int64 `form:"id"`
+		// 用户名，要查询的用户名
+		Username string `form:"username"`
+	}
+	type Response struct {
+		// 原因，如果失败返回原因，如果成功则为 null
+		Reason string `json:"reason"`
+		// 是否成功
+		Success bool `json:"success"`
+	}
+
+	log.Println("DeleteTestByIDPost")
+	var request Request
+	if err := context.ShouldBind(&request); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"success": false, "reason": "Invalid form"})
+		return
+	}
+
+	db, err := getDatabase()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+		return
+	}
+
+	// 查询用户是否存在
+	var user Users
+	if err := GetUserByUsername(db, request.Username, &user); err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Users not found"})
+		return
+	}
+
+	// 鉴权
+	if user.Type == STUDENT {
+		context.JSON(http.StatusUnauthorized, gin.H{"success": false, "reason": "Permission denied"})
+		return
+	}
+
+	// 删除试卷
+	err = DeleteTestByID(db, int(request.ID))
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+		return
+	}
+
+	// 删除指派
+	err = DeleteAssignByTestID(db, int(request.ID))
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"success": false, "reason": "Internal error"})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"success": true, "reason": ""})
+}
