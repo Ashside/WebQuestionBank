@@ -987,8 +987,7 @@ func QueryTestStateByStudentIDPost(context *gin.Context) {
 		Option4 string `json:"option4"`
 	}
 	type Question struct {
-		// 答案
-		Answer string `json:"answer"`
+
 		// 题目id
 		ID int64 `json:"id"`
 		// 选择题选项，选择题需要填写，简答题不需要
@@ -1044,7 +1043,6 @@ func QueryTestStateByStudentIDPost(context *gin.Context) {
 		}
 		if ques.Options == "" {
 			response.Questions = append(response.Questions, Question{
-				Answer:        ques.Answer,
 				ID:            int64(ques.Id),
 				Option:        nil,
 				Question:      ques.Content,
@@ -1059,7 +1057,6 @@ func QueryTestStateByStudentIDPost(context *gin.Context) {
 				return
 			}
 			response.Questions = append(response.Questions, Question{
-				Answer: ques.Answer,
 				ID:     int64(ques.Id),
 				Option: &option,
 
