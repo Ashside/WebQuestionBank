@@ -10,7 +10,7 @@
         <h2>{{ title }}</h2>
         <div class="scores">
           <div class="score">满分: {{ fullScore }}</div>
-          <div class="score">你的得分: {{ studentScore }}</div>
+          <div class="score" v-if="isReviewComplete">你的得分: {{ studentScore }}</div>
         </div>
       </div>
       <div class="editor-preview-container">
