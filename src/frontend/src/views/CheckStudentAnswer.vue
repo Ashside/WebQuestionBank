@@ -49,7 +49,7 @@ export default {
       standardAnswer: "",
       studentAnswer: "",
       fullScore: 10,
-      teacherScore: 8,
+      teacherScore: 0,
       studentUsername: "",
       questionID: -1,
       testID: -1
