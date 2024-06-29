@@ -1,19 +1,40 @@
 # 2024年春季实践项目
 
-## 第二轮开发进度
+本项目项目是一个题库管理、作答的综合平台，旨在通过前后端分离技术实现题库管理、组卷、在线答题等功能。该系统支持多种题型处理，允许教师基于科目和难度等条件组卷，同时提供AI组卷选项以自动生成试卷。系统使用 Vue 3 和 Golang 开发，依托 Markdown 来提升显示和编辑体验，确保内容的实时渲染和格式化展示。此外，系统还具备自动和手动批阅功能，支持教师和学生角色的互动，为提升教育质量和学习效率提供了强有力的技术支持。
 
-### 前端
+## 实现功能
 
-- [x] 老师录入题目界面
-- [x] 相似卷查找界面
-- [x] 相似卷添加界面功能
-- [x] 题目检索功能
-- [x] 学生作答功能
-- [x] 老师批改功能
+### 以不同身份注册使用
 
-#### maybe:
-- [ ] 老师查看学生总体数据功能
-- [ ] 题目修改功能
+以学生、管理员和教师三种身份进行注册使用：
+
+<div style="display: flex; justify-content: center;">
+    <img src="./graph/login_1.png" alt="Image 1" style="width: 45%; margin-right: 10px;">
+    <img src="./graph/login_2.png" alt="Image 2" style="width: 45%; margin-left: 10px;">
+</div>
+
+登录后来到主页。不同的身份有不同的可使用功能。左侧为教师与管理员页，右侧为学生页。
+
+<div style="display: flex; justify-content: center;">
+    <img src="./graph/teacher_page.png" alt="Image 1" style="width: 45%; margin-right: 10px;">
+    <img src="./graph/student_page.png" alt="Image 2" style="width: 45%; margin-left: 10px;">
+</div>
+
+录入题目分为简答题和选择题，选择题你可以用以下的方式录入，录入的时候可以选择难度和科目：
+
+<div style="display: flex;">
+  <div style="flex: 1; text-align: center;">
+    <img src="./graph/loadQ1.png" alt="Left Image" style="width: 100%; max-width: 300px;">
+  </div>
+  <div style="flex: 1; display: flex; flex-direction: column;">
+    <div style="flex: 1; text-align: center;">
+      <img src="./graph/loadQ2.png" alt="Right Top Image" style="width: 100%; max-width: 300px;">
+    </div>
+    <div style="flex: 1; text-align: center;">
+      <img src="./graph/loadQ3.png" alt="Right Bottom Image" style="width: 100%; max-width: 300px;">
+    </div>
+  </div>
+</div>
 
 ## Requirements
 
@@ -32,8 +53,6 @@
 ### AI 模块
 
 AI 模块需要安装 Python 3.7 或更高版本，并安装 numpy, gensim 以及 flask 库以运行。
-
-## 实现功能
 
 ## 如何部署和配置
 
@@ -130,9 +149,9 @@ pip install Flask gensim numpy jieba
 file_path = '/home/user/tencent-embedding/tencent-ailab-embedding-zh-d100-v0.2.0-s.txt'
 ```
 
-## OpenAPI
+## 其他信息
 
-我们使用 Apifox 组织 API，你可以在[此网站](https://apifox.com/apidoc/shared-6bd451e3-8d10-40a4-bb52-5ce49f6262de)中查到目前开放的API接口。
+其他信息你可以在我们的 wiki 中查看。
 
 ## Acknowledgement
 
