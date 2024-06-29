@@ -1,7 +1,0 @@
-DatabaseUserName: "yourname"
-DatabasePassword: "yourpassword"
-DatabaseName: "yourdatabase"
-DatabaseAddress: "youripaddress:3306"
-KeywordServerAddress: "youripaddress:5000"
-AccessToken: "yourtoken"
-KeyNum: "5"
